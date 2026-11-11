@@ -1,0 +1,112 @@
+<!-- SECTION ACCUEIL : STOCKAGE, 4 CARTES D'ACTION ALIGNÉES & APPLICATIONS -->
+<header class="card" id="sec_home">
+  <!-- STOCKAGE (Point 11 : "238 Go libres sur 1,8 To" en grand, détail masqué si 0 Mo) -->
+  <div class="status-box" style="margin-bottom:var(--space-3)">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px">
+      <span style="font-size:var(--text-base);font-weight:700;color:var(--text-secondary)">💽 Stockage du serveur</span>
+      <strong id="disk_txt" style="font-size:var(--text-lg);color:var(--text-primary)">Calcul de l'espace disponible...</strong>
+    </div>
+    <div class="p-bar-bg" style="height:12px;margin:10px 0"><div id="disk_bar" class="p-bar-fill"></div></div>
+    <div id="disk_details" style="font-size:var(--text-xs);color:var(--text-secondary);display:none;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:6px"></div>
+  </div>
+
+  <!-- 4 CARTES D'ACCUEIL À LA MÊME HAUTEUR AVEC ICÔNE + TITRE ALIGNÉS + CHEVRON (Point 3) -->
+  <h2 style="margin-bottom:var(--space-1)">Que souhaitez-vous faire ?</h2>
+  <p class="sub">Accédez directement à chaque espace de votre serveur multimédia :</p>
+
+  <div class="home-actions-grid" role="navigation" aria-label="Actions principales">
+    <a href="#sec_music" class="home-action-card">
+      <div class="home-action-head">
+        <div class="home-action-title-group">
+          <span class="home-action-icon" aria-hidden="true">🎧</span>
+          <span>Écouter de la musique</span>
+        </div>
+        <span class="home-action-chevron" aria-hidden="true">→</span>
+      </div>
+      <p class="home-action-desc">Ouvrir IlianTify, écouter un extrait de 30s ou ajouter un titre et un album.</p>
+    </a>
+
+    <a href="#sec_catalog" class="home-action-card">
+      <div class="home-action-head">
+        <div class="home-action-title-group">
+          <span class="home-action-icon" aria-hidden="true">🍿</span>
+          <span>Regarder ou ajouter une vidéo</span>
+        </div>
+        <span class="home-action-chevron" aria-hidden="true">→</span>
+      </div>
+      <p class="home-action-desc">Parcourir le catalogue Films, Séries, Disney+, HBO et Animés en VF ou VOSTFR.</p>
+    </a>
+
+    <a href="#sec_library" class="home-action-card">
+      <div class="home-action-head">
+        <div class="home-action-title-group">
+          <span class="home-action-icon" aria-hidden="true">🗂️</span>
+          <span>Gérer ma bibliothèque</span>
+        </div>
+        <span class="home-action-chevron" aria-hidden="true">→</span>
+      </div>
+      <p class="home-action-desc">Consulter les dossiers téléchargés sur le disque ou supprimer une saison vue.</p>
+    </a>
+
+    <a href="#sec_remote" class="home-action-card">
+      <div class="home-action-head">
+        <div class="home-action-title-group">
+          <span class="home-action-icon" aria-hidden="true">🌐</span>
+          <span>Accéder à distance</span>
+        </div>
+        <span class="home-action-chevron" aria-hidden="true">→</span>
+      </div>
+      <p class="home-action-desc">Ouvrir le serveur à la maison en Wi-Fi, hors de chez vous en 4G/5G ou via VPN fixe.</p>
+    </a>
+  </div>
+
+  <!-- APPLICATIONS DU SERVEUR (Même alignement, hauteur uniforme, 1 seule action principale bleue) -->
+  <div style="margin-top:var(--space-3);padding-top:var(--space-2);border-top:1px solid var(--border-subtle)">
+    <div style="font-size:var(--text-sm);font-weight:700;color:var(--text-secondary);margin-bottom:8px">Applications installées sur le serveur :</div>
+    <div class="app-shortcuts-grid">
+      <button type="button" class="app-shortcut-btn" onclick="openService(8096, window.JF_URL, '/web/index.html#!/home.html')">
+        <span style="display:flex;align-items:center;gap:10px">
+          <span aria-hidden="true" style="font-size:1.25rem">🍿</span>
+          <span>
+            <b style="display:block;font-size:var(--text-sm)">Mon Netflix (Jellyfin)</b>
+            <small style="color:var(--text-secondary);font-size:var(--text-xs)">Streaming Films & Séries</small>
+          </span>
+        </span>
+        <span aria-hidden="true" style="color:var(--text-secondary)">↗</span>
+      </button>
+
+      <a class="app-shortcut-btn" href="/iliantify" style="text-decoration:none">
+        <span style="display:flex;align-items:center;gap:10px">
+          <span aria-hidden="true" style="font-size:1.25rem">🎧</span>
+          <span>
+            <b style="display:block;font-size:var(--text-sm)">IlianTify</b>
+            <small style="color:var(--text-secondary);font-size:var(--text-xs)">Lecteur musical autonome</small>
+          </span>
+        </span>
+        <span aria-hidden="true" style="color:var(--text-secondary)">↗</span>
+      </a>
+
+      <button type="button" class="app-shortcut-btn" onclick="openService(4533, window.ND_URL, '/app/')">
+        <span style="display:flex;align-items:center;gap:10px">
+          <span aria-hidden="true" style="font-size:1.25rem">🎵</span>
+          <span>
+            <b style="display:block;font-size:var(--text-sm)">Navidrome</b>
+            <small style="color:var(--text-secondary);font-size:var(--text-xs)">Serveur audio Subsonic</small>
+          </span>
+        </span>
+        <span aria-hidden="true" style="color:var(--text-secondary)">↗</span>
+      </button>
+
+      <button type="button" class="app-shortcut-btn" onclick="openService(8080, window.FB_URL, '/')">
+        <span style="display:flex;align-items:center;gap:10px">
+          <span aria-hidden="true" style="font-size:1.25rem">📁</span>
+          <span>
+            <b style="display:block;font-size:var(--text-sm)">FileBrowser</b>
+            <small style="color:var(--text-secondary);font-size:var(--text-xs)">Explorateur de fichiers</small>
+          </span>
+        </span>
+        <span aria-hidden="true" style="color:var(--text-secondary)">↗</span>
+      </button>
+    </div>
+  </div>
+</header>

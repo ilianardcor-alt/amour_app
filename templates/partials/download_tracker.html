@@ -1,0 +1,58 @@
+<!-- ZONE TÉLÉCHARGEMENTS COHÉRENTE (Point 5 : État vide OU Carte de progression active, jamais les deux) -->
+<section class="card" id="sec_downloads" aria-labelledby="title_dl_box">
+  <h2>
+    <span id="title_dl_box">📥 Suivi des téléchargements</span>
+    <span id="dl_state" class="badge badge-neutral">Aucun téléchargement</span>
+  </h2>
+
+  <!-- ÉTAT 1 : AUCUN TÉLÉCHARGEMENT EN COURS (Affiché par défaut quand active === false) -->
+  <div id="dl_empty_state" class="status-box" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span aria-hidden="true" style="font-size:1.35rem">✨</span>
+      <div>
+        <div style="font-size:var(--text-base);font-weight:600;color:var(--text-primary)">Aucun téléchargement en cours</div>
+        <div id="dl_idle_note" style="font-size:var(--text-sm);color:var(--text-secondary)">Choisissez une musique ou une vidéo ci-dessous pour lancer un téléchargement.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ÉTAT 2 : CARTE DE PROGRESSION ACTIVE (Affichée UNIQUEMENT quand active === true) -->
+  <div class="status-box" id="dl_active_card" style="display:none;border-color:var(--border-focus)">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        <div id="dl_title" style="font-size:var(--text-base);font-weight:700;color:var(--text-primary)">Téléchargement en cours</div>
+        <div id="dl_step" style="font-size:var(--text-sm);color:var(--text-secondary)">Préparation...</div>
+      </div>
+      <button type="button" id="btn_stop_main" class="btn-danger btn-sm" onclick="stopDownload()">⏹️ Arrêter le téléchargement</button>
+    </div>
+    <div class="p-bar-bg" style="height:12px;margin:10px 0"><div id="dl_bar" class="p-bar-fill"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:var(--text-sm);color:var(--text-secondary)">
+      <span>Progression : <b id="dl_pct" style="color:var(--text-primary)">0%</b></span>
+      <span>Vitesse : <b id="dl_speed" style="color:var(--text-primary)">-</b></span>
+    </div>
+  </div>
+</section>
+
+<!-- DOCK FLOTTANT DE TÉLÉCHARGEMENT EN BAS DE L'ÉCRAN (VISIBLE SANS SCROLLER !) -->
+<div id="floating_dl_dock" class="floating-dl-dock" role="region" aria-label="Téléchargement en cours" style="display:none">
+  <div class="floating-dl-inner">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+        <span class="dl-spinner" id="dock_spinner" aria-hidden="true"></span>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <b id="dock_dl_title" style="font-size:var(--text-base);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Téléchargement en cours...</b>
+            <span id="dock_dl_badge" class="badge badge-warning">⏳ En cours</span>
+          </div>
+          <div id="dock_dl_step" style="font-size:var(--text-sm);color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Démarrage...</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+        <span style="font-size:var(--text-sm);font-weight:700"><span id="dock_dl_pct">0%</span> • <span id="dock_dl_speed">-</span></span>
+        <button type="button" id="btn_stop_dock" class="btn-danger btn-sm" onclick="stopDownload()">⏹️ Arrêter</button>
+        <button type="button" class="btn-ghost btn-sm" onclick="dismissFloatingDock()" aria-label="Fermer le bandeau de suivi" title="Réduire le bandeau">✕</button>
+      </div>
+    </div>
+    <div class="p-bar-bg" style="height:8px;margin:8px 0 0 0"><div id="dock_dl_bar" class="p-bar-fill"></div></div>
+  </div>
+</div>
