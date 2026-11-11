@@ -1,0 +1,41 @@
+<!-- SECTION TÉLÉCHARGEMENT PAR LIEN (YOUTUBE, TIKTOK, X / TWITTER) -->
+<section class="card" id="sec_social_dl">
+  <div class="card-title">
+    <div>
+      <h2>🔗 Télécharger via un lien (YouTube, TikTok, X / Twitter)</h2>
+      <p class="section-subtitle">Collez le lien d'une vidéo YouTube, TikTok, X (Twitter), Instagram ou Reddit pour la télécharger en MP4 HD ou en audio MP3</p>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <span class="badge badge-neutral">▶️ YouTube</span>
+      <span class="badge badge-neutral">🎵 TikTok</span>
+      <span class="badge badge-neutral">🐦 X / Twitter</span>
+    </div>
+  </div>
+
+  <!-- Champ de lien avec bouton d'action intégré -->
+  <div class="search-input-integrated">
+    <label for="social_dl_url" class="sr-only">Lien de la vidéo YouTube, TikTok ou Twitter</label>
+    <input
+      id="social_dl_url"
+      type="url"
+      placeholder="Collez votre lien ici (ex : https://www.youtube.com/watch?v=... ou https://www.tiktok.com/...)"
+      onkeydown="if(event.key==='Enter') startSocialLinkDownload(document.getElementById('social_dl_btn'))"
+    >
+    <button type="button" class="clear-x" onclick="clearSocialUrlInput()" aria-label="Effacer le lien" title="Effacer">✕</button>
+    <button type="button" id="social_dl_btn" class="btn-primary search-submit-btn" onclick="startSocialLinkDownload(this)">
+      📥 Télécharger
+    </button>
+  </div>
+
+  <!-- Sélecteur de format (Vidéo MP4 ou Audio MP3) -->
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:var(--space-2)">
+    <div class="segmented-control" role="tablist" aria-label="Format de téléchargement" style="margin-bottom:0">
+      <button type="button" id="sfmt_mp4" class="seg-btn active" role="tab" aria-selected="true" onclick="selectSocialFormat('mp4')">🎬 Vidéo MP4 (HD)</button>
+      <button type="button" id="sfmt_mp3" class="seg-btn" role="tab" aria-selected="false" onclick="selectSocialFormat('mp3')">🎵 Audio uniquement (MP3)</button>
+    </div>
+    <button type="button" class="btn-ghost btn-sm" onclick="loadSocialDownloads()">🔄 Actualiser la liste</button>
+  </div>
+
+  <!-- Liste des vidéos téléchargées par lien (avec bouton Enregistrer sur mon appareil) -->
+  <div id="social_dl_results"></div>
+</section>

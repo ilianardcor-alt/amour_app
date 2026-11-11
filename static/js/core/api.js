@@ -66,6 +66,14 @@ export const api = {
   deleteFile: (path) =>
     fetch("/api/delete_file", { method: "POST", body: toFormData({ path }) }),
 
+  // Téléchargement rapide par lien (YouTube, TikTok, X / Twitter)
+  downloadSocialLink: (url, format = "mp4") =>
+    request("/api/social_download", {
+      method: "POST",
+      body: toFormData({ url, format }),
+    }),
+  getSocialDownloads: () => request("/api/social_downloads_list"),
+
   // Accès distant & Administration
   connectTailscale: () =>
     request("/api/tailscale_connect", { method: "POST" }),

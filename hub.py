@@ -4606,6 +4606,169 @@ def stream():
     return "Introuvable", 404
 
 
+@app.route("/download_file")
+def download_file_attachment():
+    p = os.path.abspath(request.args.get("path", ""))
+    if p.startswith(os.path.abspath(MEDIAS_DIR)) and os.path.isfile(p):
+        return send_file(p, as_attachment=True, download_name=os.path.basename(p))
+    return "Introuvable", 404
+
+
+SOCIAL_DL_DIR = os.path.join(FILMS_DIR, "Videos_Web")
+os.makedirs(SOCIAL_DL_DIR, exist_ok=True)
+
+
+def social_download_worker(url, fmt="mp4"):
+    global CURRENT_PROC
+    STATUS["active"], STATUS["stop"], STATUS["error"] = True, False, ""
+    fmt = "mp3" if (fmt or "").lower() == "mp3" else "mp4"
+    u_low = (url or "").lower()
+    if "tiktok.com" in u_low:
+        plat = "TikTok"
+    elif "twitter.com" in u_low or "x.com" in u_low:
+        plat = "X / Twitter"
+    elif "instagram.com" in u_low:
+        plat = "Instagram"
+    elif "youtu" in u_low:
+        plat = "YouTube"
+    else:
+        plat = "Lien Web"
+
+    STATUS["title"] = f"🔗 {plat} ({fmt.upper()})"
+    STATUS["step"] = f"🔍 Extraction du lien {plat}..."
+    STATUS["percent"] = 5
+    STATUS["speed"] = "-"
+    os.makedirs(SOCIAL_DL_DIR, exist_ok=True)
+    ytdlp_bin = os.path.join(BIN_DIR, "yt-dlp.exe")
+    out_tmpl = os.path.join(SOCIAL_DL_DIR, "%(title).75B [%(extractor)s].%(ext)s")
+
+    if fmt == "mp3":
+        cmd = [
+            ytdlp_bin,
+            "--no-playlist",
+            "--no-check-certificate",
+            "--geo-bypass",
+            "--newline",
+            "-x",
+            "--audio-format",
+            "mp3",
+            "--audio-quality",
+            "0",
+            "-o",
+            out_tmpl,
+            url,
+        ]
+    else:
+        cmd = [
+            ytdlp_bin,
+            "--no-playlist",
+            "--no-check-certificate",
+            "--geo-bypass",
+            "--concurrent-fragments",
+            "4",
+            "-S",
+            "res:1080,codec:h264:m4a",
+            "--merge-output-format",
+            "mp4",
+            "--newline",
+            "-o",
+            out_tmpl,
+            url,
+        ]
+
+    try:
+        CURRENT_PROC = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            encoding="utf-8",
+            errors="ignore",
+            env=get_env(),
+        )
+        last_err = ""
+        for line in CURRENT_PROC.stdout:
+            if STATUS["stop"]:
+                try:
+                    CURRENT_PROC.kill()
+                except Exception:
+                    pass
+                break
+            ls = line.strip()
+            if "[download]" in ls and "%" in ls:
+                m_pct = re.search(r"(\d+(?:\.\d+)?)%", ls)
+                m_spd = re.search(r"at\s+([0-9.]+[a-zA-Z/]+)", ls)
+                if m_pct:
+                    STATUS["percent"] = float(m_pct.group(1))
+                if m_spd:
+                    STATUS["speed"] = m_spd.group(1)
+                STATUS["step"] = f"📥 Téléchargement {plat} ({fmt.upper()}) en cours..."
+            elif "Destination:" in ls:
+                fname = os.path.basename(ls.split("Destination:", 1)[1].strip())
+                STATUS["step"] = f"📥 {fname[:60]}"
+            elif "ERROR:" in ls:
+                last_err = ls
+        CURRENT_PROC.wait()
+
+        if STATUS["stop"]:
+            STATUS["title"] = "Aucun téléchargement actif"
+            STATUS["step"] = "⏹️ Téléchargement arrêté par l'utilisateur."
+            STATUS["percent"] = 0
+            STATUS["speed"] = "-"
+        elif CURRENT_PROC.returncode == 0 or not last_err:
+            refresh_jellyfin_library()
+            STATUS["percent"] = 100
+            STATUS["speed"] = "-"
+            STATUS["step"] = f"✅ Vidéo {plat} ({fmt.upper()}) téléchargée !"
+            write_log(f"✅ Téléchargement par lien ({plat} / {fmt.upper()}) terminé.")
+        else:
+            STATUS["error"] = last_err[:120]
+            STATUS["step"] = f"⚠️ Échec du lien {plat}."
+            write_log(f"⚠️ Échec lien {plat} : {last_err}")
+    except Exception as e:
+        STATUS["error"] = str(e)
+        write_log(f"❌ Erreur téléchargement lien: {e}")
+    finally:
+        STATUS["active"] = False
+
+
+@app.route("/api/social_download", methods=["POST"])
+def api_social_download():
+    url = (request.form.get("url") or "").strip()
+    fmt = (request.form.get("format") or "mp4").strip().lower()
+    if not url or not url.lower().startswith(("http://", "https://")):
+        return jsonify({"ok": False, "error": "Lien invalide."})
+    enqueue_download(f"🔗 Lien ({fmt.upper()})", social_download_worker, url, fmt)
+    return jsonify({"ok": True, "queued": STATUS["queue_count"]})
+
+
+@app.route("/api/social_downloads_list")
+def api_social_downloads_list():
+    os.makedirs(SOCIAL_DL_DIR, exist_ok=True)
+    items = []
+    exts = (".mp4", ".mkv", ".webm", ".mp3", ".m4a")
+    for f in os.listdir(SOCIAL_DL_DIR):
+        if f.lower().endswith(exts) and not f.endswith(".part"):
+            fp = os.path.join(SOCIAL_DL_DIR, f)
+            if os.path.isfile(fp):
+                try:
+                    st = os.stat(fp)
+                    items.append(
+                        {
+                            "name": f,
+                            "size_mb": round(st.st_size / 1048576, 1),
+                            "path": fp,
+                            "ext": f.rsplit(".", 1)[-1].lower(),
+                            "mtime": st.st_mtime,
+                            "date": time.strftime("%d/%m %H:%M", time.localtime(st.st_mtime)),
+                        }
+                    )
+                except Exception:
+                    pass
+    items.sort(key=lambda x: x["mtime"], reverse=True)
+    return jsonify({"files": items})
+
+
 @app.route("/api/delete_file", methods=["POST"])
 def api_delete_file():
     p = os.path.abspath(request.form.get("path", ""))

@@ -75,6 +75,13 @@ import {
   quickTermLinks,
   restartServices,
 } from "./features/admin.js";
+import {
+  clearSocialUrlInput,
+  selectSocialFormat,
+  startSocialLinkDownload,
+  loadSocialDownloads,
+  deleteSocialFile,
+} from "./features/social.js";
 
 // Pont de rétrocompatibilité : expose toutes les fonctions attendues par le DOM
 Object.assign(window, {
@@ -143,6 +150,11 @@ Object.assign(window, {
   quickTermPorts,
   quickTermLinks,
   restartServices,
+  clearSocialUrlInput,
+  selectSocialFormat,
+  startSocialLinkDownload,
+  loadSocialDownloads,
+  deleteSocialFile,
 });
 
 function initNavigationObserver() {
@@ -198,7 +210,9 @@ document.addEventListener("DOMContentLoaded", () => {
   loadFiles();
   loadMediaCatalog("trending");
   loadDeezerHome();
+  loadSocialDownloads();
 
   setInterval(updateStatus, 2500);
   setInterval(loadFiles, 10000);
+  setInterval(loadSocialDownloads, 8000);
 });
