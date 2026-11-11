@@ -1,0 +1,73 @@
+<!-- SECTION MUSIQUE : LECTEUR ILIANTIFY, RECHERCHE INTÉGRÉE & SÉLECTEUR SEGMENTÉ -->
+<section class="card" id="sec_music" aria-labelledby="title_music">
+  <h2>
+    <span id="title_music">🎧 Écouter et télécharger de la musique</span>
+    <span class="badge badge-neutral">Audio Haute Qualité (MP3 320 kbps)</span>
+  </h2>
+  <p class="sub">Ouvrez votre lecteur musical plein écran ou recherchez un titre, un album ou un artiste pour l'ajouter au serveur.</p>
+
+  <!-- ACTION PRINCIPALE UNIQUE DE LA SECTION MUSIQUE : OUVRIR ILIANTIFY (Point 2) -->
+  <div class="status-box" style="margin-bottom:var(--space-2);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span class="home-action-icon" aria-hidden="true">🎧</span>
+      <div>
+        <b style="font-size:var(--text-base);color:var(--text-primary)">Application musicale IlianTify</b>
+        <div style="font-size:var(--text-sm);color:var(--text-secondary)">Lecteur plein écran compatible iPhone, Mac et PC avec vos playlists et favoris.</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button type="button" class="btn-secondary btn-sm" onclick="toggleDeezerDrawer()">💜 Playlists Deezer (<span id="sp_pl_cnt">0</span>)</button>
+      <a href="/iliantify" class="btn btn-primary btn-sm" style="text-decoration:none">🎧 Ouvrir IlianTify</a>
+    </div>
+  </div>
+
+  <!-- TIROIR DE SYNCHRONISATION DEEZER (Option secondaire repliable) -->
+  <div id="deezer_drawer" class="status-box" style="display:none;margin-bottom:var(--space-2)">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:var(--space-2)">
+      <label for="sp_sync_url" id="dz_acct_status" style="font-size:var(--text-sm);font-weight:700;white-space:nowrap">💜 Compte ou playlist Deezer :</label>
+      <input type="text" id="sp_sync_url" placeholder="Collez un lien de profil ou de playlist Deezer..." style="flex:1;min-width:220px" onkeydown="if(event.key==='Enter') syncDeezerNow()">
+      <button type="button" class="btn-secondary btn-sm" onclick="syncDeezerNow(this)">🔄 Synchroniser</button>
+    </div>
+    <div class="segmented-control" role="tablist">
+      <button type="button" class="seg-btn active" id="dztab_recs" onclick="switchDeezerTab('recs')">🔥 Tendances</button>
+      <button type="button" class="seg-btn" id="dztab_pls" onclick="switchDeezerTab('pls')">💜 Mes Playlists</button>
+      <button type="button" class="seg-btn" id="dztab_albs" onclick="switchDeezerTab('albs')">💿 Top Albums</button>
+    </div>
+    <div id="dzview_recs" class="music-grid"></div>
+    <div id="dzview_pls" style="display:none;margin-top:8px"></div>
+    <div id="dzview_albs" class="music-grid" style="display:none"></div>
+  </div>
+
+  <!-- CHAMP DE RECHERCHE MUSICALE AVEC BOUTON INTÉGRÉ À DROITE (Point 6) -->
+  <div class="search-integrated-wrap" role="search" aria-label="Recherche musicale">
+    <label for="m_query" class="sr-only">Rechercher un titre, un album ou un artiste</label>
+    <input
+      type="search"
+      id="m_query"
+      placeholder="Rechercher un titre, un album ou un artiste (ex : Daft Punk, Damso, Stromae)..."
+      onkeydown="if(event.key==='Enter') previewMusic(window.lastMusicMode || 'track')"
+    >
+    <div class="search-integrated-actions">
+      <button type="button" class="search-clear-btn" onclick="clearMusicSearchInput()" aria-label="Effacer la recherche musicale" title="Effacer">✕</button>
+      <button type="button" class="btn-secondary btn-sm" onclick="previewMusic(window.lastMusicMode || 'track')">🔍 Rechercher</button>
+    </div>
+  </div>
+
+  <!-- SÉLECTEUR SEGMENTÉ DES MODES DE RECHERCHE MUSICALE SOUS LE CHAMP (Point 6) -->
+  <div class="segmented-control" role="tablist" aria-label="Modes de recherche musicale">
+    <button type="button" class="seg-btn active" id="mseg_track" role="tab" aria-selected="true" onclick="selectMusicSearchMode('track')">🎵 Titre</button>
+    <button type="button" class="seg-btn" id="mseg_album" role="tab" aria-selected="false" onclick="selectMusicSearchMode('album')">💿 Album</button>
+    <button type="button" class="seg-btn" id="mseg_artist" role="tab" aria-selected="false" onclick="selectMusicSearchMode('artist')">🔥 Top Artiste</button>
+    <button type="button" class="seg-btn" id="mseg_ytm_song" role="tab" aria-selected="false" onclick="selectMusicSearchMode('ytm_song')">🎯 Chansons YT Music</button>
+    <button type="button" class="seg-btn" id="mseg_yt_video" role="tab" aria-selected="false" onclick="selectMusicSearchMode('yt_video')">▶️ Tout YouTube</button>
+  </div>
+
+  <!-- MINI LECTEUR D'APERÇU 30 SECONDES -->
+  <div id="preview_bar_mini" class="status-box" style="display:none;margin-top:var(--space-2);align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <span id="preview_bar_txt" style="font-size:var(--text-sm);font-weight:700">▶ Extrait en cours...</span>
+    <audio id="preview_audio" controls style="height:36px;flex:1;max-width:340px"></audio>
+    <button type="button" class="btn-ghost btn-sm" onclick="stopMiniPreview()">⏹️ Fermer l'extrait</button>
+  </div>
+
+  <div id="music_results" class="music-grid" aria-live="polite"></div>
+</section>

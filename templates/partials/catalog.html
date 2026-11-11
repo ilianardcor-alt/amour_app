@@ -1,0 +1,77 @@
+<!-- SECTION VIDÉOS : RECHERCHE INTÉGRÉE, SÉLECTEUR SEGMENTÉ, CARROUSEL AVEC FLÈCHES & STATUT SOURCES -->
+<section class="card" id="sec_catalog" aria-labelledby="title_catalog">
+  <h2>
+    <span id="title_catalog">🍿 Regarder ou ajouter un film, une série ou un animé</span>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button type="button" id="toggle_cat_view_btn" class="btn-ghost btn-sm" onclick="toggleCatalogExpanded()">📐 Vue grille</button>
+      <button type="button" class="btn-secondary btn-sm" onclick="openService(8096, window.JF_URL, '/web/index.html#!/home.html')">🍿 Ouvrir Jellyfin</button>
+    </div>
+  </h2>
+  <p class="sub">Recherchez une œuvre ou parcourez les sélections ci-dessous. Cliquez sur une affiche pour choisir la langue (VF ou VOSTFR) et l'ajouter à votre serveur.</p>
+
+  <!-- CHAMP DE RECHERCHE AVEC BOUTON INTÉGRÉ À DROITE (Point 6) -->
+  <div class="search-integrated-wrap" role="search" aria-label="Recherche de films, séries et animés">
+    <label for="ms_query" class="sr-only">Rechercher un film, une série ou un animé</label>
+    <input
+      type="search"
+      id="ms_query"
+      placeholder="Rechercher un film, une série, un animé (ex : One Piece, Dune, The Last of Us)..."
+      onkeydown="if(event.key==='Enter') searchMediaCatalog()"
+    >
+    <div class="search-integrated-actions">
+      <button type="button" class="search-clear-btn" onclick="clearMediaSearchInput()" aria-label="Effacer la recherche vidéo" title="Effacer">✕</button>
+      <button type="button" class="btn-primary btn-sm" onclick="searchMediaCatalog()">🔍 Rechercher</button>
+    </div>
+  </div>
+
+  <!-- SÉLECTEUR SEGMENTÉ SOUS LE CHAMP DE RECHERCHE (Point 6) -->
+  <div class="segmented-control" role="tablist" aria-label="Catégories du catalogue vidéo">
+    <button type="button" class="seg-btn active" id="flt_trending" role="tab" aria-selected="true" onclick="loadMediaCatalog('trending')">🔥 Tendances</button>
+    <button type="button" class="seg-btn" id="flt_movies" role="tab" aria-selected="false" onclick="loadMediaCatalog('movies')">🍿 Films</button>
+    <button type="button" class="seg-btn" id="flt_series" role="tab" aria-selected="false" onclick="loadMediaCatalog('series')">📺 Séries</button>
+    <button type="button" class="seg-btn" id="flt_disney" role="tab" aria-selected="false" onclick="loadMediaCatalog('disney')">🏰 Disney+</button>
+    <button type="button" class="seg-btn" id="flt_hbo" role="tab" aria-selected="false" onclick="loadMediaCatalog('hbo')">🐉 HBO Max</button>
+    <button type="button" class="seg-btn" id="flt_animes" role="tab" aria-selected="false" onclick="loadMediaCatalog('animes')">🎌 Animés</button>
+  </div>
+
+  <!-- PANNEAU D'ACTION DYNAMIQUE (Saisons, Épisodes, Choix VF/VOSTFR) -->
+  <div id="media_action_panel" aria-live="polite"></div>
+
+  <!-- CARROUSEL D'AFFICHES AVEC FLÈCHES GAUCHE / DROITE SANS BARRE NATIVE (Point 7) -->
+  <div class="carousel-container" id="catalog_carousel_wrap">
+    <button
+      type="button"
+      id="carousel_prev_btn"
+      class="carousel-nav-btn prev"
+      onclick="scrollCatalogCarousel(-1)"
+      aria-label="Défiler les affiches vers la gauche"
+      title="Précédent"
+    >‹</button>
+
+    <div id="media_results" style="width:100%" role="region" aria-label="Affiches du catalogue"></div>
+
+    <button
+      type="button"
+      id="carousel_next_btn"
+      class="carousel-nav-btn next"
+      onclick="scrollCatalogCarousel(1)"
+      aria-label="Défiler les affiches vers la droite"
+      title="Suivant"
+    >›</button>
+  </div>
+
+  <!-- STATUT DES SOURCES DU CATALOGUE AVEC VOLET REPLIABLE (Point 8) -->
+  <details id="stream_healer_bar" class="sources-details status-box" style="margin-top:var(--space-2)">
+    <summary>
+      <span style="display:inline-flex;align-items:center;gap:8px;font-size:var(--text-sm)">
+        <span id="healer_dot" aria-hidden="true">🟢</span>
+        <span id="healer_txt">Catalogue opérationnel — 5 sources sur 5 actives</span>
+      </span>
+      <span style="font-size:var(--text-xs);color:var(--text-secondary);font-weight:600">Détail des sources ▾</span>
+    </summary>
+    <div style="margin-top:var(--space-2);padding-top:var(--space-2);border-top:1px solid var(--border-default);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+      <div id="healer_domains_pills" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+      <button type="button" id="btn_run_healer" class="btn-secondary btn-sm" onclick="runStreamHealerNow(this)">🛠️ Tester les sources</button>
+    </div>
+  </details>
+</section>
