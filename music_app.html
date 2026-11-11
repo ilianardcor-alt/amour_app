@@ -1,0 +1,2628 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="IlianTify">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#09090b">
+<link rel="apple-touch-icon" href="/iliantify_icon.png">
+<link rel="icon" type="image/png" href="/iliantify_icon.png">
+<link rel="manifest" href="/manifest_iliantify.json">
+<title>IlianTify — Streaming Musical</title>
+<style>
+:root{
+    --bg:#09090b;
+    --surface:#121216;
+    --card:#18181f;
+    --card-hover:#22222c;
+    --border:rgba(255,255,255,0.08);
+    --sp-green:#1db954;
+    --dz-purple:#a238ff;
+    --text:#ffffff;
+    --sub:#a1a1aa;
+    --safe-top:env(safe-area-inset-top, 0px);
+    --safe-bottom:env(safe-area-inset-bottom, 0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{
+    margin:0;
+    padding:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;
+    overscroll-behavior-y:none;
+    user-select:none;
+    -webkit-user-select:none;
+}
+body{
+    padding-top:calc(var(--safe-top) + 10px);
+    padding-bottom:calc(148px + var(--safe-bottom));
+    max-width:780px;
+    margin:0 auto;
+    min-height:100vh;
+}
+
+/* ==================== HEADER SUPÉRIEUR ==================== */
+.app-header{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:rgba(9,9,11,0.86);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    padding:10px 16px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid var(--border);
+}
+.brand-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+.brand-logo{
+    width:34px;
+    height:34px;
+    border-radius:10px;
+    background:linear-gradient(135deg,var(--sp-green),var(--dz-purple));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    box-shadow:0 4px 14px rgba(29,185,84,0.35);
+}
+.brand-title{
+    font-size:20px;
+    font-weight:800;
+    letter-spacing:-0.4px;
+    background:linear-gradient(90deg,#ffffff,#d4d4d8);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+.header-actions{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+.hdr-pill{
+    background:var(--card);
+    border:1px solid var(--border);
+    color:var(--sub);
+    padding:6px 11px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    cursor:pointer;
+}
+.hdr-pill:active{transform:scale(0.96)}
+
+/* ==================== BANNIÈRE TÉLÉCHARGEMENT EN DIRECT ==================== */
+.dl-live-banner{
+    display:none;
+    margin:10px 16px 0 16px;
+    background:linear-gradient(90deg,rgba(29,185,84,0.16),rgba(162,56,255,0.18));
+    border:1px solid rgba(29,185,84,0.45);
+    border-radius:14px;
+    padding:10px 14px;
+}
+.dl-live-bar{
+    width:100%;
+    height:6px;
+    background:rgba(255,255,255,0.1);
+    border-radius:4px;
+    overflow:hidden;
+    margin-top:6px;
+}
+.dl-live-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,var(--sp-green),var(--dz-purple));
+    transition:width 0.3s;
+}
+
+/* ==================== SECTIONS / PAGES ==================== */
+.tab-page{
+    display:none;
+    padding:14px 16px;
+    animation:fadeIn 0.18s ease-out;
+}
+.tab-page.active{
+    display:block;
+}
+@keyframes fadeIn{
+    from{opacity:0;transform:translateY(4px)}
+    to{opacity:1;transform:translateY(0)}
+}
+
+.sec-title{
+    font-size:18px;
+    font-weight:800;
+    letter-spacing:-0.3px;
+    margin:18px 0 10px 0;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+.sec-title:first-child{margin-top:4px}
+.sec-title small{
+    font-size:12px;
+    font-weight:600;
+    color:var(--sp-green);
+    cursor:pointer;
+}
+
+/* ==================== GRILLE D'ACCÈS RAPIDE SPOTIFY (2x2) ==================== */
+.quick-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin-bottom:16px;
+}
+.quick-tile{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    cursor:pointer;
+    height:56px;
+    transition:background 0.15s,transform 0.1s;
+}
+.quick-tile:active{
+    transform:scale(0.98);
+    background:var(--card-hover);
+}
+.quick-tile-icon{
+    width:56px;
+    height:56px;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    background:linear-gradient(135deg,#1db954,#059669);
+}
+.quick-tile-title{
+    font-size:13px;
+    font-weight:700;
+    line-height:1.2;
+    padding-right:8px;
+    overflow:hidden;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+}
+
+/* ==================== CARROUSEL HORIZONTAL RÉCENTS ==================== */
+.h-scroll{
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    padding-bottom:6px;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+}
+.h-scroll::-webkit-scrollbar{display:none}
+.h-card{
+    width:132px;
+    flex-shrink:0;
+    cursor:pointer;
+}
+.h-card:active{transform:scale(0.97)}
+.h-card img{
+    width:132px;
+    height:132px;
+    border-radius:12px;
+    object-fit:cover;
+    background:#1e1e26;
+    box-shadow:0 6px 16px rgba(0,0,0,0.45);
+    display:block;
+    margin-bottom:7px;
+}
+.h-card-title{
+    font-size:13px;
+    font-weight:700;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.h-card-sub{
+    font-size:11.5px;
+    color:var(--sub);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    margin-top:2px;
+}
+
+/* ==================== GRILLE ALBUMS 2 COLONNES IPHONE ==================== */
+.albums-grid-2col{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+}
+@media(min-width:540px){
+    .albums-grid-2col{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+.album-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:10px;
+    cursor:pointer;
+    transition:transform 0.14s,background 0.14s;
+}
+.album-card:active{
+    transform:scale(0.97);
+    background:var(--card-hover);
+}
+.album-card img{
+    width:100%;
+    aspect-ratio:1/1;
+    border-radius:10px;
+    object-fit:cover;
+    background:#1e1e26;
+    display:block;
+    margin-bottom:8px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.4);
+}
+.album-card.artist-round img{
+    border-radius:50%;
+}
+.album-card-title{
+    font-size:13.5px;
+    font-weight:700;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.album-card-sub{
+    font-size:11.5px;
+    color:var(--sub);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    margin-top:2px;
+}
+
+/* ==================== LISTE DE TITRES STYLE SPOTIFY IOS ==================== */
+.track-list{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+.track-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:8px 10px;
+    border-radius:12px;
+    background:var(--surface);
+    border:1px solid rgba(255,255,255,0.04);
+    cursor:pointer;
+    transition:background 0.12s;
+}
+.track-row:active, .track-row.playing{
+    background:var(--card-hover);
+    border-color:rgba(29,185,84,0.45);
+}
+.track-row img{
+    width:48px;
+    height:48px;
+    border-radius:8px;
+    object-fit:cover;
+    background:#1e1e26;
+    flex-shrink:0;
+}
+.track-info{
+    flex:1;
+    min-width:0;
+}
+.track-title{
+    font-size:14px;
+    font-weight:700;
+    color:#ffffff;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.track-row.playing .track-title{
+    color:var(--sp-green);
+}
+.track-sub{
+    font-size:12px;
+    color:var(--sub);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    margin-top:2px;
+}
+.track-actions{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-shrink:0;
+}
+.icon-btn{
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    border:none;
+    background:rgba(255,255,255,0.07);
+    color:#ffffff;
+    font-size:14px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+}
+.icon-btn.liked{
+    color:#ef4444;
+}
+.icon-btn.dl-btn{
+    background:linear-gradient(135deg,var(--sp-green),#059669);
+    color:#041f0e;
+    font-weight:800;
+}
+
+/* ==================== BARRE DE RECHERCHE 16PX GRAND CONFORT IPHONE ==================== */
+.search-box-wrap{
+    position:relative;
+    width:100%;
+    margin-bottom:10px;
+}
+.search-input-ios{
+    width:100%;
+    min-height:50px;
+    padding:14px 44px 14px 42px;
+    border-radius:14px;
+    border:2px solid rgba(255,255,255,0.12);
+    background:var(--card);
+    color:#ffffff;
+    font-size:16px !important; /* Anti-zoom Safari iOS */
+    font-weight:500;
+    outline:none;
+    -webkit-appearance:none;
+    transition:border-color 0.15s,box-shadow 0.15s;
+}
+.search-input-ios:focus{
+    border-color:#38bdf8;
+    box-shadow:0 0 0 3px rgba(56,189,248,0.22);
+}
+.search-left-ico{
+    position:absolute;
+    left:14px;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:16px;
+    color:var(--sub);
+    pointer-events:none;
+}
+.search-clear-btn{
+    position:absolute;
+    right:10px;
+    top:50%;
+    transform:translateY(-50%);
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    border:none;
+    background:rgba(255,255,255,0.14);
+    color:#ffffff;
+    font-size:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+}
+
+/* PILULES DE FILTRE HORIZONTALES FLUIDES */
+.pills-row{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding-bottom:6px;
+    margin-bottom:12px;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+}
+.pills-row::-webkit-scrollbar{display:none}
+.pill-chip{
+    flex-shrink:0;
+    padding:8px 15px;
+    border-radius:20px;
+    border:1px solid var(--border);
+    background:var(--card);
+    color:#e4e4e7;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all 0.15s;
+}
+.pill-chip.active{
+    background:var(--sp-green);
+    color:#041f0e;
+    border-color:var(--sp-green);
+}
+.pill-chip.purple.active{
+    background:var(--dz-purple);
+    color:#ffffff;
+    border-color:var(--dz-purple);
+}
+
+/* ==================== VUE DÉTAILLÉE D'UN ALBUM OU D'UN ARTISTE ==================== */
+.entity-detail-sheet{
+    display:none;
+    background:linear-gradient(180deg,#1e1b2e 0%,var(--bg) 320px);
+    border-radius:18px;
+    padding:16px;
+    margin-bottom:16px;
+    border:1px solid var(--border);
+}
+.entity-header{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    margin-bottom:16px;
+}
+.entity-header img{
+    width:170px;
+    height:170px;
+    border-radius:14px;
+    object-fit:cover;
+    box-shadow:0 12px 32px rgba(0,0,0,0.65);
+    margin-bottom:12px;
+}
+.entity-header img.round{border-radius:50%}
+.entity-play-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    margin-top:10px;
+}
+.btn-big-green{
+    background:var(--sp-green);
+    color:#041f0e;
+    border:none;
+    padding:12px 24px;
+    border-radius:28px;
+    font-size:14px;
+    font-weight:800;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    cursor:pointer;
+    box-shadow:0 6px 20px rgba(29,185,84,0.4);
+}
+.btn-big-sec{
+    background:var(--card);
+    color:#ffffff;
+    border:1px solid var(--border);
+    padding:12px 18px;
+    border-radius:28px;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+/* ==================== MINI-PLAYER FLOTTANT AU-DESSUS DE LA TAB BAR ==================== */
+.mini-player{
+    position:fixed;
+    left:8px;
+    right:8px;
+    bottom:calc(62px + var(--safe-bottom));
+    max-width:764px;
+    margin:0 auto;
+    background:rgba(24,24,32,0.96);
+    backdrop-filter:blur(22px);
+    -webkit-backdrop-filter:blur(22px);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:14px;
+    padding:7px 10px 9px 10px;
+    z-index:90;
+    display:none;
+    box-shadow:0 10px 30px rgba(0,0,0,0.75);
+}
+.mp-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+.mp-cover{
+    width:42px;
+    height:42px;
+    border-radius:8px;
+    object-fit:cover;
+    background:#1e1e26;
+    flex-shrink:0;
+}
+.mp-text{
+    flex:1;
+    min-width:0;
+    cursor:pointer;
+}
+.mp-title{
+    font-size:13.5px;
+    font-weight:700;
+    color:#ffffff;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.mp-artist{
+    font-size:11.5px;
+    color:var(--sp-green);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    margin-top:1px;
+}
+.mp-btns{
+    display:flex;
+    align-items:center;
+    gap:4px;
+}
+.mp-ctl{
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    border:none;
+    background:transparent;
+    color:#ffffff;
+    font-size:17px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+}
+.mp-bar-bg{
+    position:absolute;
+    left:10px;
+    right:10px;
+    bottom:2px;
+    height:2.5px;
+    background:rgba(255,255,255,0.14);
+    border-radius:2px;
+    overflow:hidden;
+}
+.mp-bar-fill{
+    height:100%;
+    width:0%;
+    background:var(--sp-green);
+}
+
+/* ==================== LECTEUR PLEIN ÉCRAN (FULLSCREEN SHEET STYLE SPOTIFY IOS) ==================== */
+.full-player-modal{
+    position:fixed;
+    inset:0;
+    z-index:200;
+    background:linear-gradient(180deg,#1e293b 0%,#09090b 65%,#050507 100%);
+    padding:calc(var(--safe-top) + 14px) 22px calc(var(--safe-bottom) + 20px) 22px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    transform:translateY(105%);
+    transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);
+}
+.full-player-modal.open{
+    transform:translateY(0);
+}
+.fp-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+.fp-down-btn{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    border:none;
+    background:rgba(255,255,255,0.1);
+    color:#ffffff;
+    font-size:18px;
+    cursor:pointer;
+}
+.fp-top-label{
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.8px;
+    color:#d4d4d8;
+}
+.fp-art-wrap{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:12px 0;
+    flex:1;
+    min-height:0;
+}
+.fp-art{
+    width:min(76vw,320px);
+    height:min(76vw,320px);
+    border-radius:18px;
+    object-fit:cover;
+    background:#18181f;
+    box-shadow:0 24px 60px rgba(0,0,0,0.8);
+}
+.fp-meta-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:14px;
+}
+.fp-meta-text{
+    flex:1;
+    min-width:0;
+}
+.fp-title{
+    font-size:21px;
+    font-weight:800;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.fp-artist{
+    font-size:15px;
+    color:var(--sub);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    margin-top:3px;
+}
+.fp-seek-wrap{
+    margin-bottom:14px;
+}
+.fp-range{
+    width:100%;
+    height:5px;
+    accent-color:var(--sp-green);
+    cursor:pointer;
+}
+.fp-times{
+    display:flex;
+    justify-content:space-between;
+    font-size:11.5px;
+    color:var(--sub);
+    margin-top:4px;
+}
+.fp-controls{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    max-width:360px;
+    width:100%;
+    margin:0 auto 14px auto;
+}
+.fp-btn-sec{
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    border:none;
+    background:transparent;
+    color:#d4d4d8;
+    font-size:20px;
+    cursor:pointer;
+}
+.fp-btn-sec.active{
+    color:var(--sp-green);
+}
+.fp-btn-skip{
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    border:none;
+    background:transparent;
+    color:#ffffff;
+    font-size:28px;
+    cursor:pointer;
+}
+.fp-btn-play{
+    width:68px;
+    height:68px;
+    border-radius:50%;
+    border:none;
+    background:#ffffff;
+    color:#09090b;
+    font-size:26px;
+    font-weight:900;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    box-shadow:0 8px 25px rgba(255,255,255,0.25);
+}
+.fp-queue-drawer{
+    display:none;
+    max-height:200px;
+    overflow-y:auto;
+    background:rgba(18,18,22,0.92);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:10px;
+    margin-top:8px;
+}
+
+/* ==================== BARRE DE NAVIGATION FIXE EN BAS (BOTTOM TAB BAR IOS) ==================== */
+.bottom-tabbar{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    height:calc(56px + var(--safe-bottom));
+    padding-bottom:var(--safe-bottom);
+    background:rgba(9,9,11,0.94);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    border-top:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:space-around;
+    z-index:100;
+}
+.tab-item{
+    flex:1;
+    height:100%;
+    border:none;
+    background:transparent;
+    color:var(--sub);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:3px;
+    font-size:10.5px;
+    font-weight:600;
+    cursor:pointer;
+}
+.tab-item .tab-ico{
+    font-size:19px;
+}
+.tab-item.active{
+    color:#ffffff;
+}
+.tab-item.active .tab-ico{
+    transform:scale(1.08);
+}
+
+/* ==================== MODE HORS-LIGNE (OFFLINE IOS DEEZER / SPOTIFY) ==================== */
+.hdr-pill.offline-active{
+    background:linear-gradient(135deg,var(--sp-green),#059669);
+    color:#041f0e;
+    border-color:var(--sp-green);
+    font-weight:800;
+}
+.offline-mode-banner{
+    display:none;
+    margin:8px 16px 0 16px;
+    background:linear-gradient(90deg,rgba(29,185,84,0.22),rgba(162,56,255,0.22));
+    border:1px solid rgba(29,185,84,0.55);
+    border-radius:12px;
+    padding:9px 14px;
+    font-size:12.5px;
+    font-weight:700;
+    color:#ecfdf5;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+}
+.offline-mode-banner.show{
+    display:flex;
+}
+.offline-storage-card{
+    background:var(--card);
+    border:1px solid rgba(29,185,84,0.35);
+    border-radius:14px;
+    padding:11px 14px;
+    margin-bottom:12px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+}
+.offline-storage-info{
+    font-size:12.5px;
+    font-weight:700;
+    color:#e4e4e7;
+}
+.offline-storage-info span{
+    color:var(--sp-green);
+}
+.btn-purge-offline{
+    background:rgba(239,68,68,0.14);
+    border:1px solid rgba(239,68,68,0.4);
+    color:#fca5a5;
+    padding:6px 11px;
+    border-radius:18px;
+    font-size:11.5px;
+    font-weight:700;
+    cursor:pointer;
+}
+.btn-purge-offline:active{
+    transform:scale(0.96);
+}
+.offline-switch-bar{
+    background:rgba(255,255,255,0.04);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:10px 14px;
+    margin:10px 0 12px 0;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+}
+.offline-switch-label{
+    font-size:13px;
+    font-weight:700;
+    color:#ffffff;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+.ios-switch{
+    position:relative;
+    width:46px;
+    height:26px;
+    background:rgba(255,255,255,0.18);
+    border-radius:26px;
+    border:none;
+    cursor:pointer;
+    transition:background 0.2s;
+    flex-shrink:0;
+    padding:0;
+}
+.ios-switch::after{
+    content:"";
+    position:absolute;
+    top:3px;
+    left:3px;
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:#ffffff;
+    transition:transform 0.2s;
+    box-shadow:0 2px 5px rgba(0,0,0,0.4);
+}
+.ios-switch.on{
+    background:var(--sp-green);
+}
+.ios-switch.on::after{
+    transform:translateX(20px);
+}
+.icon-btn.offline-btn{
+    background:rgba(255,255,255,0.08);
+    color:#d4d4d8;
+    font-size:13px;
+    transition:transform 0.15s,background 0.15s;
+}
+.icon-btn.offline-btn.downloaded{
+    background:rgba(29,185,84,0.2);
+    border:1px solid rgba(29,185,84,0.6);
+    color:var(--sp-green);
+}
+.icon-btn.offline-btn.spinning{
+    background:rgba(162,56,255,0.25);
+    border:1px solid var(--dz-purple);
+    animation:spinPulse 1s linear infinite;
+}
+@keyframes spinPulse{
+    0%{transform:rotate(0deg)}
+    100%{transform:rotate(360deg)}
+}
+.track-row.unavailable-offline{
+    opacity:0.36;
+    filter:grayscale(0.75);
+}
+.offline-badge-inline{
+    display:inline-block;
+    font-size:10px;
+    font-weight:800;
+    padding:1px 5px;
+    border-radius:6px;
+    background:rgba(29,185,84,0.2);
+    color:var(--sp-green);
+    margin-left:5px;
+    vertical-align:middle;
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER SUPÉRIEUR ILIANTIFY -->
+<header class="app-header">
+    <div class="brand-row">
+        <div class="brand-logo">🎧</div>
+        <span class="brand-title">IlianTify</span>
+    </div>
+    <div class="header-actions">
+        <button type="button" class="hdr-pill" id="hdr_offline_btn" onclick="toggleManualOfflineMode()">✈️ Hors-Ligne</button>
+        <button type="button" class="hdr-pill" onclick="refreshAllMusic()">🔄 Sync</button>
+        <a href="/" class="hdr-pill">🖥️ Portail</a>
+    </div>
+</header>
+
+<!-- BANDEAU MODE HORS-LIGNE ACTIF (AUTOMATIQUE OU MANUEL) -->
+<div class="offline-mode-banner" id="offline_mode_banner">
+    <span>✈️ Mode Hors-Ligne actif — Lecture depuis la mémoire de l'iPhone</span>
+    <button type="button" class="hdr-pill" style="padding:4px 9px;font-size:11px" onclick="switchMainTab('library');switchLibFilter('offline')">Voir mes sons ✅</button>
+</div>
+
+<!-- BANNIÈRE PROGRESSION TÉLÉCHARGEMENT HORS-LIGNE SUR L'IPHONE -->
+<div class="dl-live-banner" id="offline_batch_banner">
+    <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700">
+        <span id="offline_batch_title">📱 Enregistrement sur l'iPhone...</span>
+        <span id="offline_batch_pct" style="color:#1db954">0%</span>
+    </div>
+    <div id="offline_batch_step" style="font-size:11px;color:#a1a1aa;margin-top:2px">Compression AAC 96kbps...</div>
+    <div class="dl-live-bar"><div class="dl-live-fill" id="offline_batch_fill"></div></div>
+</div>
+
+<!-- BANNIÈRE SUIVI DE TÉLÉCHARGEMENT EN DIRECT DANS ILIANTIFY -->
+<div class="dl-live-banner" id="dl_banner">
+    <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700">
+        <span id="dl_banner_title">📥 Téléchargement en cours...</span>
+        <span id="dl_banner_pct" style="color:#1db954">0%</span>
+    </div>
+    <div id="dl_banner_step" style="font-size:11px;color:#a1a1aa;margin-top:2px">Préparation...</div>
+    <div class="dl-live-bar"><div class="dl-live-fill" id="dl_banner_fill"></div></div>
+</div>
+
+<!-- =========================================================================
+     ONGLET 1 : 🏠 ACCUEIL (RÉCENTS, ALBUMS 2 COLONNES, ACCÈS RAPIDE SINGLES)
+     ========================================================================= -->
+<section class="tab-page active" id="page_home">
+    <!-- Grille 2x2 Accès Rapide style Spotify iOS -->
+    <div class="quick-grid">
+        <div class="quick-tile" onclick="playAllLibraryShuffle()">
+            <div class="quick-tile-icon" style="background:linear-gradient(135deg,#1db954,#047857)">🔀</div>
+            <div class="quick-tile-title">Mix Aléatoire (Tous mes Sons)</div>
+        </div>
+        <div class="quick-tile" onclick="openOfflineLibraryView()">
+            <div class="quick-tile-icon" style="background:linear-gradient(135deg,#059669,#065f46)">✈️</div>
+            <div class="quick-tile-title">Sur mon iPhone (<span id="home_offline_cnt">0</span>)</div>
+        </div>
+        <div class="quick-tile" onclick="openSinglesAlbum()">
+            <div class="quick-tile-icon" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">⚡</div>
+            <div class="quick-tile-title">Singles & Sons en vrac</div>
+        </div>
+        <div class="quick-tile" onclick="openFavoritesView()">
+            <div class="quick-tile-icon" style="background:linear-gradient(135deg,#ec4899,#be185d)">❤️</div>
+            <div class="quick-tile-title">Titres Likés (<span id="home_fav_cnt">0</span>)</div>
+        </div>
+        <div class="quick-tile" onclick="switchMainTab('search')">
+            <div class="quick-tile-icon" style="background:linear-gradient(135deg,#a238ff,#6d28d9)">📥</div>
+            <div class="quick-tile-title">Télécharger depuis Deezer</div>
+        </div>
+    </div>
+
+    <!-- Ajoutés récemment -->
+    <div class="sec-title">
+        <span>🔥 Ajoutés récemment</span>
+        <small onclick="switchMainTab('library');switchLibFilter('tracks')">Tout voir</small>
+    </div>
+    <div class="h-scroll" id="home_recent_strip"></div>
+
+    <!-- Mes Albums en grille 2 colonnes -->
+    <div class="sec-title">
+        <span>💿 Mes Albums</span>
+        <small onclick="switchMainTab('library');switchLibFilter('albums')">Tout voir</small>
+    </div>
+    <div class="albums-grid-2col" id="home_albums_grid"></div>
+
+    <!-- Mes Artistes -->
+    <div class="sec-title">
+        <span>🎤 Mes Artistes</span>
+        <small onclick="switchMainTab('library');switchLibFilter('artists')">Tout voir</small>
+    </div>
+    <div class="h-scroll" id="home_artists_strip"></div>
+</section>
+
+<!-- =========================================================================
+     ONGLET 2 : 🔍 RECHERCHER & TÉLÉCHARGER (LOCAL + DEEZER / YT SANS QUITTER)
+     ========================================================================= -->
+<section class="tab-page" id="page_search">
+    <div class="search-box-wrap">
+        <span class="search-left-ico">🔍</span>
+        <input type="text" id="app_search_input" class="search-input-ios" placeholder="Artiste, titre, album (local ou à télécharger)..." oninput="onSearchInputChanged()" onkeydown="if(event.key==='Enter') runOnlineSearch(CURRENT_SEARCH_SOURCE)">
+        <button type="button" class="search-clear-btn" onclick="clearAppSearch()">✕</button>
+    </div>
+
+    <!-- Pilules de sources -->
+    <div class="pills-row">
+        <button type="button" class="pill-chip active" id="src_track" onclick="runOnlineSearch('track')">💜 Titres Deezer</button>
+        <button type="button" class="pill-chip" id="src_album" onclick="runOnlineSearch('album')">💿 Albums Deezer</button>
+        <button type="button" class="pill-chip" id="src_artist" onclick="runOnlineSearch('artist')">🔥 Top Artiste</button>
+        <button type="button" class="pill-chip" id="src_ytmusic" onclick="runOnlineSearch('ytmusic')">🔴 YT Music</button>
+        <button type="button" class="pill-chip" id="src_youtube_all" onclick="runOnlineSearch('youtube_all')">▶️ Tout YouTube</button>
+    </div>
+
+    <!-- Résultats filtrés dans ma bibliothèque locale -->
+    <div id="local_search_section" style="display:none;margin-bottom:16px">
+        <div class="sec-title" style="margin-top:0"><span>🎧 Dans ma bibliothèque</span></div>
+        <div class="track-list" id="local_search_results"></div>
+    </div>
+
+    <!-- Résultats en ligne (Deezer / YouTube Music) pour écouter un extrait ou télécharger en 1 tap -->
+    <div class="sec-title" style="margin-top:4px"><span id="online_search_heading">✨ Recommandations & Téléchargement Direct</span></div>
+    <div class="track-list" id="online_search_results"></div>
+</section>
+
+<!-- =========================================================================
+     ONGLET 3 : 📚 BIBLIOTHÈQUE (TITRES, ALBUMS, ARTISTES, FAVORIS ❤️, HORS-LIGNE ✈️, DEEZER)
+     ========================================================================= -->
+<section class="tab-page" id="page_library">
+    <div class="pills-row">
+        <button type="button" class="pill-chip active" id="libf_tracks" onclick="switchLibFilter('tracks')">🎵 Titres (<span id="cnt_tracks">0</span>)</button>
+        <button type="button" class="pill-chip" id="libf_albums" onclick="switchLibFilter('albums')">💿 Albums (<span id="cnt_albums">0</span>)</button>
+        <button type="button" class="pill-chip" id="libf_artists" onclick="switchLibFilter('artists')">🎤 Artistes (<span id="cnt_artists">0</span>)</button>
+        <button type="button" class="pill-chip" id="libf_offline" onclick="switchLibFilter('offline')">✈️ Hors-Ligne (<span id="cnt_offline">0</span>)</button>
+        <button type="button" class="pill-chip purple" id="libf_favs" onclick="switchLibFilter('favs')">❤️ Favoris (<span id="cnt_favs">0</span>)</button>
+        <button type="button" class="pill-chip purple" id="libf_deezer" onclick="switchLibFilter('deezer')">💜 Compte Deezer</button>
+    </div>
+
+    <!-- Indicateur d'espace occupé sur l'iPhone + bouton de purge -->
+    <div class="offline-storage-card" id="offline_storage_card">
+        <div class="offline-storage-info">📱 Stocké sur l'iPhone : <span id="offline_stat_count">0 titre</span> (<span id="offline_stat_mb">0.0 Mo</span>)</div>
+        <button type="button" class="btn-purge-offline" onclick="confirmPurgeOfflineStorage()">🗑️ Vider le téléchargement local</button>
+    </div>
+
+    <!-- Fiche détaillée d'un Album ou d'un Artiste sélectionné -->
+    <div class="entity-detail-sheet" id="entity_sheet"></div>
+
+    <!-- Liste de tous les titres -->
+    <div id="lib_list_tracks" class="track-list"></div>
+
+    <!-- Grille de tous les albums -->
+    <div id="lib_list_albums" class="albums-grid-2col" style="display:none"></div>
+
+    <!-- Grille de tous les artistes -->
+    <div id="lib_list_artists" class="albums-grid-2col" style="display:none"></div>
+
+    <!-- Liste des sons stockés Hors-Ligne sur l'iPhone ✈️ -->
+    <div id="lib_list_offline" class="track-list" style="display:none"></div>
+
+    <!-- Liste des Favoris ❤️ -->
+    <div id="lib_list_favs" class="track-list" style="display:none"></div>
+
+    <!-- Synchronisation Compte / Playlists Deezer -->
+    <div id="lib_list_deezer" style="display:none">
+        <div style="background:var(--card);border:1px solid rgba(162,56,255,0.4);border-radius:14px;padding:12px;margin-bottom:14px">
+            <div style="font-size:13px;font-weight:700;color:#c084fc;margin-bottom:8px" id="dz_sync_label">💜 Synchroniser mon profil ou une playlist Deezer</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <input type="text" id="dz_sync_input" class="search-input-ios" placeholder="https://www.deezer.com/fr/profile/... ou playlist" style="padding-left:14px;flex:1;min-width:200px">
+                <button type="button" class="btn-big-green" style="background:var(--dz-purple);color:#fff;box-shadow:none" onclick="syncDeezerFromApp(this)">🔄 Sync</button>
+            </div>
+        </div>
+        <div id="dz_playlists_box"></div>
+    </div>
+</section>
+
+<!-- =========================================================================
+     MINI-PLAYER FLOTTANT (AU-DESSUS DE LA BARRE DE NAVIGATION)
+     ========================================================================= -->
+<div class="mini-player" id="mini_player">
+    <div class="mp-row">
+        <img src="/iliantify_icon.png" alt="" class="mp-cover" id="mp_cover" onclick="openFullPlayer()">
+        <div class="mp-text" onclick="openFullPlayer()">
+            <div class="mp-title" id="mp_title">Aucun titre</div>
+            <div class="mp-artist" id="mp_artist">IlianTify</div>
+        </div>
+        <div class="mp-btns">
+            <button type="button" class="mp-ctl" id="mp_like_btn" onclick="toggleCurrentTrackFavorite()">🤍</button>
+            <button type="button" class="mp-ctl" id="mp_play_btn" onclick="togglePlayPause()">▶</button>
+            <button type="button" class="mp-ctl" onclick="playNextTrack()">⏭</button>
+        </div>
+    </div>
+    <div class="mp-bar-bg"><div class="mp-bar-fill" id="mp_progress_fill"></div></div>
+</div>
+
+<!-- =========================================================================
+     LECTEUR PLEIN ÉCRAN (SWIPE / TAP SUR LE MINI-PLAYER)
+     ========================================================================= -->
+<div class="full-player-modal" id="full_player" ontouchstart="onFpTouchStart(event)" ontouchend="onFpTouchEnd(event)">
+    <div class="fp-top">
+        <button type="button" class="fp-down-btn" onclick="closeFullPlayer()">⌄</button>
+        <span class="fp-top-label" id="fp_album_top">EN LECTURE</span>
+        <button type="button" class="fp-down-btn" onclick="toggleQueueDrawer()" title="File d'attente">☰</button>
+    </div>
+
+    <div class="fp-art-wrap">
+        <img src="/iliantify_icon.png" alt="" class="fp-art" id="fp_cover">
+    </div>
+
+    <div>
+        <div class="fp-meta-row">
+            <div class="fp-meta-text">
+                <div class="fp-title" id="fp_title">Titre</div>
+                <div class="fp-artist" id="fp_artist">Artiste</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+                <button type="button" class="icon-btn offline-btn" id="fp_offline_btn" onclick="toggleCurrentTrackOffline()" style="width:42px;height:42px;font-size:16px" title="Télécharger hors-ligne sur l'iPhone">⬇️</button>
+                <button type="button" class="icon-btn" id="fp_like_btn" onclick="toggleCurrentTrackFavorite()" style="width:42px;height:42px;font-size:18px">🤍</button>
+            </div>
+        </div>
+
+        <div class="fp-seek-wrap">
+            <input type="range" id="fp_seek" class="fp-range" min="0" max="100" step="0.1" value="0" oninput="seekAudioTo(this.value)">
+            <div class="fp-times">
+                <span id="fp_cur_time">0:00</span>
+                <span id="fp_rem_time">-0:00</span>
+            </div>
+        </div>
+
+        <div class="fp-controls">
+            <button type="button" class="fp-btn-sec" id="fp_shuffle_btn" onclick="toggleShuffle()">🔀</button>
+            <button type="button" class="fp-btn-skip" onclick="playPrevTrack()">⏮</button>
+            <button type="button" class="fp-btn-play" id="fp_play_btn" onclick="togglePlayPause()">▶</button>
+            <button type="button" class="fp-btn-skip" onclick="playNextTrack()">⏭</button>
+            <button type="button" class="fp-btn-sec" id="fp_repeat_btn" onclick="toggleRepeat()">🔁</button>
+        </div>
+
+        <div class="fp-queue-drawer" id="fp_queue_drawer"></div>
+    </div>
+</div>
+
+<!-- =========================================================================
+     BOTTOM TAB BAR FIXE STYLE IOS
+     ========================================================================= -->
+<nav class="bottom-tabbar">
+    <button type="button" class="tab-item active" id="nav_home" onclick="switchMainTab('home')">
+        <span class="tab-ico">🏠</span>
+        <span>Accueil</span>
+    </button>
+    <button type="button" class="tab-item" id="nav_search" onclick="switchMainTab('search')">
+        <span class="tab-ico">🔍</span>
+        <span>Rechercher</span>
+    </button>
+    <button type="button" class="tab-item" id="nav_library" onclick="switchMainTab('library')">
+        <span class="tab-ico">📚</span>
+        <span>Bibliothèque</span>
+    </button>
+</nav>
+
+<audio id="iliantify_audio" preload="metadata" playsinline></audio>
+
+<script>
+let LIB = {tracks: [], albums: [], artists: []};
+let FAVORITES = new Set();
+let QUEUE = [];
+let Q_INDEX = -1;
+let IS_SHUFFLE = false;
+let IS_REPEAT = false;
+let CURRENT_SEARCH_SOURCE = "track";
+let FP_TOUCH_Y = 0;
+let CURRENT_LIB_FILTER = "tracks";
+let ACTIVE_ALBUM_IDX = -1;
+let ACTIVE_ARTIST_IDX = -1;
+
+/* ==================== ÉTAT HORS-LIGNE & BASE INDEXEDDB (MISSION 2, 3, 4) ==================== */
+const OFFLINE_DB_NAME = "IlianTifyOfflineDB";
+const OFFLINE_STORE = "offline_tracks";
+let OFFLINE_DB = null;
+let OFFLINE_META = new Map(); // path -> {path, title, artist, album, duration, duration_str, track_num, size_mb, downloaded_at, coverDataUrl}
+let OFFLINE_DOWNLOADING = new Set(); // path en cours de téléchargement
+let BATCH_DOWNLOAD_ACTIVE = false;
+let MANUAL_OFFLINE_MODE = localStorage.getItem("iliantify_manual_offline") === "1";
+let AUTO_OFFLINE_DETECTED = !navigator.onLine;
+let CURRENT_BLOB_URL = null;
+
+const audioEl = document.getElementById("iliantify_audio");
+
+/* 1. Enregistrement du Service Worker PWA + Demande de persistance iOS */
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw_iliantify.js", {scope: "/"}).catch(() => {});
+    });
+}
+if (navigator.storage && navigator.storage.persist) {
+    navigator.storage.persist().catch(() => {});
+}
+
+window.addEventListener("online", () => {
+    AUTO_OFFLINE_DETECTED = false;
+    updateOfflineModeUI();
+    refreshAllMusic();
+});
+window.addEventListener("offline", () => {
+    AUTO_OFFLINE_DETECTED = true;
+    updateOfflineModeUI();
+    renderHomeView();
+    renderLibraryViews();
+});
+
+function isOfflineModeActive() {
+    return MANUAL_OFFLINE_MODE || AUTO_OFFLINE_DETECTED || !navigator.onLine;
+}
+
+function toggleManualOfflineMode() {
+    MANUAL_OFFLINE_MODE = !MANUAL_OFFLINE_MODE;
+    localStorage.setItem("iliantify_manual_offline", MANUAL_OFFLINE_MODE ? "1" : "0");
+    updateOfflineModeUI();
+    renderHomeView();
+    renderLibraryViews();
+    if (ACTIVE_ALBUM_IDX >= 0 && document.getElementById("entity_sheet").style.display === "block") {
+        openAlbumDetail(ACTIVE_ALBUM_IDX);
+    } else if (ACTIVE_ARTIST_IDX >= 0 && document.getElementById("entity_sheet").style.display === "block") {
+        openArtistDetail(ACTIVE_ARTIST_IDX);
+    }
+}
+
+function updateOfflineModeUI() {
+    const active = isOfflineModeActive();
+    const btn = document.getElementById("hdr_offline_btn");
+    const banner = document.getElementById("offline_mode_banner");
+    if (btn) {
+        btn.classList.toggle("offline-active", active);
+        btn.textContent = active ? "✈️ Hors-Ligne ON" : "✈️ Hors-Ligne";
+    }
+    if (banner) {
+        banner.classList.toggle("show", active);
+    }
+}
+
+/* ==================== MOTEUR INDEXEDDB (IlianTifyOfflineDB) ==================== */
+function initOfflineDB() {
+    return new Promise((resolve) => {
+        if (!("indexedDB" in window)) {
+            resolve(null);
+            return;
+        }
+        const req = indexedDB.open(OFFLINE_DB_NAME, 1);
+        req.onupgradeneeded = (ev) => {
+            const db = ev.target.result;
+            if (!db.objectStoreNames.contains(OFFLINE_STORE)) {
+                db.createObjectStore(OFFLINE_STORE, {keyPath: "path"});
+            }
+        };
+        req.onsuccess = (ev) => {
+            OFFLINE_DB = ev.target.result;
+            loadOfflineMetadataIndex().then(() => resolve(OFFLINE_DB));
+        };
+        req.onerror = () => resolve(null);
+    });
+}
+
+function loadOfflineMetadataIndex() {
+    return new Promise((resolve) => {
+        if (!OFFLINE_DB) {
+            resolve();
+            return;
+        }
+        try {
+            const tx = OFFLINE_DB.transaction([OFFLINE_STORE], "readonly");
+            const store = tx.objectStore(OFFLINE_STORE);
+            const req = store.openCursor();
+            OFFLINE_META.clear();
+            req.onsuccess = (ev) => {
+                const cursor = ev.target.result;
+                if (cursor) {
+                    const v = cursor.value;
+                    OFFLINE_META.set(v.path, {
+                        path: v.path,
+                        title: v.title || "Titre",
+                        artist: v.artist || "Artiste",
+                        album: v.album || "Singles",
+                        duration: v.duration || 0,
+                        duration_str: v.duration_str || "",
+                        track_num: v.track_num || 0,
+                        size_mb: v.size_mb || 0,
+                        downloaded_at: v.downloaded_at || 0,
+                        coverDataUrl: v.coverDataUrl || "/iliantify_icon.png"
+                    });
+                    cursor.continue();
+                } else {
+                    updateOfflineStorageStatsUI();
+                    resolve();
+                }
+            };
+            req.onerror = () => resolve();
+        } catch (e) {
+            resolve();
+        }
+    });
+}
+
+function getOfflineRecord(path) {
+    return new Promise((resolve) => {
+        if (!OFFLINE_DB || !path) {
+            resolve(null);
+            return;
+        }
+        try {
+            const tx = OFFLINE_DB.transaction([OFFLINE_STORE], "readonly");
+            const store = tx.objectStore(OFFLINE_STORE);
+            const req = store.get(path);
+            req.onsuccess = () => resolve(req.result || null);
+            req.onerror = () => resolve(null);
+        } catch (e) {
+            resolve(null);
+        }
+    });
+}
+
+function saveOfflineRecord(record) {
+    return new Promise((resolve, reject) => {
+        if (!OFFLINE_DB) {
+            reject(new Error("IndexedDB indisponible"));
+            return;
+        }
+        try {
+            const tx = OFFLINE_DB.transaction([OFFLINE_STORE], "readwrite");
+            const store = tx.objectStore(OFFLINE_STORE);
+            store.put(record);
+            tx.oncomplete = () => {
+                OFFLINE_META.set(record.path, {
+                    path: record.path,
+                    title: record.title,
+                    artist: record.artist,
+                    album: record.album,
+                    duration: record.duration,
+                    duration_str: record.duration_str,
+                    track_num: record.track_num || 0,
+                    size_mb: record.size_mb,
+                    downloaded_at: record.downloaded_at,
+                    coverDataUrl: record.coverDataUrl || "/iliantify_icon.png"
+                });
+                updateOfflineStorageStatsUI();
+                resolve(true);
+            };
+            tx.onerror = (e) => reject(e);
+        } catch (e) {
+            reject(e);
+        }
+    });
+}
+
+function deleteOfflineRecord(path) {
+    return new Promise((resolve) => {
+        if (!OFFLINE_DB || !path) {
+            resolve(false);
+            return;
+        }
+        try {
+            const tx = OFFLINE_DB.transaction([OFFLINE_STORE], "readwrite");
+            const store = tx.objectStore(OFFLINE_STORE);
+            store.delete(path);
+            tx.oncomplete = () => {
+                OFFLINE_META.delete(path);
+                updateOfflineStorageStatsUI();
+                resolve(true);
+            };
+            tx.onerror = () => resolve(false);
+        } catch (e) {
+            resolve(false);
+        }
+    });
+}
+
+function clearAllOfflineRecords() {
+    return new Promise((resolve) => {
+        if (!OFFLINE_DB) {
+            resolve(false);
+            return;
+        }
+        try {
+            const tx = OFFLINE_DB.transaction([OFFLINE_STORE], "readwrite");
+            const store = tx.objectStore(OFFLINE_STORE);
+            store.clear();
+            tx.oncomplete = () => {
+                OFFLINE_META.clear();
+                updateOfflineStorageStatsUI();
+                resolve(true);
+            };
+            tx.onerror = () => resolve(false);
+        } catch (e) {
+            resolve(false);
+        }
+    });
+}
+
+function updateOfflineStorageStatsUI() {
+    const count = OFFLINE_META.size;
+    let totalMb = 0;
+    OFFLINE_META.forEach(v => {
+        totalMb += (parseFloat(v.size_mb) || 0);
+    });
+    const mbStr = totalMb.toFixed(1) + " Mo";
+    const cntEl = document.getElementById("cnt_offline");
+    const homeCntEl = document.getElementById("home_offline_cnt");
+    const statCountEl = document.getElementById("offline_stat_count");
+    const statMbEl = document.getElementById("offline_stat_mb");
+    if (cntEl) cntEl.textContent = count;
+    if (homeCntEl) homeCntEl.textContent = count;
+    if (statCountEl) statCountEl.textContent = count + (count > 1 ? " titres" : " titre");
+    if (statMbEl) statMbEl.textContent = mbStr;
+    updateFullscreenOfflineButtonUI();
+}
+
+function blobToDataUrl(blob) {
+    return new Promise((resolve) => {
+        if (!blob) {
+            resolve("/iliantify_icon.png");
+            return;
+        }
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result || "/iliantify_icon.png");
+        reader.onerror = () => resolve("/iliantify_icon.png");
+        reader.readAsDataURL(blob);
+    });
+}
+
+function findTrackByPath(path) {
+    if (!path) return null;
+    const fromLib = (LIB.tracks || []).find(t => t.path === path);
+    if (fromLib) return fromLib;
+    const fromQueue = (QUEUE || []).find(t => t.path === path);
+    if (fromQueue) return fromQueue;
+    if (OFFLINE_META.has(path)) return OFFLINE_META.get(path);
+    return null;
+}
+
+async function downloadTrackToIphone(track, silent = false) {
+    if (!track || !track.path) return false;
+    const path = track.path;
+    if (OFFLINE_META.has(path)) return true;
+    if (OFFLINE_DOWNLOADING.has(path)) return false;
+
+    OFFLINE_DOWNLOADING.add(path);
+    refreshOfflineButtonsForPath(path);
+
+    try {
+        const streamUrl = track.offline_stream_url || (`/api/music_offline_stream?path=${encodeURIComponent(path)}&quality=eco`);
+        const coverUrl = track.offline_cover_url || (`/api/music_offline_cover?path=${encodeURIComponent(path)}`);
+
+        const [audioResp, coverResp] = await Promise.all([
+            fetch(streamUrl),
+            fetch(coverUrl).catch(() => null)
+        ]);
+        if (!audioResp.ok) throw new Error("Échec transcodage AAC hors-ligne");
+        const audioBlob = await audioResp.blob();
+        const coverBlob = (coverResp && coverResp.ok) ? await coverResp.blob() : null;
+        const coverDataUrl = coverBlob ? await blobToDataUrl(coverBlob) : (track.cover_url || "/iliantify_icon.png");
+
+        const totalBytes = audioBlob.size + (coverBlob ? coverBlob.size : 0);
+        const sizeMb = Math.max(0.1, Math.round((totalBytes / (1024 * 1024)) * 100) / 100);
+
+        await saveOfflineRecord({
+            path: path,
+            title: track.title || "Titre",
+            artist: track.artist || "Artiste",
+            album: track.album || "Singles",
+            duration: track.duration || 0,
+            duration_str: track.duration_str || fmtTime(track.duration || 0),
+            track_num: track.track_num || 0,
+            audioBlob: audioBlob,
+            coverBlob: coverBlob,
+            coverDataUrl: coverDataUrl,
+            size_mb: sizeMb,
+            downloaded_at: Date.now()
+        });
+
+        OFFLINE_DOWNLOADING.delete(path);
+        refreshOfflineButtonsForPath(path);
+        if (!silent) {
+            renderLibraryViews();
+        }
+        return true;
+    } catch (e) {
+        OFFLINE_DOWNLOADING.delete(path);
+        refreshOfflineButtonsForPath(path);
+        if (!silent) {
+            alert("Impossible de télécharger ce titre hors-ligne. Vérifie la connexion au serveur.");
+        }
+        return false;
+    }
+}
+
+async function toggleTrackOffline(path, ev) {
+    if (ev) ev.stopPropagation();
+    if (!path || OFFLINE_DOWNLOADING.has(path)) return;
+
+    if (OFFLINE_META.has(path)) {
+        const meta = OFFLINE_META.get(path);
+        if (confirm(`Supprimer « ${meta.title} » (${meta.size_mb} Mo) de la mémoire de l'iPhone ?`)) {
+            await deleteOfflineRecord(path);
+            refreshOfflineButtonsForPath(path);
+            renderLibraryViews();
+            if (ACTIVE_ALBUM_IDX >= 0 && document.getElementById("entity_sheet").style.display === "block") {
+                openAlbumDetail(ACTIVE_ALBUM_IDX);
+            } else if (ACTIVE_ARTIST_IDX >= 0 && document.getElementById("entity_sheet").style.display === "block") {
+                openArtistDetail(ACTIVE_ARTIST_IDX);
+            }
+        }
+        return;
+    }
+
+    const track = findTrackByPath(path);
+    if (!track) return;
+    await downloadTrackToIphone(track, false);
+    if (ACTIVE_ALBUM_IDX >= 0 && document.getElementById("entity_sheet").style.display === "block") {
+        openAlbumDetail(ACTIVE_ALBUM_IDX);
+    } else if (ACTIVE_ARTIST_IDX >= 0 && document.getElementById("entity_sheet").style.display === "block") {
+        openArtistDetail(ACTIVE_ARTIST_IDX);
+    }
+}
+
+function toggleCurrentTrackOffline() {
+    if (Q_INDEX < 0 || !QUEUE[Q_INDEX] || !QUEUE[Q_INDEX].path) return;
+    toggleTrackOffline(QUEUE[Q_INDEX].path);
+}
+
+function refreshOfflineButtonsForPath(path) {
+    const isDl = OFFLINE_META.has(path);
+    const isSpin = OFFLINE_DOWNLOADING.has(path);
+    document.querySelectorAll("[data-offline-path]").forEach(btn => {
+        if (btn.getAttribute("data-offline-path") === path) {
+            btn.classList.toggle("downloaded", isDl && !isSpin);
+            btn.classList.toggle("spinning", isSpin);
+            btn.textContent = isSpin ? "⏳" : (isDl ? "✅" : "⬇️");
+        }
+    });
+    updateFullscreenOfflineButtonUI();
+}
+
+function updateFullscreenOfflineButtonUI() {
+    const btn = document.getElementById("fp_offline_btn");
+    if (!btn) return;
+    const cur = (Q_INDEX >= 0 && QUEUE[Q_INDEX]) ? QUEUE[Q_INDEX] : null;
+    if (!cur || !cur.path) {
+        btn.classList.remove("downloaded", "spinning");
+        btn.textContent = "⬇️";
+        return;
+    }
+    const isDl = OFFLINE_META.has(cur.path);
+    const isSpin = OFFLINE_DOWNLOADING.has(cur.path);
+    btn.classList.toggle("downloaded", isDl && !isSpin);
+    btn.classList.toggle("spinning", isSpin);
+    btn.textContent = isSpin ? "⏳" : (isDl ? "✅" : "⬇️");
+}
+
+function areAllTracksDownloaded(tracks) {
+    if (!tracks || !tracks.length) return false;
+    return tracks.every(t => t.path && OFFLINE_META.has(t.path));
+}
+
+async function toggleBatchOfflineDownload(tracks, labelName) {
+    if (!tracks || !tracks.length) return;
+    if (BATCH_DOWNLOAD_ACTIVE) return;
+
+    const allDone = areAllTracksDownloaded(tracks);
+    if (allDone) {
+        if (confirm(`Supprimer les ${tracks.length} titres de « ${labelName} » de la mémoire de l'iPhone ?`)) {
+            for (const t of tracks) {
+                if (t.path) await deleteOfflineRecord(t.path);
+            }
+            renderLibraryViews();
+            if (ACTIVE_ALBUM_IDX >= 0 && document.getElementById("entity_sheet").style.display === "block") {
+                openAlbumDetail(ACTIVE_ALBUM_IDX);
+            } else if (ACTIVE_ARTIST_IDX >= 0 && document.getElementById("entity_sheet").style.display === "block") {
+                openArtistDetail(ACTIVE_ARTIST_IDX);
+            }
+        }
+        return;
+    }
+
+    const todo = tracks.filter(t => t.path && !OFFLINE_META.has(t.path));
+    if (!todo.length) return;
+
+    BATCH_DOWNLOAD_ACTIVE = true;
+    const banner = document.getElementById("offline_batch_banner");
+    const titleEl = document.getElementById("offline_batch_title");
+    const pctEl = document.getElementById("offline_batch_pct");
+    const stepEl = document.getElementById("offline_batch_step");
+    const fillEl = document.getElementById("offline_batch_fill");
+    banner.style.display = "block";
+
+    for (let i = 0; i < todo.length; i++) {
+        const t = todo[i];
+        const pct = Math.round((i / todo.length) * 100);
+        titleEl.textContent = `📥 Hors-Ligne : ${labelName} (${i + 1}/${todo.length})`;
+        pctEl.textContent = pct + "%";
+        stepEl.textContent = `Compression AAC 96kbps : ${t.title}`;
+        fillEl.style.width = pct + "%";
+        await downloadTrackToIphone(t, true);
+    }
+
+    titleEl.textContent = `✅ ${labelName} enregistré sur l'iPhone !`;
+    pctEl.textContent = "100%";
+    stepEl.textContent = `${tracks.length} titres disponibles en Mode Avion`;
+    fillEl.style.width = "100%";
+    BATCH_DOWNLOAD_ACTIVE = false;
+
+    renderLibraryViews();
+    if (ACTIVE_ALBUM_IDX >= 0 && document.getElementById("entity_sheet").style.display === "block") {
+        openAlbumDetail(ACTIVE_ALBUM_IDX);
+    } else if (ACTIVE_ARTIST_IDX >= 0 && document.getElementById("entity_sheet").style.display === "block") {
+        openArtistDetail(ACTIVE_ARTIST_IDX);
+    }
+
+    setTimeout(() => {
+        if (!BATCH_DOWNLOAD_ACTIVE) banner.style.display = "none";
+    }, 2800);
+}
+
+async function confirmPurgeOfflineStorage() {
+    if (OFFLINE_META.size === 0) {
+        alert("Aucun titre n'est stocké dans la mémoire hors-ligne de l'iPhone.");
+        return;
+    }
+    if (confirm(`Vider les ${OFFLINE_META.size} titre(s) téléchargés dans la mémoire de l'iPhone ? (Ils resteront sur ton serveur)`)) {
+        await clearAllOfflineRecords();
+        renderHomeView();
+        renderLibraryViews();
+        if (ACTIVE_ALBUM_IDX >= 0 && document.getElementById("entity_sheet").style.display === "block") {
+            openAlbumDetail(ACTIVE_ALBUM_IDX);
+        }
+    }
+}
+
+function getEffectiveCoverUrl(t) {
+    if (t && t.path && OFFLINE_META.has(t.path)) {
+        const m = OFFLINE_META.get(t.path);
+        if (m && m.coverDataUrl) return m.coverDataUrl;
+    }
+    return (t && t.cover_url) ? t.cover_url : "/iliantify_icon.png";
+}
+
+function esc(s) {
+    return String(s || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, "&quot;");
+}
+
+function fmtTime(sec) {
+    if (!sec || isNaN(sec) || sec < 0) return "0:00";
+    const s = Math.floor(sec);
+    return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+}
+
+/* ==================== NAVIGATION ENTRE LES 3 ONGLETS IOS ==================== */
+function switchMainTab(tab) {
+    ["home", "search", "library"].forEach(t => {
+        document.getElementById("page_" + t).classList.toggle("active", t === tab);
+        document.getElementById("nav_" + t).classList.toggle("active", t === tab);
+    });
+    if (tab === "search" && !document.getElementById("online_search_results").innerHTML.trim()) {
+        loadDeezerRecommendationsInSearch();
+    }
+    window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+function switchLibFilter(flt) {
+    CURRENT_LIB_FILTER = flt;
+    ["tracks", "albums", "artists", "offline", "favs", "deezer"].forEach(k => {
+        const chip = document.getElementById("libf_" + k);
+        const box = document.getElementById("lib_list_" + k);
+        if (chip) chip.classList.toggle("active", k === flt);
+        if (box) box.style.display = (k === flt) ? (k === "albums" || k === "artists" ? "grid" : "flex") : "none";
+        if (k === "deezer" && box) box.style.display = (k === flt) ? "block" : "none";
+    });
+    ACTIVE_ALBUM_IDX = -1;
+    ACTIVE_ARTIST_IDX = -1;
+    document.getElementById("entity_sheet").style.display = "none";
+}
+
+function openOfflineLibraryView() {
+    switchMainTab("library");
+    switchLibFilter("offline");
+}
+
+/* ==================== FAVORIS ❤️ (STOCKÉS SUR LE SERVEUR + LOCALSTORAGE) ==================== */
+async function loadFavorites() {
+    try {
+        const localFavs = JSON.parse(localStorage.getItem("iliantify_favs") || "[]");
+        localFavs.forEach(p => FAVORITES.add(p));
+        if (!isOfflineModeActive()) {
+            const r = await fetch("/api/music_favorites");
+            const d = await r.json();
+            if (d.favorites) {
+                FAVORITES = new Set([...FAVORITES, ...d.favorites]);
+                localStorage.setItem("iliantify_favs", JSON.stringify([...FAVORITES]));
+            }
+        }
+    } catch (e) {}
+    updateFavCounters();
+}
+
+async function toggleFavoritePath(path, ev) {
+    if (ev) ev.stopPropagation();
+    if (!path) return;
+    if (FAVORITES.has(path)) {
+        FAVORITES.delete(path);
+    } else {
+        FAVORITES.add(path);
+    }
+    localStorage.setItem("iliantify_favs", JSON.stringify([...FAVORITES]));
+    updateFavCounters();
+    renderLibraryViews();
+    updateLikeButtonsUI();
+    try {
+        const fd = new FormData();
+        fd.append("path", path);
+        await fetch("/api/music_favorites", {method: "POST", body: fd});
+    } catch (e) {}
+}
+
+function toggleCurrentTrackFavorite() {
+    if (Q_INDEX < 0 || !QUEUE[Q_INDEX] || !QUEUE[Q_INDEX].path) return;
+    toggleFavoritePath(QUEUE[Q_INDEX].path);
+}
+
+function updateLikeButtonsUI() {
+    const cur = (Q_INDEX >= 0 && QUEUE[Q_INDEX]) ? QUEUE[Q_INDEX] : null;
+    const isLiked = cur && cur.path && FAVORITES.has(cur.path);
+    document.getElementById("mp_like_btn").textContent = isLiked ? "❤️" : "🤍";
+    document.getElementById("fp_like_btn").textContent = isLiked ? "❤️" : "🤍";
+}
+
+function updateFavCounters() {
+    const favTracks = (LIB.tracks || []).filter(t => FAVORITES.has(t.path));
+    document.getElementById("home_fav_cnt").textContent = favTracks.length;
+    document.getElementById("cnt_favs").textContent = favTracks.length;
+}
+
+/* ==================== RECONSTRUCTION DU CATALOGUE DEPUIS INDEXEDDB EN SECOURS ==================== */
+function ensureOfflineTracksInLib() {
+    if (!LIB || ! Array.isArray(LIB.tracks)) {
+        LIB = {tracks: [], albums: [], artists: [], counts: {tracks: 0, albums: 0, artists: 0}};
+    }
+    const existingPaths = new Set((LIB.tracks || []).map(t => t.path));
+    OFFLINE_META.forEach((m) => {
+        if (!existingPaths.has(m.path)) {
+            LIB.tracks.push({
+                path: m.path,
+                title: m.title,
+                artist: m.artist,
+                album: m.album,
+                duration: m.duration || 0,
+                duration_str: m.duration_str || "",
+                track_num: m.track_num || 0,
+                cover_url: m.coverDataUrl || "/iliantify_icon.png",
+                stream_url: `/media/${encodeURIComponent(m.path)}`
+            });
+        }
+    });
+
+    if (!LIB.albums || !LIB.albums.length) {
+        const albMap = new Map();
+        (LIB.tracks || []).forEach(t => {
+            const key = (t.album || "Singles").toLowerCase();
+            if (!albMap.has(key)) {
+                albMap.set(key, {
+                    album: t.album || "Singles",
+                    artist: t.artist || "Artiste",
+                    cover_url: getEffectiveCoverUrl(t),
+                    tracks_count: 0,
+                    tracks: []
+                });
+            }
+            const a = albMap.get(key);
+            a.tracks.push(t);
+            a.tracks_count = a.tracks.length;
+        });
+        LIB.albums = Array.from(albMap.values());
+    }
+
+    if (!LIB.artists || !LIB.artists.length) {
+        const artMap = new Map();
+        (LIB.tracks || []).forEach(t => {
+            const key = (t.artist || "Artiste").toLowerCase();
+            if (!artMap.has(key)) {
+                artMap.set(key, {
+                    artist: t.artist || "Artiste",
+                    photo_url: getEffectiveCoverUrl(t),
+                    albums_count: 1,
+                    tracks_count: 0,
+                    tracks: []
+                });
+            }
+            const ar = artMap.get(key);
+            ar.tracks.push(t);
+            ar.tracks_count = ar.tracks.length;
+        });
+        LIB.artists = Array.from(artMap.values());
+    }
+
+    LIB.counts = {
+        tracks: (LIB.tracks || []).length,
+        albums: (LIB.albums || []).length,
+        artists: (LIB.artists || []).length
+    };
+}
+
+/* ==================== CHARGEMENT DE LA BIBLIOTHÈQUE LOCALE (CONNECTÉ OU MODE AVION) ==================== */
+async function refreshAllMusic() {
+    await initOfflineDB();
+    await loadFavorites();
+
+    try {
+        const cachedRaw = localStorage.getItem("iliantify_cached_lib");
+        if (cachedRaw && (!LIB.tracks || !LIB.tracks.length)) {
+            LIB = JSON.parse(cachedRaw);
+        }
+    } catch (e) {}
+
+    if (!MANUAL_OFFLINE_MODE && navigator.onLine) {
+        try {
+            const r = await fetch("/api/music_library");
+            const data = await r.json();
+            if (data && Array.isArray(data.tracks) && !data.offline) {
+                LIB = data;
+                AUTO_OFFLINE_DETECTED = false;
+                try {
+                    localStorage.setItem("iliantify_cached_lib", JSON.stringify(LIB));
+                } catch (e) {}
+            } else if (data && data.offline) {
+                AUTO_OFFLINE_DETECTED = true;
+            }
+        } catch (e) {
+            AUTO_OFFLINE_DETECTED = true;
+        }
+    }
+
+    ensureOfflineTracksInLib();
+    updateOfflineModeUI();
+
+    const c = LIB.counts || {tracks: 0, albums: 0, artists: 0};
+    document.getElementById("cnt_tracks").textContent = c.tracks;
+    document.getElementById("cnt_albums").textContent = c.albums;
+    document.getElementById("cnt_artists").textContent = c.artists;
+    updateFavCounters();
+    updateOfflineStorageStatsUI();
+    renderHomeView();
+    renderLibraryViews();
+}
+
+function renderTrackRow(t, idx, queueType = "all") {
+    const isPlaying = (Q_INDEX >= 0 && QUEUE[Q_INDEX] && QUEUE[Q_INDEX].path === t.path);
+    const isLiked = t.path && FAVORITES.has(t.path);
+    const isDl = t.path && OFFLINE_META.has(t.path);
+    const isSpin = t.path && OFFLINE_DOWNLOADING.has(t.path);
+    const unavailable = isOfflineModeActive() && !isDl;
+    const coverSrc = getEffectiveCoverUrl(t);
+
+    return `
+    <div class="track-row ${isPlaying ? 'playing' : ''} ${unavailable ? 'unavailable-offline' : ''}" onclick="playFromSource('${queueType}', ${idx})">
+        <img src="${coverSrc}" alt="" loading="lazy">
+        <div class="track-info">
+            <div class="track-title">${t.title}${isDl ? '<span class="offline-badge-inline">📱 iPhone</span>' : ''}</div>
+            <div class="track-sub">${t.artist} • ${t.album}${t.duration_str ? ' • ' + t.duration_str : ''}</div>
+        </div>
+        <div class="track-actions">
+            <button type="button" class="icon-btn offline-btn ${isDl && !isSpin ? 'downloaded' : ''} ${isSpin ? 'spinning' : ''}" data-offline-path="${esc(t.path)}" onclick="toggleTrackOffline('${esc(t.path)}', event)" title="Télécharger hors-ligne sur l'iPhone">${isSpin ? '⏳' : (isDl ? '✅' : '⬇️')}</button>
+            <button type="button" class="icon-btn ${isLiked ? 'liked' : ''}" onclick="toggleFavoritePath('${esc(t.path)}', event)">${isLiked ? '❤️' : '🤍'}</button>
+        </div>
+    </div>`;
+}
+
+function renderHomeView() {
+    // 1. Ajoutés récemment
+    const recBox = document.getElementById("home_recent_strip");
+    const rec = (LIB.tracks || []).slice(0, 12);
+    recBox.innerHTML = rec.length ? rec.map((t, i) => {
+        const isDl = t.path && OFFLINE_META.has(t.path);
+        const unavail = isOfflineModeActive() && !isDl;
+        return `
+        <div class="h-card" style="${unavail ? 'opacity:0.38' : ''}" onclick="playFromSource('all', ${i})">
+            <img src="${getEffectiveCoverUrl(t)}" alt="" loading="lazy">
+            <div class="h-card-title">${isDl ? '✅ ' : ''}${t.title}</div>
+            <div class="h-card-sub">${t.artist}</div>
+        </div>`;
+    }).join("") : `<div style="color:var(--sub);font-size:13px">Aucun titre local. Utilise l'onglet 🔍 Rechercher pour télécharger !</div>`;
+
+    // 2. Albums en grille 2 colonnes
+    const albBox = document.getElementById("home_albums_grid");
+    const albs = (LIB.albums || []).slice(0, 8);
+    albBox.innerHTML = albs.map((a, i) => {
+        const allDl = areAllTracksDownloaded(a.tracks || []);
+        const cover = (a.tracks && a.tracks[0]) ? getEffectiveCoverUrl(a.tracks[0]) : a.cover_url;
+        return `
+        <div class="album-card" onclick="openAlbumDetail(${i})">
+            <img src="${cover}" alt="" loading="lazy">
+            <div class="album-card-title">${allDl ? '✅ ' : ''}${a.album}</div>
+            <div class="album-card-sub">${a.artist} • ${a.tracks_count} titres</div>
+        </div>`;
+    }).join("");
+
+    // 3. Artistes ronds HD
+    const artBox = document.getElementById("home_artists_strip");
+    const arts = (LIB.artists || []);
+    artBox.innerHTML = arts.map((ar, i) => {
+        const photo = (isOfflineModeActive() && ar.tracks && ar.tracks[0]) ? getEffectiveCoverUrl(ar.tracks[0]) : ar.photo_url;
+        return `
+        <div class="h-card" style="text-align:center" onclick="openArtistDetail(${i})">
+            <img src="${photo}" alt="" style="border-radius:50%" loading="lazy" onerror="this.src='/iliantify_icon.png'">
+            <div class="h-card-title">${ar.artist}</div>
+            <div class="h-card-sub">${ar.tracks_count} titres</div>
+        </div>`;
+    }).join("");
+}
+
+function renderSwitchBarHTML(tracks, labelName, jsCallExpr) {
+    const allDl = areAllTracksDownloaded(tracks);
+    const dlCount = (tracks || []).filter(t => t.path && OFFLINE_META.has(t.path)).length;
+    return `
+    <div class="offline-switch-bar" onclick="${jsCallExpr}">
+        <div class="offline-switch-label">
+            <span>📥 Télécharger pour écoute hors-ligne</span>
+            <small style="color:var(--sub);font-weight:600">(${dlCount}/${(tracks || []).length})</small>
+        </div>
+        <button type="button" class="ios-switch ${allDl ? 'on' : ''}" aria-label="Télécharger hors-ligne"></button>
+    </div>`;
+}
+
+function renderLibraryViews() {
+    // 1. Titres + Switch global Hors-Ligne
+    const trBox = document.getElementById("lib_list_tracks");
+    const allTracks = LIB.tracks || [];
+    trBox.innerHTML = allTracks.length
+        ? (renderSwitchBarHTML(allTracks, "Toute ma bibliothèque", "toggleAllLibraryOffline()") +
+           allTracks.map((t, i) => renderTrackRow(t, i, "all")).join(""))
+        : `<div style="color:var(--sub);font-size:13px">Aucun titre dans ta bibliothèque.</div>`;
+
+    // 2. Albums
+    const alBox = document.getElementById("lib_list_albums");
+    alBox.innerHTML = (LIB.albums || []).map((a, i) => {
+        const allDl = areAllTracksDownloaded(a.tracks || []);
+        const cover = (a.tracks && a.tracks[0]) ? getEffectiveCoverUrl(a.tracks[0]) : a.cover_url;
+        return `
+        <div class="album-card" onclick="openAlbumDetail(${i})">
+            <img src="${cover}" alt="" loading="lazy">
+            <div class="album-card-title">${allDl ? '✅ ' : ''}${a.album}</div>
+            <div class="album-card-sub">${a.artist} • ${a.tracks_count} titres</div>
+        </div>`;
+    }).join("");
+
+    // 3. Artistes
+    const arBox = document.getElementById("lib_list_artists");
+    arBox.innerHTML = (LIB.artists || []).map((ar, i) => {
+        const photo = (isOfflineModeActive() && ar.tracks && ar.tracks[0]) ? getEffectiveCoverUrl(ar.tracks[0]) : ar.photo_url;
+        return `
+        <div class="album-card artist-round" style="text-align:center" onclick="openArtistDetail(${i})">
+            <img src="${photo}" alt="" loading="lazy" onerror="this.src='/iliantify_icon.png'">
+            <div class="album-card-title">${ar.artist}</div>
+            <div class="album-card-sub">${ar.albums_count} album(s) • ${ar.tracks_count} son(s)</div>
+        </div>`;
+    }).join("");
+
+    // 4. Hors-Ligne (Sur mon iPhone) ✈️
+    const offlineTracks = getOfflineTracksList();
+    const offBox = document.getElementById("lib_list_offline");
+    if (offBox) {
+        offBox.innerHTML = offlineTracks.length
+            ? (`<div style="display:flex;gap:8px;margin-bottom:8px">
+                    <button type="button" class="btn-big-green" style="flex:1;justify-content:center" onclick="playFromSource('offline', 0)">▶ Lecture Hors-Ligne (${offlineTracks.length})</button>
+                    <button type="button" class="btn-big-sec" onclick="playOfflineShuffle()">🔀 Aléatoire</button>
+               </div>` +
+               offlineTracks.map((t, i) => renderTrackRow(t, i, "offline")).join(""))
+            : `<div style="color:var(--sub);font-size:13px;padding:12px 4px">Aucun son téléchargé sur l'iPhone. Touche le bouton <b>⬇️</b> à droite d'un titre ou active <b>📥 Télécharger pour écoute hors-ligne</b> sur un album !</div>`;
+    }
+
+    // 5. Favoris ❤️ + Switch Hors-Ligne Favoris
+    const favTracks = (LIB.tracks || []).filter(t => FAVORITES.has(t.path));
+    const favBox = document.getElementById("lib_list_favs");
+    favBox.innerHTML = favTracks.length
+        ? (renderSwitchBarHTML(favTracks, "Titres Likés ❤️", "toggleFavoritesOffline()") +
+           favTracks.map((t, i) => renderTrackRow(t, i, "favs")).join(""))
+        : `<div style="color:var(--sub);font-size:13px">Touche le cœur 🤍 sur n'importe quel titre pour l'ajouter à tes Favoris.</div>`;
+}
+
+function getOfflineTracksList() {
+    const inLib = (LIB.tracks || []).filter(t => t.path && OFFLINE_META.has(t.path));
+    if (inLib.length === OFFLINE_META.size) return inLib;
+    const seen = new Set(inLib.map(t => t.path));
+    const list = inLib.slice();
+    OFFLINE_META.forEach(m => {
+        if (!seen.has(m.path)) {
+            list.push({
+                path: m.path,
+                title: m.title,
+                artist: m.artist,
+                album: m.album,
+                duration: m.duration,
+                duration_str: m.duration_str,
+                track_num: m.track_num,
+                cover_url: m.coverDataUrl || "/iliantify_icon.png",
+                stream_url: `/media/${encodeURIComponent(m.path)}`
+            });
+        }
+    });
+    return list;
+}
+
+function toggleAllLibraryOffline() {
+    toggleBatchOfflineDownload(LIB.tracks || [], "Bibliothèque complète");
+}
+
+function toggleFavoritesOffline() {
+    const favTracks = (LIB.tracks || []).filter(t => FAVORITES.has(t.path));
+    toggleBatchOfflineDownload(favTracks, "Titres Likés ❤️");
+}
+
+function toggleAlbumOfflineByIdx(albIdx) {
+    const alb = (LIB.albums || [])[albIdx];
+    if (!alb) return;
+    toggleBatchOfflineDownload(alb.tracks || [], alb.album);
+}
+
+function toggleArtistOfflineByIdx(artIdx) {
+    const ar = (LIB.artists || [])[artIdx];
+    if (!ar) return;
+    toggleBatchOfflineDownload(ar.tracks || [], ar.artist);
+}
+
+function openAlbumDetail(albIdx) {
+    const alb = (LIB.albums || [])[albIdx];
+    if (!alb) return;
+    ACTIVE_ALBUM_IDX = albIdx;
+    ACTIVE_ARTIST_IDX = -1;
+    switchMainTab("library");
+    const sheet = document.getElementById("entity_sheet");
+    const cover = (alb.tracks && alb.tracks[0]) ? getEffectiveCoverUrl(alb.tracks[0]) : alb.cover_url;
+    sheet.style.display = "block";
+    sheet.innerHTML = `
+        <div class="entity-header">
+            <img src="${cover}" alt="">
+            <div style="font-size:19px;font-weight:800">${alb.album}</div>
+            <div style="font-size:13px;color:var(--sub);margin-top:3px">${alb.artist} • ${alb.tracks_count} titres</div>
+            <div class="entity-play-row">
+                <button type="button" class="btn-big-green" onclick="playEntityTracks('album', ${albIdx}, 0, false)">▶ Lecture</button>
+                <button type="button" class="btn-big-sec" onclick="playEntityTracks('album', ${albIdx}, 0, true)">🔀 Aléatoire</button>
+                <button type="button" class="btn-big-sec" onclick="document.getElementById('entity_sheet').style.display='none';ACTIVE_ALBUM_IDX=-1">✕</button>
+            </div>
+        </div>
+        ${renderSwitchBarHTML(alb.tracks || [], alb.album, `toggleAlbumOfflineByIdx(${albIdx})`)}
+        <div class="track-list">
+            ${alb.tracks.map((t, ti) => {
+                const isDl = t.path && OFFLINE_META.has(t.path);
+                const isSpin = t.path && OFFLINE_DOWNLOADING.has(t.path);
+                const unavail = isOfflineModeActive() && !isDl;
+                return `
+                <div class="track-row ${unavail ? 'unavailable-offline' : ''}" onclick="playEntityTracks('album', ${albIdx}, ${ti}, false)">
+                    <img src="${getEffectiveCoverUrl(t)}" alt="">
+                    <div class="track-info">
+                        <div class="track-title">${t.track_num ? String(t.track_num).padStart(2,'0') + '. ' : ''}${t.title}${isDl ? '<span class="offline-badge-inline">📱 iPhone</span>' : ''}</div>
+                        <div class="track-sub">${t.artist}${t.duration_str ? ' • ' + t.duration_str : ''}</div>
+                    </div>
+                    <div class="track-actions">
+                        <button type="button" class="icon-btn offline-btn ${isDl && !isSpin ? 'downloaded' : ''} ${isSpin ? 'spinning' : ''}" data-offline-path="${esc(t.path)}" onclick="toggleTrackOffline('${esc(t.path)}', event)">${isSpin ? '⏳' : (isDl ? '✅' : '⬇️')}</button>
+                        <button type="button" class="icon-btn ${FAVORITES.has(t.path) ? 'liked' : ''}" onclick="toggleFavoritePath('${esc(t.path)}', event)">${FAVORITES.has(t.path) ? '❤️' : '🤍'}</button>
+                    </div>
+                </div>`;
+            }).join("")}
+        </div>`;
+    window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+function openArtistDetail(artIdx) {
+    const ar = (LIB.artists || [])[artIdx];
+    if (!ar) return;
+    ACTIVE_ARTIST_IDX = artIdx;
+    ACTIVE_ALBUM_IDX = -1;
+    switchMainTab("library");
+    const sheet = document.getElementById("entity_sheet");
+    const photo = (isOfflineModeActive() && ar.tracks && ar.tracks[0]) ? getEffectiveCoverUrl(ar.tracks[0]) : ar.photo_url;
+    sheet.style.display = "block";
+    sheet.innerHTML = `
+        <div class="entity-header">
+            <img src="${photo}" alt="" class="round" onerror="this.src='/iliantify_icon.png'">
+            <div style="font-size:20px;font-weight:800">${ar.artist}</div>
+            <div style="font-size:13px;color:var(--sub);margin-top:3px">${ar.albums_count} album(s) • ${ar.tracks_count} titres</div>
+            <div class="entity-play-row">
+                <button type="button" class="btn-big-green" onclick="playEntityTracks('artist', ${artIdx}, 0, false)">▶ Tout lire</button>
+                <button type="button" class="btn-big-sec" onclick="playEntityTracks('artist', ${artIdx}, 0, true)">🔀 Mix Artiste</button>
+                <button type="button" class="btn-big-sec" onclick="document.getElementById('entity_sheet').style.display='none';ACTIVE_ARTIST_IDX=-1">✕</button>
+            </div>
+        </div>
+        ${renderSwitchBarHTML(ar.tracks || [], ar.artist, `toggleArtistOfflineByIdx(${artIdx})`)}
+        <div class="track-list">
+            ${ar.tracks.map((t, ti) => {
+                const isDl = t.path && OFFLINE_META.has(t.path);
+                const isSpin = t.path && OFFLINE_DOWNLOADING.has(t.path);
+                const unavail = isOfflineModeActive() && !isDl;
+                return `
+                <div class="track-row ${unavail ? 'unavailable-offline' : ''}" onclick="playEntityTracks('artist', ${artIdx}, ${ti}, false)">
+                    <img src="${getEffectiveCoverUrl(t)}" alt="">
+                    <div class="track-info">
+                        <div class="track-title">${t.title}${isDl ? '<span class="offline-badge-inline">📱 iPhone</span>' : ''}</div>
+                        <div class="track-sub">${t.album}${t.duration_str ? ' • ' + t.duration_str : ''}</div>
+                    </div>
+                    <div class="track-actions">
+                        <button type="button" class="icon-btn offline-btn ${isDl && !isSpin ? 'downloaded' : ''} ${isSpin ? 'spinning' : ''}" data-offline-path="${esc(t.path)}" onclick="toggleTrackOffline('${esc(t.path)}', event)">${isSpin ? '⏳' : (isDl ? '✅' : '⬇️')}</button>
+                        <button type="button" class="icon-btn ${FAVORITES.has(t.path) ? 'liked' : ''}" onclick="toggleFavoritePath('${esc(t.path)}', event)">${FAVORITES.has(t.path) ? '❤️' : '🤍'}</button>
+                    </div>
+                </div>`;
+            }).join("")}
+        </div>`;
+    window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+function openSinglesAlbum() {
+    const idx = (LIB.albums || []).findIndex(a => a.album.toLowerCase().includes("singles"));
+    if (idx >= 0) {
+        openAlbumDetail(idx);
+    } else {
+        switchMainTab("library");
+        switchLibFilter("tracks");
+    }
+}
+
+function openFavoritesView() {
+    switchMainTab("library");
+    switchLibFilter("favs");
+}
+
+/* ==================== LECTURE AUDIO INTELLIGENTE (PRIORITÉ BLOB LOCAL IPHONE - MISSION 4) ==================== */
+function playFromSource(source, idx) {
+    if (source === "all") {
+        QUEUE = (LIB.tracks || []).slice();
+    } else if (source === "favs") {
+        QUEUE = (LIB.tracks || []).filter(t => FAVORITES.has(t.path));
+    } else if (source === "offline") {
+        QUEUE = getOfflineTracksList();
+    }
+    if (!QUEUE.length) return;
+    startQueueAt(idx);
+}
+
+function playOfflineShuffle() {
+    const list = getOfflineTracksList();
+    if (!list.length) return;
+    QUEUE = list;
+    IS_SHUFFLE = true;
+    document.getElementById("fp_shuffle_btn").classList.add("active");
+    startQueueAt(Math.floor(Math.random() * QUEUE.length));
+}
+
+function playEntityTracks(kind, entityIdx, trackIdx, shuffleNow) {
+    const list = (kind === "album")
+        ? ((LIB.albums || [])[entityIdx] || {}).tracks
+        : ((LIB.artists || [])[entityIdx] || {}).tracks;
+    if (!list || !list.length) return;
+    QUEUE = list.slice();
+    IS_SHUFFLE = !!shuffleNow;
+    document.getElementById("fp_shuffle_btn").classList.toggle("active", IS_SHUFFLE);
+    const startIdx = shuffleNow ? Math.floor(Math.random() * QUEUE.length) : trackIdx;
+    startQueueAt(startIdx);
+}
+
+function playAllLibraryShuffle() {
+    const base = isOfflineModeActive() ? getOfflineTracksList() : (LIB.tracks || []);
+    if (!base || !base.length) {
+        if (isOfflineModeActive()) {
+            alert("✈️ Aucun son n'est encore téléchargé sur l'iPhone.");
+        }
+        return;
+    }
+    QUEUE = base.slice();
+    IS_SHUFFLE = true;
+    document.getElementById("fp_shuffle_btn").classList.add("active");
+    startQueueAt(Math.floor(Math.random() * QUEUE.length));
+}
+
+async function startQueueAt(idx) {
+    if (!QUEUE.length) return;
+    if (idx < 0) idx = QUEUE.length - 1;
+    if (idx >= QUEUE.length) idx = 0;
+
+    const candidate = QUEUE[idx];
+    const hasLocal = candidate && candidate.path && OFFLINE_META.has(candidate.path);
+
+    if (isOfflineModeActive() && !hasLocal && candidate.path) {
+        const nextLocalIdx = QUEUE.findIndex((item, k) => k !== idx && item.path && OFFLINE_META.has(item.path));
+        if (nextLocalIdx >= 0) {
+            idx = nextLocalIdx;
+        } else {
+            alert("✈️ Mode Hors-Ligne actif : ce titre n'est pas téléchargé dans la mémoire de l'iPhone (touche ⬇️ quand tu as du réseau).");
+            return;
+        }
+    }
+
+    Q_INDEX = idx;
+    const t = QUEUE[Q_INDEX];
+    let playUrl = t.stream_url;
+    let coverUrl = getEffectiveCoverUrl(t);
+    let playingFromIphone = false;
+
+    // MISSION 4.1 : Vérifie toujours d'abord IlianTifyOfflineDB (lecture locale 0 data, 0.01s)
+    if (t.path && OFFLINE_META.has(t.path)) {
+        const rec = await getOfflineRecord(t.path);
+        if (rec && rec.audioBlob) {
+            if (CURRENT_BLOB_URL) {
+                try { URL.revokeObjectURL(CURRENT_BLOB_URL); } catch (e) {}
+            }
+            CURRENT_BLOB_URL = URL.createObjectURL(rec.audioBlob);
+            playUrl = CURRENT_BLOB_URL;
+            if (rec.coverDataUrl) {
+                coverUrl = rec.coverDataUrl;
+            }
+            playingFromIphone = true;
+        }
+    }
+
+    document.getElementById("mini_player").style.display = "block";
+    document.getElementById("mp_cover").src = coverUrl;
+    document.getElementById("mp_title").textContent = t.title || "Morceau";
+    document.getElementById("mp_artist").textContent = (t.artist || "Artiste") + (playingFromIphone ? " • 📱 iPhone" : "");
+
+    document.getElementById("fp_cover").src = coverUrl;
+    document.getElementById("fp_title").textContent = t.title || "Morceau";
+    document.getElementById("fp_artist").textContent = `${t.artist || "Artiste"} • ${t.album || "IlianTify"}`;
+    document.getElementById("fp_album_top").textContent = (t.album || "ILIANTIFY") + (playingFromIphone ? " • 📱 HORS-LIGNE" : "");
+
+    audioEl.src = playUrl;
+    audioEl.play().catch(() => {});
+    updateLikeButtonsUI();
+    updateFullscreenOfflineButtonUI();
+    updateMediaSession(t, coverUrl);
+    renderQueueDrawer();
+    renderLibraryViews();
+}
+
+function togglePlayPause(forcePlay = null) {
+    if (!audioEl.src) return;
+    const wantPlay = (forcePlay !== null) ? forcePlay : audioEl.paused;
+    if (wantPlay) {
+        audioEl.play().catch(() => {});
+    } else {
+        audioEl.pause();
+    }
+}
+
+function playNextTrack() {
+    if (!QUEUE.length) return;
+    if (IS_SHUFFLE && QUEUE.length > 1) {
+        let n = Q_INDEX;
+        while (n === Q_INDEX) {
+            n = Math.floor(Math.random() * QUEUE.length);
+        }
+        startQueueAt(n);
+    } else {
+        startQueueAt(Q_INDEX + 1);
+    }
+}
+
+function playPrevTrack() {
+    if (audioEl.currentTime > 4) {
+        audioEl.currentTime = 0;
+        return;
+    }
+    if (!QUEUE.length) return;
+    startQueueAt(Q_INDEX - 1);
+}
+
+function toggleShuffle() {
+    IS_SHUFFLE = !IS_SHUFFLE;
+    document.getElementById("fp_shuffle_btn").classList.toggle("active", IS_SHUFFLE);
+}
+
+function toggleRepeat() {
+    IS_REPEAT = !IS_REPEAT;
+    document.getElementById("fp_repeat_btn").classList.toggle("active", IS_REPEAT);
+}
+
+function seekAudioTo(pct) {
+    if (audioEl.duration && !isNaN(audioEl.duration)) {
+        audioEl.currentTime = (parseFloat(pct) / 100) * audioEl.duration;
+    }
+}
+
+function openFullPlayer() {
+    document.getElementById("full_player").classList.add("open");
+}
+
+function closeFullPlayer() {
+    document.getElementById("full_player").classList.remove("open");
+}
+
+function onFpTouchStart(ev) {
+    if (ev.touches && ev.touches.length === 1) {
+        FP_TOUCH_Y = ev.touches[0].clientY;
+    }
+}
+
+function onFpTouchEnd(ev) {
+    if (ev.changedTouches && ev.changedTouches.length === 1) {
+        const dy = ev.changedTouches[0].clientY - FP_TOUCH_Y;
+        if (dy > 90 && ev.target.id !== "fp_seek") {
+            closeFullPlayer();
+        }
+    }
+}
+
+function toggleQueueDrawer() {
+    const dr = document.getElementById("fp_queue_drawer");
+    dr.style.display = (dr.style.display === "block") ? "none" : "block";
+    renderQueueDrawer();
+}
+
+function renderQueueDrawer() {
+    const dr = document.getElementById("fp_queue_drawer");
+    if (!QUEUE.length) {
+        dr.innerHTML = "<div style='color:var(--sub);font-size:12px'>File d'attente vide.</div>";
+        return;
+    }
+    dr.innerHTML = `<div style="font-size:12px;font-weight:700;color:var(--sp-green);margin-bottom:6px">À suivre dans la file (${QUEUE.length} titres)</div>` +
+        QUEUE.slice(0, 30).map((t, i) => `
+            <div onclick="startQueueAt(${i})" style="display:flex;justify-content:space-between;align-items:center;padding:6px 4px;border-bottom:1px solid var(--border);font-size:12px;cursor:pointer;color:${i === Q_INDEX ? '#1db954' : '#fff'}">
+                <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${i === Q_INDEX ? '🔊 ' : ''}${t.path && OFFLINE_META.has(t.path) ? '✅ ' : ''}${t.title} — <span style="color:var(--sub)">${t.artist}</span></span>
+                <span style="color:var(--sub);margin-left:8px">${t.duration_str || ''}</span>
+            </div>`).join("");
+}
+
+function updateMediaSession(track, customCoverUrl = null) {
+    if (!("mediaSession" in navigator) || !track) return;
+    try {
+        const rawCover = customCoverUrl || getEffectiveCoverUrl(track);
+        const absImg = (rawCover.startsWith("http") || rawCover.startsWith("data:") || rawCover.startsWith("blob:"))
+            ? rawCover
+            : window.location.origin + (rawCover || "/iliantify_icon.png");
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: track.title || "IlianTify",
+            artist: track.artist || "Artiste",
+            album: track.album || "IlianTify",
+            artwork: [
+                {src: absImg, sizes: "300x300", type: "image/jpeg"},
+                {src: absImg, sizes: "512x512", type: "image/jpeg"}
+            ]
+        });
+        navigator.mediaSession.setActionHandler("play", () => togglePlayPause(true));
+        navigator.mediaSession.setActionHandler("pause", () => togglePlayPause(false));
+        navigator.mediaSession.setActionHandler("previoustrack", () => playPrevTrack());
+        navigator.mediaSession.setActionHandler("nexttrack", () => playNextTrack());
+        navigator.mediaSession.setActionHandler("seekto", (details) => {
+            if (details.seekTime !== undefined && audioEl.duration) {
+                audioEl.currentTime = details.seekTime;
+            }
+        });
+    } catch (e) {}
+}
+
+audioEl.addEventListener("timeupdate", () => {
+    const cur = audioEl.currentTime || 0;
+    const dur = audioEl.duration || 0;
+    document.getElementById("fp_cur_time").textContent = fmtTime(cur);
+    if (dur > 0 && !isNaN(dur)) {
+        const pct = (cur / dur) * 100;
+        document.getElementById("mp_progress_fill").style.width = pct + "%";
+        document.getElementById("fp_seek").value = pct;
+        document.getElementById("fp_rem_time").textContent = "-" + fmtTime(Math.max(0, dur - cur));
+        if ("mediaSession" in navigator && navigator.mediaSession.setPositionState) {
+            try {
+                navigator.mediaSession.setPositionState({duration: dur, playbackRate: audioEl.playbackRate || 1, position: Math.min(cur, dur)});
+            } catch (e) {}
+        }
+    }
+});
+
+audioEl.addEventListener("play", () => {
+    document.getElementById("mp_play_btn").textContent = "⏸";
+    document.getElementById("fp_play_btn").textContent = "⏸";
+});
+
+audioEl.addEventListener("pause", () => {
+    document.getElementById("mp_play_btn").textContent = "▶";
+    document.getElementById("fp_play_btn").textContent = "▶";
+});
+
+audioEl.addEventListener("ended", () => {
+    if (IS_REPEAT) {
+        audioEl.currentTime = 0;
+        audioEl.play().catch(() => {});
+    } else {
+        playNextTrack();
+    }
+});
+
+/* ==================== RECHERCHE HYBRIDE (LOCALE + TÉLÉCHARGEMENT DEEZER/YOUTUBE) ==================== */
+function clearAppSearch() {
+    const inp = document.getElementById("app_search_input");
+    inp.value = "";
+    inp.focus();
+    document.getElementById("local_search_section").style.display = "none";
+    loadDeezerRecommendationsInSearch();
+}
+
+function onSearchInputChanged() {
+    const q = document.getElementById("app_search_input").value.trim().toLowerCase();
+    const locSec = document.getElementById("local_search_section");
+    const locBox = document.getElementById("local_search_results");
+    if (!q) {
+        locSec.style.display = "none";
+        return;
+    }
+    const matches = (LIB.tracks || []).map((t, idx) => ({t, idx})).filter(x =>
+        x.t.title.toLowerCase().includes(q) ||
+        x.t.artist.toLowerCase().includes(q) ||
+        x.t.album.toLowerCase().includes(q)
+    );
+    if (matches.length) {
+        locSec.style.display = "block";
+        locBox.innerHTML = matches.slice(0, 8).map(x => renderTrackRow(x.t, x.idx, "all")).join("");
+    } else {
+        locSec.style.display = "none";
+    }
+}
+
+async function runOnlineSearch(sourceType) {
+    CURRENT_SEARCH_SOURCE = sourceType;
+    ["track", "album", "artist", "ytmusic", "youtube_all"].forEach(s => {
+        const el = document.getElementById("src_" + s);
+        if (el) el.classList.toggle("active", s === sourceType);
+    });
+    const q = document.getElementById("app_search_input").value.trim();
+    if (!q) {
+        document.getElementById("app_search_input").focus();
+        return;
+    }
+    if (isOfflineModeActive()) {
+        document.getElementById("online_search_heading").textContent = "✈️ Recherche Hors-Ligne (Bibliothèque iPhone)";
+        document.getElementById("online_search_results").innerHTML = `<div style="color:var(--sub);font-size:13px">La recherche Deezer/YouTube en ligne est désactivée en Mode Hors-Ligne. Tes résultats locaux s'affichent ci-dessus.</div>`;
+        return;
+    }
+    document.getElementById("online_search_heading").textContent = `🌐 Résultats en ligne (${sourceType.toUpperCase()})`;
+    const box = document.getElementById("online_search_results");
+    box.innerHTML = `<div style="color:var(--sub);font-size:13px">⏳ Recherche en cours...</div>`;
+    try {
+        const r = await fetch(`/api/music_preview?q=${encodeURIComponent(q)}&type=${encodeURIComponent(sourceType)}`);
+        const items = await r.json();
+        renderOnlineItems(items);
+    } catch (e) {
+        box.innerHTML = `<div style="color:#fca5a5;font-size:13px">Erreur de recherche (Mode Hors-Ligne ?).</div>`;
+    }
+}
+
+function renderOnlineItems(items) {
+    const box = document.getElementById("online_search_results");
+    if (!items || !items.length) {
+        box.innerHTML = `<div style="color:var(--sub);font-size:13px">Aucun résultat trouvé.</div>`;
+        return;
+    }
+    box.innerHTML = items.map(it => {
+        const img = it.image || "/iliantify_icon.png";
+        return `
+        <div class="track-row" onclick="playOnlinePreview('${esc(it.title)}', '${esc(it.artist || '')}', '${esc(img)}', '${esc(it.preview || '')}')">
+            <img src="${img}" alt="" loading="lazy">
+            <div class="track-info">
+                <div class="track-title">${it.title}</div>
+                <div class="track-sub">${it.subtitle || it.artist || ''}</div>
+            </div>
+            <div class="track-actions" onclick="event.stopPropagation()">
+                <button type="button" class="icon-btn" onclick="playOnlinePreview('${esc(it.title)}', '${esc(it.artist || '')}', '${esc(img)}', '${esc(it.preview || '')}')" title="Écouter un extrait">▶</button>
+                <button type="button" class="icon-btn dl-btn" onclick="downloadFromApp('${it.type || 'track'}', '${esc(it.id)}', '${esc(it.title)}', '${esc(it.artist || '')}', '${esc(img)}', this)" title="Télécharger dans IlianTify">📥</button>
+            </div>
+        </div>`;
+    }).join("");
+}
+
+async function playOnlinePreview(title, artist, image, directPreview) {
+    let url = directPreview;
+    if (!url) {
+        const q = (artist && !title.toLowerCase().includes(artist.toLowerCase())) ? `${artist} ${title}` : title;
+        const r = await fetch(`/api/music_find_preview?q=${encodeURIComponent(q)}`);
+        const d = await r.json();
+        url = d.preview || "";
+    }
+    if (!url) {
+        alert("Aucun extrait 30s disponible. Touche 📥 pour télécharger le titre complet dans IlianTify !");
+        return;
+    }
+    QUEUE = [{
+        title: title,
+        artist: artist || "Extrait Deezer",
+        album: "Aperçu 30s",
+        cover_url: image || "/iliantify_icon.png",
+        stream_url: url,
+        path: ""
+    }];
+    startQueueAt(0);
+}
+
+async function downloadFromApp(type, id, title, artist, image, btnEl) {
+    if (btnEl) {
+        btnEl.textContent = "✅";
+        btnEl.style.background = "#16a34a";
+        btnEl.style.color = "#fff";
+    }
+    const fd = new FormData();
+    fd.append("type", type);
+    fd.append("id", id);
+    fd.append("title", title);
+    fd.append("artist", artist || "");
+    fd.append("image", image || "");
+    await fetch("/api/music_download", {method: "POST", body: fd});
+    pollDownloadStatus();
+}
+
+async function loadDeezerRecommendationsInSearch() {
+    if (isOfflineModeActive()) {
+        document.getElementById("online_search_heading").textContent = "✈️ Mode Hors-Ligne actif";
+        document.getElementById("online_search_results").innerHTML = `<div style="color:var(--sub);font-size:13px">Utilise la barre de recherche ci-dessus pour chercher dans tes titres téléchargés sur l'iPhone.</div>`;
+        return;
+    }
+    try {
+        const r = await fetch("/api/deezer_home");
+        const d = await r.json();
+        document.getElementById("online_search_heading").textContent = "✨ Sons Proposés Pour Toi (Téléchargement 1-Tap)";
+        renderOnlineItems(d.recommendations || []);
+        if (d.account_name && d.account_name !== "Non connecté") {
+            document.getElementById("dz_sync_label").textContent = "💜 Connecté : " + d.account_name;
+        }
+        if (d.account_url) {
+            document.getElementById("dz_sync_input").value = d.account_url;
+        }
+        const pls = d.playlists || [];
+        document.getElementById("dz_playlists_box").innerHTML = pls.map(p => `
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:10px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                    <b>💜 ${p.name} (${p.tracks_count || (p.tracks||[]).length} titres)</b>
+                    <button type="button" class="hdr-pill" style="background:var(--dz-purple);color:#fff" onclick="downloadPlaylistInApp('${esc(p.id)}', this)">📥 Tout télécharger</button>
+                </div>
+            </div>`).join("");
+    } catch (e) {}
+}
+
+async function syncDeezerFromApp(btnEl) {
+    const u = document.getElementById("dz_sync_input").value.trim();
+    if (!u) return;
+    btnEl.textContent = "⏳...";
+    const fd = new FormData();
+    fd.append("url", u);
+    const r = await fetch("/api/deezer_sync", {method: "POST", body: fd});
+    const d = await r.json();
+    btnEl.textContent = d.ok ? "✅ Sync" : "🔄 Sync";
+    await loadDeezerRecommendationsInSearch();
+}
+
+async function downloadPlaylistInApp(pid, btnEl) {
+    if (btnEl) btnEl.textContent = "✅ Lancé";
+    const fd = new FormData();
+    fd.append("id", pid);
+    await fetch("/api/spotify_download_playlist", {method: "POST", body: fd});
+    pollDownloadStatus();
+}
+
+/* ==================== SUIVI AUTOMATIQUE DES TÉLÉCHARGEMENTS EN ARRIÈRE-PLAN ==================== */
+let WAS_ACTIVE_DL = false;
+async function pollDownloadStatus() {
+    if (isOfflineModeActive()) return;
+    try {
+        const r = await fetch("/api/status");
+        const st = await r.json();
+        const banner = document.getElementById("dl_banner");
+        if (st.active) {
+            WAS_ACTIVE_DL = true;
+            banner.style.display = "block";
+            document.getElementById("dl_banner_title").textContent = st.title || "Téléchargement...";
+            document.getElementById("dl_banner_pct").textContent = (st.percent || 0) + "%";
+            document.getElementById("dl_banner_step").textContent = st.step || "";
+            document.getElementById("dl_banner_fill").style.width = (st.percent || 0) + "%";
+        } else {
+            if (WAS_ACTIVE_DL) {
+                WAS_ACTIVE_DL = false;
+                banner.style.display = "none";
+                refreshAllMusic();
+            }
+        }
+    } catch (e) {}
+}
+
+setInterval(pollDownloadStatus, 2500);
+refreshAllMusic();
+loadDeezerRecommendationsInSearch();
+</script>
+</body>
+</html>

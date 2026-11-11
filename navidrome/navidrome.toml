@@ -1,0 +1,11 @@
+MusicFolder = 'C:\Serveur\Medias\Musique'
+DataFolder = 'C:\Serveur\navidrome\data'
+Address = '0.0.0.0'
+Port = 4533
+SessionTimeout = '8760h'
+DevAutoLoginUsername = 'ilian'
+DefaultLanguage = 'fr'
+EnableDownloads = true
+CoverArtPriority = 'embedded, cover.*, folder.*, front.*, external'
+ArtistArtPriority = 'artist.*, album/artist.*, external'
+Scanner.Schedule = '@every 5m'

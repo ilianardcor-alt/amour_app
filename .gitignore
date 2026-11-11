@@ -1,0 +1,36 @@
+﻿# --- Secrets & données personnelles ---
+secrets.json
+spotify_sync.json
+music_favorites.json
+*_favorites.json
+listening_history.json
+library_index.json
+sources_config.json
+
+# --- Bases de données / états des services ---
+*.db
+jellyfin_data/
+jellyfin_cache/
+navidrome/*
+!navidrome/navidrome.toml
+adguard/
+filebrowser.db
+
+# --- Binaires & médias ---
+bin/
+Medias/
+logs/
+*.mp3
+*.mp4
+*.mkv
+*.m4a
+*.part
+
+# --- Sauvegardes locales & caches ---
+backups/
+backup_*/
+__pycache__/
+*.pyc
+.offline_cache/
+*.log
+
