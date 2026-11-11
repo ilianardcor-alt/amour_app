@@ -13,7 +13,7 @@
   </div>
 
   <!-- Champ de lien avec bouton d'action intégré -->
-  <div class="search-input-integrated">
+  <div class="search-integrated-wrap" style="margin-top:var(--space-2)">
     <label for="social_dl_url" class="sr-only">Lien de la vidéo YouTube, TikTok ou Twitter</label>
     <input
       id="social_dl_url"
@@ -21,10 +21,12 @@
       placeholder="Collez votre lien ici (ex : https://www.youtube.com/watch?v=... ou https://www.tiktok.com/...)"
       onkeydown="if(event.key==='Enter') startSocialLinkDownload(document.getElementById('social_dl_btn'))"
     >
-    <button type="button" class="clear-x" onclick="clearSocialUrlInput()" aria-label="Effacer le lien" title="Effacer">✕</button>
-    <button type="button" id="social_dl_btn" class="btn-primary search-submit-btn" onclick="startSocialLinkDownload(this)">
-      📥 Télécharger
-    </button>
+    <div class="search-integrated-actions">
+      <button type="button" class="search-clear-btn" onclick="clearSocialUrlInput()" aria-label="Effacer le lien" title="Effacer">✕</button>
+      <button type="button" id="social_dl_btn" class="btn-primary btn-sm" onclick="startSocialLinkDownload(this)">
+        📥 Télécharger
+      </button>
+    </div>
   </div>
 
   <!-- Sélecteur de format (Vidéo MP4 ou Audio MP3) -->
