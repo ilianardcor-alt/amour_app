@@ -1,0 +1,106 @@
+<!-- SECTION ADMINISTRATION & OUTILS AVANCÉS (REPLIÉE PAR DÉFAUT) -->
+<section class="card" id="sec_admin">
+  <div id="sec_studio" class="sr-only" aria-hidden="true"></div>
+  <details class="advanced-details">
+    <summary>
+      <span>⚙️ Outils avancés & Administration du serveur</span>
+      <span class="badge badge-neutral">Ouvrir / Fermer ▾</span>
+    </summary>
+
+    <div class="warning-banner" role="alert">
+      ⚠️ <strong>Zone d'administration avancée :</strong> Ces outils permettent d'exécuter des commandes système, de modifier le code source et de redémarrer les services du serveur.
+    </div>
+
+    <!-- Journaux techniques -->
+    <div class="status-box" style="margin-bottom:var(--space-2)">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+        <b>📋 Journaux d'activité en direct</b>
+        <div style="display:flex;gap:8px">
+          <button type="button" class="btn-secondary btn-sm" onclick="copyLogs()">📤 Copier les journaux</button>
+          <button type="button" class="btn-ghost btn-sm" onclick="clearLogs()">🧹 Vider</button>
+        </div>
+      </div>
+      <textarea id="raw_logs" aria-label="Journaux techniques" readonly></textarea>
+    </div>
+
+    <div class="segmented-control" role="tablist" aria-label="Outils d'administration">
+      <button type="button" id="stab_term" class="seg-btn active" role="tab" onclick="switchStudioTab('term')">🖥️ Terminal PowerShell</button>
+      <button type="button" id="stab_ide" class="seg-btn" role="tab" onclick="switchStudioTab('ide')">📝 Éditeur de code</button>
+      <button type="button" id="stab_bk" class="seg-btn" role="tab" onclick="switchStudioTab('bk')">🛡️ Sauvegardes</button>
+      <button type="button" id="stab_ag" class="seg-btn" role="tab" onclick="switchStudioTab('ag')">🚫 AdGuard Home</button>
+      <button type="button" id="stab_mac" class="seg-btn" role="tab" onclick="switchStudioTab('mac')">🍎 Accès SSH</button>
+    </div>
+
+    <div id="spanel_term">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        <button type="button" class="btn-secondary btn-sm" onclick="quickTermPorts()">🔍 État des ports</button>
+        <button type="button" class="btn-secondary btn-sm" onclick="quickTermLinks()">🌐 Adresses IP & liens</button>
+        <button type="button" class="btn-ghost btn-sm" onclick="clearTerminal()">🧹 Vider la console</button>
+        <button type="button" class="btn-danger btn-sm" onclick="restartServices()">🔄 Relancer le serveur</button>
+      </div>
+      <div class="win-term" onclick="document.getElementById('term_input').focus()">
+        <div class="win-term-header">
+          <span>⚡ Windows PowerShell — Administrateur</span>
+          <span id="xp_clock">12:00</span>
+        </div>
+        <div class="win-term-body" id="term_body">Console PowerShell connectée au serveur.</div>
+        <div class="win-term-input-row">
+          <span class="win-term-prompt" id="term_prompt">PS&gt;</span>
+          <input type="text" id="term_input" class="win-term-input" aria-label="Commande PowerShell" placeholder="Tapez une commande PowerShell (dir, git, pip...)" autocomplete="off" spellcheck="false" onkeydown="handleTermKey(event)">
+        </div>
+      </div>
+    </div>
+
+    <div id="spanel_ide" style="display:none">
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <select id="ide_file_sel" aria-label="Fichier à modifier" onchange="loadCodeFile()" style="flex:1">
+          <option value="templates\index.html">🌐 templates\index.html (Template Principal Jinja2)</option>
+          <option value="static\css\style.css">🎨 static\css\style.css (Feuille de style principale)</option>
+          <option value="music_app.html">🎧 music_app.html (Application IlianTify)</option>
+          <option value="hub.py">🐍 hub.py (Serveur Python & API)</option>
+          <option value="sources_config.json">🛠️ sources_config.json (Sources Streaming)</option>
+          <option value="watchdog.ps1">🛡️ watchdog.ps1 (Maintien en vie & Tunnels)</option>
+          <option value="start_all.ps1">🚀 start_all.ps1 (Script de Démarrage)</option>
+        </select>
+        <button type="button" class="btn-secondary btn-sm" onclick="loadCodeFile()">🔄 Recharger</button>
+      </div>
+      <textarea id="code_editor" aria-label="Contenu du fichier" spellcheck="false"></textarea>
+      <div id="ide_status" style="font-size:var(--text-xs);color:var(--text-secondary);margin:8px 0"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" class="btn-primary" onclick="saveCodeFile()">💾 Enregistrer & Appliquer</button>
+        <button type="button" class="btn-danger" onclick="restartServices()">🔄 Relancer les services</button>
+      </div>
+    </div>
+
+    <div id="spanel_bk" style="display:none">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        <label for="bk_label" class="sr-only">Nom de la sauvegarde</label>
+        <input type="text" id="bk_label" placeholder="Nom de la sauvegarde (ex : avant_modification)" style="flex:2">
+        <button type="button" class="btn-primary btn-sm" onclick="createBackupNow()">➕ Créer une sauvegarde</button>
+        <a href="/api/backups_download_zip" target="_blank" class="btn btn-secondary btn-sm">📦 Télécharger tout en ZIP</a>
+      </div>
+      <div id="backups_list_box">Chargement des sauvegardes...</div>
+    </div>
+
+    <div id="spanel_ag" style="display:none">
+      <div class="status-box">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+          <b>🛡️ AdGuard Home — Bloqueur de publicités réseau</b>
+          <a href="/go/adguard" target="_blank" class="btn btn-primary btn-sm">⚡ Ouvrir AdGuard Home</a>
+        </div>
+        <p class="sub" style="margin:0">Configurez l'adresse IP locale du serveur comme serveur DNS sur votre box Internet, votre iPhone ou votre Mac pour bloquer les publicités.</p>
+      </div>
+    </div>
+
+    <div id="spanel_mac" style="display:none">
+      <div class="status-box">
+        <b style="display:block;margin-bottom:8px">🍎 Connexion SSH depuis le Terminal Mac ou VS Code :</b>
+        <div class="copy-input-group">
+          <label for="mac_ssh_cmd" class="sr-only">Commande SSH</label>
+          <input id="mac_ssh_cmd" type="text" readonly value="ssh ilian@192.168.1.22" onclick="this.select()">
+          <button type="button" class="btn-secondary btn-sm" onclick="copyLinkWithFeedback(document.getElementById('mac_ssh_cmd').value, 'Commande SSH')">📋 Copier</button>
+        </div>
+      </div>
+    </div>
+  </details>
+</section>

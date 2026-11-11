@@ -1,5 +1,5 @@
-MusicFolder = 'C:\Serveur\Medias\Musique'
-DataFolder = 'C:\Serveur\navidrome\data'
+MusicFolder = 'E:\Serveur\Sex_app\Medias\Musique'
+DataFolder = 'E:\Serveur\Sex_app\navidrome\data'
 Address = '0.0.0.0'
 Port = 4533
 SessionTimeout = '8760h'

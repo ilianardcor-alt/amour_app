@@ -1,0 +1,2039 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Serveur PC - Ilian</title>
+<style>
+/* ==================== INTERFACE PAR DÉFAUT : MODE NUIT (SOMBRE) ==================== */
+*{box-sizing:border-box}
+body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:#090d16;
+    color:#f8fafc;
+    margin:0;
+    padding:12px;
+    padding-bottom:115px;
+    max-width:1000px;
+    margin-left:auto;
+    margin-right:auto;
+}
+h2{font-size:16px;color:#38bdf8;margin:0 0 10px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.filter-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.filter-btn{flex:1;min-width:95px;padding:8px 8px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:#e2e8f0;font-weight:700;font-size:12px;cursor:pointer;transition:all 0.2s;margin:0}
+.filter-btn.active,.filter-btn:hover{background:linear-gradient(135deg,#0284c7,#2563eb);border-color:#38bdf8;color:#fff}
+.filter-disney.active{background:linear-gradient(135deg,#1d4ed8,#1e3a8a);border-color:#60a5fa}
+.filter-hbo.active{background:linear-gradient(135deg,#6d28d9,#4c1d95);border-color:#a78bfa}
+.filter-anime.active{background:linear-gradient(135deg,#db2777,#9d174d);border-color:#f472b6}
+.ep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:6px;margin-top:10px;max-height:210px;overflow-y:auto;padding:4px}
+.app-btn{background:linear-gradient(135deg,#1e293b,#0f172a);border:1px solid #334155;padding:13px 8px;border-radius:14px;text-align:center;color:#fff;text-decoration:none;font-weight:700;display:block;cursor:pointer;transition:transform 0.15s}
+.app-btn:hover{transform:translateY(-1px);border-color:#38bdf8}
+.app-btn-nf{background:linear-gradient(135deg,#991b1b,#450a0a);border:1px solid #dc2626}
+.card{background:#1e293b;padding:15px;border-radius:16px;margin-bottom:14px;border:1px solid #334155}
+input,select,textarea{width:100%;padding:10px 12px;margin:4px 0;border-radius:10px;border:1px solid #475569;background:#090d16;color:#fff;box-sizing:border-box;font-size:16px}
+button{width:100%;padding:11px 10px;border-radius:10px;border:none;background:#0284c7;color:#fff;font-weight:700;font-size:13px;margin-top:5px;cursor:pointer}
+.btn-purp{background:#7c3aed}.btn-green{background:#059669}.btn-red{background:#dc2626}.btn-sec{background:#475569}.btn-yt{background:#e11d48}.btn-spot{background:#1db954;color:#052e16}.btn-ytall{background:#ff0000;color:#fff}
+.sub{font-size:12px;color:#94a3b8;margin-bottom:8px;line-height:1.4}
+.p-bar-bg{width:100%;background:#090d16;height:14px;border-radius:8px;overflow:hidden;border:1px solid #334155;margin:6px 0}
+.p-bar-fill{height:100%;background:linear-gradient(90deg,#0284c7,#10b981);width:0%;transition:width 0.4s}
+.status-box{background:#090d16;padding:11px;border-radius:10px;border:1px solid #334155;font-size:13px}
+.badge{background:#0284c7;color:#fff;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:700;display:inline-block}
+.badge-disney{background:#1d4ed8}.badge-hbo{background:#6d28d9}.badge-film{background:#b45309}.badge-anime{background:#db2777}
+#raw_logs{font-family:Consolas,monospace;font-size:11px;height:100px;background:#04060b;color:#38bdf8;border:1px solid #334155;resize:vertical}
+.link-box{background:#090d16;padding:10px 12px;border-radius:12px;border:1px solid #38bdf8;font-size:12px;margin-bottom:12px;word-break:break-all}
+.link-box a{color:#38bdf8;font-weight:700;text-decoration:none}
+
+/* ==================== MISSION 1 : ERGONOMIE MOBILE GRAND CONFORT (IOS SAFARI) ==================== */
+.mobile-search-wrap{
+    position:relative;
+    width:100%;
+    display:block;
+    margin-bottom:8px;
+}
+#m_query, #ms_query, #a_query, .mobile-search-input{
+    width:100% !important;
+    min-height:48px !important;
+    padding:14px 44px 14px 16px !important;
+    border-radius:12px !important;
+    font-size:16px !important; /* Obligatoire pour empêcher le zoom auto de Safari sur iPhone */
+    line-height:1.25 !important;
+    border:2px solid #475569 !important;
+    background:#090d16;
+    color:#ffffff;
+    margin:0 !important;
+    transition:border-color 0.15s, box-shadow 0.15s;
+    -webkit-appearance:none;
+    appearance:none;
+}
+#m_query:focus, #ms_query:focus, #a_query:focus, .mobile-search-input:focus{
+    border:2px solid #38bdf8 !important;
+    box-shadow:0 0 0 3px rgba(56,189,248,0.25) !important;
+    outline:none !important;
+}
+.input-clear-btn{
+    position:absolute;
+    right:8px;
+    top:50%;
+    transform:translateY(-50%);
+    width:32px !important;
+    height:32px !important;
+    min-height:32px !important;
+    padding:0 !important;
+    margin:0 !important;
+    border-radius:50% !important;
+    background:rgba(71,85,105,0.45) !important;
+    border:none !important;
+    color:#f8fafc !important;
+    font-size:13px !important;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    z-index:3;
+}
+.input-clear-btn:hover, .input-clear-btn:active{
+    background:#dc2626 !important;
+}
+
+/* BOUTON DE SWITCH THÈME STRICT (MODE NUIT <-> MODE JOUR WINDOWS XP ORIGINAL) */
+.theme-mini-btn{
+    width:auto;
+    height:30px;
+    padding:0 10px;
+    margin:0;
+    border-radius:8px;
+    background:#0f172a;
+    border:1px solid #38bdf8;
+    color:#f8fafc;
+    font-size:12px;
+    font-weight:700;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    cursor:pointer;
+    flex-shrink:0;
+    transition:transform 0.15s,border-color 0.15s;
+}
+.theme-mini-btn:hover{transform:scale(1.04);border-color:#7dd3fc}
+
+/* CARROUSEL COMPACT CATALOGUE (ANTI-SCROLL INFINI) */
+.poster-strip{display:flex;gap:10px;overflow-x:auto;padding:6px 2px 10px 2px;scroll-behavior:smooth}
+.poster-strip::-webkit-scrollbar{height:6px}
+.poster-strip::-webkit-scrollbar-thumb{background:#334155;border-radius:4px}
+.poster-card{width:128px;flex-shrink:0;background:#090d16;border:1px solid #334155;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform 0.15s,border-color 0.15s;display:flex;flex-direction:column}
+.poster-card:hover{transform:translateY(-2px);border-color:#38bdf8}
+.poster-card img{width:100%;height:168px;object-fit:cover;background:#0f172a}
+.poster-card-body{padding:7px;flex:1;display:flex;flex-direction:column;justify-content:space-between}
+.poster-card-title{font-size:12px;font-weight:700;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+
+.poster-grid-expanded{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px;max-height:420px;overflow-y:auto;padding-right:4px}
+.res-item{display:flex;align-items:flex-start;background:#090d16;padding:9px;border-radius:12px;border:1px solid #334155;gap:10px}
+.res-item img{width:56px;height:80px;border-radius:8px;object-fit:cover;background:#1e293b;flex-shrink:0}
+.res-info{flex:1;font-size:12px;min-width:0}
+.res-info b{display:block;color:#f8fafc;font-size:13px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.synopsis{font-size:11px;color:#94a3b8;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:3px;line-height:1.3}
+.season-box{background:#0f172a;padding:12px;border-radius:12px;margin-bottom:10px;border:1px solid #38bdf8}
+.season-btn{background:#1e293b;border:1px solid #475569;padding:8px 12px;border-radius:8px;margin-top:6px;display:flex;justify-content:space-between;align-items:center}
+
+/* MUSIQUE : RÉSULTATS DE RECHERCHE & MINI-SPOTIFY / DEEZER */
+.music-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:8px;margin-top:10px;max-height:360px;overflow-y:auto;padding-right:4px}
+.spot-card{display:flex;align-items:center;gap:10px;background:#121212;border:1px solid #282828;padding:9px 10px;border-radius:12px;transition:border-color 0.15s}
+.spot-card:hover{border-color:#1db954}
+.spot-card img{width:54px;height:54px;border-radius:8px;object-fit:cover;background:#1e293b;flex-shrink:0}
+.spot-info{flex:1;min-width:0}
+.spot-info b{display:block;font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spot-info span{display:block;font-size:11px;color:#b3b3b3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.spot-actions{display:flex;gap:5px;flex-shrink:0}
+.spot-btn-play{width:36px;height:36px;border-radius:50%;background:#1db954;color:#000;border:none;font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;margin:0;padding:0}
+.spot-btn-dl{width:auto;padding:7px 10px;border-radius:8px;background:#0284c7;color:#fff;font-size:12px;margin:0}
+.deezer-bar{display:flex;gap:6px;align-items:center;background:#0f172a;border:1px solid #7c3aed;padding:8px 10px;border-radius:12px;margin-bottom:10px;flex-wrap:wrap}
+
+/* MISSION 4 : GRILLE VISUELLE BIBLIOTHÈQUE LOCALE MINI-SPOTIFY / DEEZER */
+.lib-shell{
+    background:linear-gradient(180deg,#121212 0%,#0b0f17 100%);
+    border:1px solid #2e2e2e;
+    border-radius:14px;
+    padding:12px;
+    margin-top:14px;
+    color:#ffffff;
+}
+.lib-Visual-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(138px,1fr));
+    gap:10px;
+    margin-top:10px;
+    max-height:390px;
+    overflow-y:auto;
+    padding:4px 2px;
+}
+.lib-album-card{
+    background:#181818;
+    border:1px solid #282828;
+    border-radius:12px;
+    padding:9px;
+    cursor:pointer;
+    transition:transform 0.15s, border-color 0.15s, background 0.15s;
+    display:flex;
+    flex-direction:column;
+}
+.lib-album-card:hover{
+    transform:translateY(-2px);
+    border-color:#1db954;
+    background:#222222;
+}
+.lib-album-card img{
+    width:100%;
+    aspect-ratio:1/1;
+    object-fit:cover;
+    border-radius:8px;
+    background:#0f172a;
+    margin-bottom:8px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.45);
+}
+.lib-album-card.artist-mode img{
+    border-radius:50%;
+}
+.lib-card-title{
+    font-size:12.5px;
+    font-weight:700;
+    color:#ffffff;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.lib-card-sub{
+    font-size:11px;
+    color:#9ca3af;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    margin-top:2px;
+}
+
+/* PLAYER AUDIO FIXE EN BAS DE L'ÉCRAN (MINI-SPOTIFY AVEC MEDIA SESSION IPHONE) */
+.bottom-spotify-player{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:1600;
+    background:rgba(12,16,24,0.97);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    border-top:2px solid #1db954;
+    padding:8px 14px 10px 14px;
+    box-shadow:0 -6px 24px rgba(0,0,0,0.65);
+    color:#ffffff;
+    display:none;
+}
+.bp-inner{
+    max-width:1000px;
+    margin:0 auto;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+.bp-top-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+}
+.bp-track-meta{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex:1;
+    min-width:0;
+}
+.bp-track-meta img{
+    width:46px;
+    height:46px;
+    border-radius:8px;
+    object-fit:cover;
+    background:#1e293b;
+    flex-shrink:0;
+    border:1px solid rgba(255,255,255,0.15);
+}
+.bp-track-text{
+    flex:1;
+    min-width:0;
+}
+.bp-track-text b{
+    display:block;
+    font-size:13px;
+    color:#ffffff;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.bp-track-text span{
+    display:block;
+    font-size:11px;
+    color:#86efac;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    margin-top:2px;
+}
+.bp-controls{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-shrink:0;
+}
+.bp-ctl-btn{
+    width:36px !important;
+    height:36px !important;
+    padding:0 !important;
+    margin:0 !important;
+    border-radius:50% !important;
+    background:#1e293b !important;
+    border:1px solid #334155 !important;
+    color:#ffffff !important;
+    font-size:14px !important;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+}
+.bp-ctl-btn.active{
+    background:#059669 !important;
+    border-color:#34d399 !important;
+}
+.bp-play-main{
+    width:42px !important;
+    height:42px !important;
+    background:#1db954 !important;
+    color:#041f0e !important;
+    border:none !important;
+    font-size:16px !important;
+    font-weight:900 !important;
+}
+.bp-progress-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:11px;
+    color:#9ca3af;
+}
+.bp-seek{
+    flex:1;
+    height:5px !important;
+    margin:0 !important;
+    padding:0 !important;
+    accent-color:#1db954;
+    cursor:pointer;
+}
+
+/* BOUTON & CARTE APPLICATION AUTONOME ILIANTIFY */
+.iliantify-promo-card{
+    margin-top:14px;
+    background:linear-gradient(135deg,#09090b 0%,#111827 50%,#1e1b4b 100%);
+    border:2px solid #1db954;
+    border-radius:16px;
+    padding:16px;
+    box-shadow:0 10px 28px rgba(29,185,84,0.18);
+}
+.btn-iliantify-launch{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    width:100%;
+    padding:15px 18px;
+    margin-top:10px;
+    border-radius:14px;
+    background:linear-gradient(90deg,#1db954 0%,#10b981 45%,#a238ff 100%);
+    color:#ffffff !important;
+    font-size:15px;
+    font-weight:900;
+    text-decoration:none !important;
+    box-shadow:0 6px 20px rgba(29,185,84,0.35);
+    transition:transform 0.15s,box-shadow 0.15s;
+}
+.btn-iliantify-launch:hover{
+    transform:translateY(-1px);
+    box-shadow:0 8px 25px rgba(162,56,255,0.45);
+}
+
+/* SÉLECTEUR DE LANGUE COMPACT [ 🇫🇷 VF ] [ 🇯🇵 VOSTFR ] [ 🇬🇧 VO ] */
+.lang-pill-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:10px 0 8px 0;
+    padding:8px 10px;
+    background:#090d16;
+    border:1px solid #334155;
+    border-radius:12px;
+}
+.lang-pill-group{
+    display:inline-flex;
+    background:#1e293b;
+    padding:3px;
+    border-radius:999px;
+    gap:4px;
+}
+.lang-pill{
+    width:auto !important;
+    margin:0 !important;
+    padding:6px 13px !important;
+    border-radius:999px !important;
+    background:transparent !important;
+    color:#cbd5e1 !important;
+    font-size:12px !important;
+    font-weight:800 !important;
+    border:none !important;
+    cursor:pointer;
+    transition:all 0.15s;
+}
+.lang-pill.active{
+    background:linear-gradient(90deg,#0284c7,#6366f1) !important;
+    color:#ffffff !important;
+    box-shadow:0 2px 8px rgba(2,132,199,0.45);
+}
+.lang-fallback-badge{
+    display:inline-block;
+    background:#422006;
+    border:1px solid #f59e0b;
+    color:#fde68a;
+    padding:4px 9px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:700;
+}
+
+/* BARRE STREAM HEALER (AUTO-RÉPARATEUR DE SOURCES STREAMING) */
+.healer-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
+    background:#090d16;
+    border:1px solid #10b981;
+    border-radius:12px;
+    padding:9px 12px;
+    margin-bottom:10px;
+}
+.healer-pill{
+    font-size:10.5px;
+    padding:2px 7px;
+    border-radius:6px;
+    background:#1e293b;
+    color:#cbd5e1;
+    border:1px solid #334155;
+}
+.healer-pill.ok{border-color:#059669;color:#86efac}
+.healer-pill.healed{border-color:#f59e0b;color:#fde68a}
+
+/* CARTE VPN PRIVÉ FIXE (TAILSCALE) */
+.ts-step-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:8px;
+    margin-top:8px;
+}
+.ts-step-box{
+    background:#090d16;
+    border:1px solid #334155;
+    border-radius:10px;
+    padding:10px;
+    font-size:12px;
+    line-height:1.5;
+}
+
+/* ACCORDÉONS MÉDIAS SUR LE PC */
+.folder-acc{background:#090d16;border:1px solid #334155;border-radius:10px;margin-top:7px;overflow:hidden}
+.folder-acc-head{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;cursor:pointer;background:#0f172a;transition:background 0.15s}
+.folder-acc-head:hover{background:#1e293b}
+.folder-acc-body{display:none;padding:6px 10px 10px 10px;border-top:1px solid #1e293b;max-height:240px;overflow-y:auto}
+.folder-acc.open .folder-acc-body{display:block}
+.ep-row{display:flex;justify-content:space-between;align-items:center;background:#090d16;padding:7px 10px;border-radius:8px;margin-top:5px;border:1px solid #1e293b;font-size:12px}
+
+/* STUDIO MAC & TERMINAL */
+.studio-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.studio-tab{flex:1;min-width:120px;padding:9px;border-radius:10px;background:#0f172a;border:1px solid #334155;color:#cbd5e1;font-weight:700;font-size:12px;cursor:pointer;margin:0}
+.studio-tab.active{background:#0284c7;border-color:#38bdf8;color:#fff}
+.term-quick-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px;margin-bottom:10px}
+.term-quick-btn{background:#0f172a;border:1px solid #334155;color:#38bdf8;padding:8px 10px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;margin:0}
+.term-quick-btn:hover{background:#1e293b;border-color:#38bdf8}
+.win-term{background:#0c0c0c;border:1px solid #333;border-radius:10px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.6);font-family:Consolas,'Courier New',monospace}
+.win-term-header{background:#1f1f1f;padding:7px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #2d2d2d;user-select:none}
+.win-term-tab{background:#0c0c0c;color:#f8fafc;padding:4px 12px;border-radius:6px 6px 0 0;font-size:12px;display:flex;align-items:center;gap:6px;border-top:2px solid #38bdf8}
+.win-term-dots{display:flex;gap:6px}
+.win-term-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.win-term-body{padding:12px;height:280px;overflow-y:auto;color:#cccccc;font-size:13px;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+.term-cmd-echo{color:#4ec9b0;font-weight:700}
+.term-out-text{color:#d4d4d4}
+.win-term-input-row{display:flex;align-items:center;background:#0c0c0c;border-top:1px solid #222;padding:6px 12px;gap:6px}
+.win-term-prompt{color:#22c55e;font-weight:700;font-size:13px;white-space:nowrap;font-family:Consolas,'Courier New',monospace}
+.win-term-input{flex:1;background:transparent !important;border:none !important;color:#f8fafc !important;font-family:Consolas,'Courier New',monospace;font-size:14px !important;padding:4px 0 !important;margin:0 !important;outline:none !important;box-shadow:none !important}
+#code_editor{font-family:Consolas,'Courier New',monospace;font-size:12px;height:340px;background:#090d16;color:#e2e8f0;border:1px solid #38bdf8;white-space:pre;overflow:auto;tab-size:4}
+
+/* Éléments décoratifs Windows XP masqués en Mode Nuit */
+.xp-win-btns{display:none;align-items:center;gap:3px;margin-left:6px}
+.xp-ctl{width:20px;height:20px;border-radius:3px;border:1px solid rgba(255,255,255,0.85);background:linear-gradient(180deg,#63a4ff 0%,#1d64f2 55%,#0b46c4 100%);color:#fff;font-family:'Tahoma',sans-serif;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;text-shadow:none;box-shadow:inset 0 1px 0 rgba(255,255,255,0.45)}
+.xp-ctl.close{background:linear-gradient(180deg,#ff8770 0%,#e04328 55%,#b82107 100%)}
+.xp-taskbar{display:none}
+
+/* ============================================================================
+   MISSION 2 : MODE JOUR (WINDOWS XP ORIGINAL AUTHENTIQUE — VRAI FOND "BLISS" HD)
+   ============================================================================ */
+body.theme-xp{
+    font-family:'Tahoma','Trebuchet MS','Segoe UI',sans-serif;
+    background-image:url('/static/xp_bliss.jpg');
+    background-size:cover;
+    background-position:center center;
+    background-attachment:fixed;
+    background-repeat:no-repeat;
+    color:#111827;
+    padding-bottom:145px;
+}
+/* Support plein écran fixe sur iPhone (iOS Safari) sans aucune altération de l'image Bliss */
+body.theme-xp::before{
+    content:"";
+    position:fixed;
+    top:0;left:0;right:0;bottom:0;
+    background:url('/static/xp_bliss.jpg') no-repeat center center;
+    background-size:cover;
+    z-index:-1;
+    pointer-events:none;
+}
+body.theme-xp .xp-win-btns{display:inline-flex}
+body.theme-xp .card{
+    background:linear-gradient(180deg, rgba(252,252,249,0.96) 0%, rgba(236,233,216,0.98) 100%);
+    padding:0 14px 14px 14px;
+    border-radius:9px 9px 4px 4px;
+    margin-bottom:15px;
+    border:3px solid #0054e3;
+    box-shadow:0 8px 22px rgba(0,20,60,0.38), inset 0 0 0 1px rgba(255,255,255,0.75);
+    overflow:hidden;
+}
+body.theme-xp .card > h2{
+    background:linear-gradient(180deg,
+        #3d95ff 0%,
+        #0058ee 9%,
+        #0050e6 45%,
+        #0066ff 85%,
+        #003dd9 94%,
+        #002799 100%);
+    color:#ffffff;
+    font-family:'Trebuchet MS','Tahoma',sans-serif;
+    font-size:14.5px;
+    font-weight:700;
+    text-shadow:1px 1px 2px rgba(0,0,0,0.75);
+    margin:0 -14px 12px -14px;
+    padding:7px 12px;
+    border-bottom:1px solid #001f7a;
+}
+body.theme-xp .app-btn{
+    background:linear-gradient(180deg,#ffffff 0%,#ebf3fc 50%,#d3e4f8 100%);
+    border:2px solid #0054e3;
+    border-radius:8px;
+    color:#002b7a;
+    box-shadow:inset 0 1px 0 #ffffff, 0 4px 10px rgba(0,30,80,0.22);
+}
+body.theme-xp .app-btn-nf{
+    background:linear-gradient(180deg,#ff6b6b 0%,#dc2626 48%,#991b1b 100%);
+    border-color:#7f1d1d;
+    color:#ffffff;
+}
+body.theme-xp .filter-btn, body.theme-xp .studio-tab, body.theme-xp .term-quick-btn{
+    background:linear-gradient(180deg,#ffffff 0%,#e4effa 55%,#cce0f5 100%);
+    border:1px solid #6c92b8;
+    color:#003380;
+    box-shadow:inset 0 1px 0 #fff;
+}
+body.theme-xp .filter-btn.active, body.theme-xp .studio-tab.active{
+    background:linear-gradient(180deg,#52b6ff 0%,#0066ff 50%,#0044b8 100%);
+    border-color:#002b7a;
+    color:#ffffff;
+}
+body.theme-xp .p-bar-bg{
+    background:#ffffff;
+    border:1px solid #688caf;
+    padding:2px;
+    border-radius:3px;
+}
+body.theme-xp .p-bar-fill{
+    background:repeating-linear-gradient(90deg,#28d13b 0px,#58f56a 6px,#1ca82b 9px,transparent 9px,transparent 11px);
+}
+body.theme-xp .status-box, body.theme-xp .poster-card, body.theme-xp .res-item, body.theme-xp .folder-acc, body.theme-xp .ep-row, body.theme-xp .deezer-bar, body.theme-xp .season-box{
+    background:#ffffff;
+    border-color:#7f9db9;
+    color:#111827;
+}
+body.theme-xp .link-box{
+    background:linear-gradient(180deg,#ffffff 0%,#e6f0fc 100%);
+    border:2px solid #0054e3;
+    color:#002b7a;
+    box-shadow:0 3px 10px rgba(0,30,80,0.2);
+}
+body.theme-xp .link-box a{color:#0054e3;text-decoration:underline}
+body.theme-xp .poster-card-title, body.theme-xp .res-info b, body.theme-xp #dl_title{color:#002b7a !important}
+body.theme-xp .sub{color:#374151}
+body.theme-xp input, body.theme-xp select{
+    background:#ffffff;
+    color:#111827;
+    border:2px solid #7f9db9;
+}
+body.theme-xp #m_query, body.theme-xp #ms_query{
+    background:#ffffff !important;
+    color:#111827 !important;
+    border:2px solid #0054e3 !important;
+}
+body.theme-xp .folder-acc-head{background:linear-gradient(180deg,#f3f7fd 0%,#dce7f7 100%);color:#002b7a}
+body.theme-xp .theme-mini-btn{
+    background:linear-gradient(180deg,#ffffff 0%,#dce7f7 100%);
+    color:#002b7a;
+    border:1px solid #002b7a;
+    text-shadow:none;
+}
+body.theme-xp .bottom-spotify-player{
+    bottom:34px;
+}
+
+/* Barre des tâches authentique Windows XP Luna en bas de l'écran */
+body.theme-xp .xp-taskbar{
+    position:fixed;
+    bottom:0;left:0;right:0;
+    height:34px;
+    background:linear-gradient(180deg,
+        #3168d5 0%,
+        #4993e6 6%,
+        #2257d5 18%,
+        #245edb 75%,
+        #1941a5 92%,
+        #122e7a 100%);
+    border-top:1px solid #67a9ff;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    z-index:1700;
+    box-shadow:0 -2px 10px rgba(0,0,0,0.45);
+    user-select:none;
+}
+.xp-start-btn{
+    width:auto !important;
+    height:100% !important;
+    margin:0 !important;
+    padding:0 16px 0 10px !important;
+    background:linear-gradient(180deg,
+        #86d674 0%,
+        #3ea027 12%,
+        #38961d 50%,
+        #2c7c14 85%,
+        #1b5709 100%) !important;
+    border:none !important;
+    border-radius:0 14px 14px 0 !important;
+    border-right:2px solid #164906 !important;
+    color:#ffffff !important;
+    font-family:'Trebuchet MS','Tahoma',sans-serif !important;
+    font-size:14px !important;
+    font-weight:700 !important;
+    font-style:italic !important;
+    text-shadow:1px 1px 2px rgba(0,0,0,0.75) !important;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    cursor:pointer;
+}
+.xp-task-items{display:flex;align-items:center;gap:4px;flex:1;padding:0 8px;overflow-x:auto}
+.xp-task-pill{background:linear-gradient(180deg,#3c7ff2 0%,#2962cc 50%,#1f50b0 100%);border:1px solid #143985;box-shadow:inset 0 1px 0 rgba(255,255,255,0.35);color:#ffffff;font-size:11px;padding:4px 9px;border-radius:3px;cursor:pointer;white-space:nowrap;text-decoration:none;font-weight:700}
+.xp-systray{height:100%;padding:0 12px;background:linear-gradient(180deg,#16adf0 0%,#0e8ee0 18%,#0d85d6 80%,#0961a3 100%);border-left:2px solid #094f8a;color:#ffffff;display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;text-shadow:0 1px 1px rgba(0,0,0,0.5)}
+</style>
+</head>
+<body>
+
+<!-- STATUT DISQUE & SERVEUR + SWITCH STRICT 2 THÈMES (NUIT / JOUR WINDOWS XP) -->
+<div class="card" id="sec_top">
+<h2>
+    <span>🖥️ Poste de Travail — Serveur Dell Latitude E5450 (ilian)</span>
+    <span style="display:flex;align-items:center;gap:6px">
+        <button type="button" id="theme_toggle_btn" class="theme-mini-btn" onclick="cycleTheme()" title="Basculer entre Mode Nuit et Mode Jour Windows XP Original">🌙 Mode Nuit</button>
+        <span class="xp-win-btns"><span class="xp-ctl">_</span><span class="xp-ctl">□</span><span class="xp-ctl close">✕</span></span>
+    </span>
+</h2>
+<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;gap:8px">
+<span>💽 Disque Local (C:)</span>
+<span id="disk_txt" style="color:#38bdf8">Calcul...</span>
+</div>
+<div class="p-bar-bg" style="height:12px;margin:6px 0"><div id="disk_bar" class="p-bar-fill"></div></div>
+<div id="disk_details" style="font-size:11.5px;color:#94a3b8;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+<span>🎵 Musique: - Mo</span><span>🎬 Animés: - Mo</span><span>🍿 Films: - Mo</span><span>📺 Séries: - Mo</span>
+</div>
+</div>
+
+<!-- LIENS 4G/5G & LOCAL FIXE -->
+<div class="link-box" id="links_panel">Chargement des liens 4G/5G et Wi-Fi...</div>
+
+<!-- APPLICATIONS PRINCIPALES (AUTO-LOGIN 1-CLIC ACTIVÉ + APP AUTONOME ILIANTIFY) -->
+<div class="grid">
+<a class="app-btn" href="/iliantify" style="background:linear-gradient(135deg,#1db954 0%,#059669 45%,#a238ff 100%);border-color:#1db954;color:#fff">🎧 IlianTify (App iPhone)<br><span style="font-size:11px;color:#fef08a">🔥 Clone Spotify / Deezer Autonome</span></a>
+<a class="app-btn app-btn-nf" onclick="openService(8096, window.JF_URL, '/web/index.html#!/home.html')">🍿 Mon Netflix (Jellyfin)<br><span style="font-size:11px;color:#86efac">⚡ Connexion Auto 1-Clic</span></a>
+<a class="app-btn" onclick="openService(4533, window.ND_URL, '/app/')">🎵 Navidrome / Amperfy<br><span style="font-size:11px;color:#86efac">⚡ Connexion Auto 1-Clic</span></a>
+<a class="app-btn" onclick="openService(8080, window.FB_URL, '/')">📁 FileBrowser<br><span style="font-size:11px;color:#86efac">⚡ Connexion Auto 1-Clic</span></a>
+<a class="app-btn" href="/go/adguard" target="_blank">🛡️ AdGuard Home<br><span style="font-size:11px;color:#86efac">⚡ Auto-Login 1-Clic • Anti-Pub</span></a>
+<a class="app-btn" onclick="toggleTailscaleCard()" style="border-color:#38bdf8">🛡️ Mon VPN Privé (Tailscale)<br><span id="ts_mini_badge" style="font-size:11px;color:#38bdf8">🔒 IP Fixe à vie (iPhone & Mac)</span></a>
+</div>
+
+<!-- MISSION 4 : CARTE REPLIABLE "MON VPN PRIVÉ (TAILSCALE)" + TUTO 3 ÉTAPES -->
+<div class="card" id="sec_tailscale" style="display:none;border-color:#38bdf8">
+<h2>
+    <span>🛡️ Mon VPN Privé Gratuit (Tailscale) — Accès Fixe à Vie (4G/5G/Wi-Fi)</span>
+    <span style="display:flex;align-items:center;gap:6px">
+        <button type="button" class="btn-sec" style="width:auto;padding:4px 9px;margin:0;font-size:11px" onclick="toggleTailscaleCard(false)">✖️ Fermer</button>
+    </span>
+</h2>
+<div class="sub">Même si ton serveur Dell redémarre en pleine nuit, l'adresse IP Tailscale (<code>100.x.y.z</code>) ne change <b>JAMAIS</b>. Tes icônes sur l'écran d'accueil de ton iPhone 13 et tes favoris Mac marchent à vie sans jamais les refaire !</div>
+<div class="status-box" id="ts_live_box" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+    <div>
+        <b id="ts_state_title" style="color:#38bdf8">⏳ Vérification du service Tailscale sur le Dell...</b>
+        <div id="ts_state_sub" style="font-size:12px;color:#94a3b8;margin-top:2px">Service Windows Tailscale installé et actif.</div>
+    </div>
+    <button type="button" id="ts_connect_btn" class="btn-spot" style="width:auto;padding:8px 14px;margin:0;font-size:12px" onclick="connectTailscaleNow(this)">🔗 Connecter le Dell (1-Clic)</button>
+</div>
+<div class="ts-step-grid">
+    <div class="ts-step-box">
+        <b style="color:#38bdf8">1️⃣ Étape 1 : Sur ce PC Serveur Dell (1 seule fois)</b><br>
+        Clique sur <b>🔗 Connecter le Dell (1-Clic)</b> ci-dessus (ou sur l'icône Tailscale près de l'horloge Windows en bas à droite) et connecte-toi avec ton compte <b>Google, Apple ou GitHub</b>.
+    </div>
+    <div class="ts-step-box">
+        <b style="color:#a855f7">2️⃣ Étape 2 : Sur ton iPhone 13 & ton Mac</b><br>
+        Télécharge l'app gratuite <b>Tailscale</b> sur l'App Store (iPhone) et sur ton Mac, puis connecte-toi avec <b>exactement le même compte</b>.
+    </div>
+    <div class="ts-step-box">
+        <b style="color:#10b981">3️⃣ Étape 3 : Tes liens fixes à vie partout</b><br>
+        Active le switch VPN Tailscale sur ton iPhone ou ton Mac :
+        <div style="margin-top:4px;font-size:11.5px" id="ts_links_tuto">
+            • Portail : <code style="color:#86efac">http://100.x.y.z:5000</code><br>
+            • IlianTify : <code style="color:#86efac">http://100.x.y.z:5000/iliantify</code><br>
+            • Jellyfin : <code style="color:#86efac">http://100.x.y.z:8096</code>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- SUIVI DES TÉLÉCHARGEMENTS -->
+<div class="card">
+<h2>
+    <span>📥 Suivi & Logs en direct</span>
+    <span style="display:flex;align-items:center;gap:6px">
+        <span id="dl_state" class="badge">Prêt</span>
+        <span class="xp-win-btns"><span class="xp-ctl">_</span><span class="xp-ctl">□</span><span class="xp-ctl close">✕</span></span>
+    </span>
+</h2>
+<div class="status-box">
+<div id="dl_title" style="font-weight:700;color:#f8fafc;margin-bottom:4px">Aucun téléchargement actif</div>
+<div id="dl_step" style="font-size:12px;color:#94a3b8">Prêt.</div>
+<div class="p-bar-bg"><div id="dl_bar" class="p-bar-fill"></div></div>
+<div style="display:flex;justify-content:space-between;font-size:12px;color:#cbd5e1">
+<span id="dl_pct">0%</span><span id="dl_speed">-</span>
+</div>
+</div>
+<div class="grid3" style="margin-top:8px">
+<button class="btn-sec" onclick="copyLogs()">📤 Copier Logs</button>
+<button class="btn-sec" onclick="clearLogs()">🧹 Vider Logs</button>
+<button class="btn-red" onclick="stopDownload()">⏹️ Arrêter</button>
+</div>
+<textarea id="raw_logs" readonly></textarea>
+</div>
+
+<!-- CATALOGUE UNIVERSEL COMPACT : TENDANCES, DISNEY+, HBO MAX, ANIMÉS, FILMS & SÉRIES -->
+<div class="card" id="sec_catalog">
+<h2>
+<span>🎬 Catalogue Universel (Films, Séries, Disney+, HBO & Animés)</span>
+<span style="display:flex;align-items:center;gap:6px">
+    <button type="button" id="toggle_cat_view_btn" onclick="toggleCatalogExpanded()" style="width:auto;padding:5px 11px;margin:0;font-size:11px;background:#334155">👁️ Tout voir</button>
+    <span class="xp-win-btns"><span class="xp-ctl">_</span><span class="xp-ctl">□</span><span class="xp-ctl close">✕</span></span>
+</span>
+</h2>
+
+<!-- MISSION 3 : AUTO-RÉPARATEUR DES SOURCES DE STREAMING ("STREAM HEALER") -->
+<div class="healer-bar" id="stream_healer_bar">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span id="healer_dot">🟢</span>
+        <b id="healer_txt" style="font-size:12px;color:#86efac">Sources Streaming : Opérationnelles (Auto-Heal actif)</b>
+        <span id="healer_domains_pills" style="display:flex;gap:4px;flex-wrap:wrap"></span>
+    </div>
+    <button type="button" id="btn_run_healer" class="btn-sec" style="width:auto;padding:6px 11px;margin:0;font-size:11px;border:1px solid #38bdf8;color:#38bdf8" onclick="runStreamHealerNow(this)">🛠️ Vérifier & Réparer les sites de streaming</button>
+</div>
+
+<div class="filter-bar">
+<button type="button" id="flt_trending" class="filter-btn active" onclick="loadMediaCatalog('trending')">🔥 Tendances</button>
+<button type="button" id="flt_disney" class="filter-btn filter-disney" onclick="loadMediaCatalog('disney')">🏰 Disney+</button>
+<button type="button" id="flt_hbo" class="filter-btn filter-hbo" onclick="loadMediaCatalog('hbo')">🐉 HBO Max</button>
+<button type="button" id="flt_animes" class="filter-btn filter-anime" onclick="loadMediaCatalog('animes')">🎌 Animés</button>
+<button type="button" id="flt_movies" class="filter-btn" onclick="loadMediaCatalog('movies')">🍿 Films</button>
+<button type="button" id="flt_series" class="filter-btn" onclick="loadMediaCatalog('series')">📺 Séries</button>
+</div>
+
+<!-- Barre de recherche Films/Séries/Animés grand confort iOS 16px + bouton ❌ 1-tap -->
+<div class="mobile-search-wrap">
+    <input type="text" id="ms_query" class="mobile-search-input" placeholder="Rechercher un Film, une Série ou un Animé (ex: Solo Leveling, The Last of Us, Dune...)" onkeydown="if(event.key==='Enter') searchMediaCatalog()">
+    <button type="button" class="input-clear-btn" onclick="clearMediaSearchInput()" title="Effacer la recherche">❌</button>
+</div>
+<button type="button" onclick="searchMediaCatalog()" style="margin-top:0;margin-bottom:6px">🔎 Chercher dans Films, Séries & Animés</button>
+
+<!-- Tiroir de sélection Saison / Épisode / Téléchargement (avec Sélecteur VF / VOSTFR / VO) -->
+<div id="media_action_panel" style="margin-top:8px"></div>
+<!-- Résultats (Bandeau horizontal compact par défaut, ou grille dépliée lors d'une recherche) -->
+<div id="media_results" style="margin-top:8px"></div>
+</div>
+
+<!-- MUSIQUE : TÉLÉCHARGEMENT RAPIDE + BOUTON GÉANT VERS L'APP AUTONOME ILIANTIFY -->
+<div class="card" id="sec_music">
+<h2>
+    <span>🎵 Téléchargeur Musique HD & Application IlianTify</span>
+    <span style="display:flex;align-items:center;gap:6px">
+        <button type="button" onclick="toggleDeezerDrawer()" style="width:auto;padding:5px 10px;margin:0;font-size:11px;background:#7c3aed">💜 Compte Deezer</button>
+        <span class="xp-win-btns"><span class="xp-ctl">_</span><span class="xp-ctl">□</span><span class="xp-ctl close">✕</span></span>
+    </span>
+</h2>
+<div class="sub">Télécharge tes sons, albums et artistes en HD (<code>1000x1000</code>) ou ouvre directement ton application musicale autonome <b>IlianTify</b>.</div>
+
+<!-- MISSION 1 : GROS BOUTON VERT/VIOLET BIEN VISIBLE POUR OUVRIR L'APP AUTONOME ILIANTIFY -->
+<div class="iliantify-promo-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <div style="display:flex;align-items:center;gap:12px">
+            <img src="/iliantify_icon.png" alt="IlianTify" style="width:52px;height:52px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.5)">
+            <div>
+                <b style="font-size:15px;color:#fff">🎧 IlianTify — Ton App Musicale iPhone (Clone Spotify / Deezer)</b>
+                <div style="font-size:12px;color:#a7f3d0;margin-top:2px">Plein écran iOS • Dynamic Island & Écran verrouillé • Recherche & Téléchargement intégrés</div>
+            </div>
+        </div>
+    </div>
+    <a href="/iliantify" class="btn-iliantify-launch">🎧 Ouvrir l'App IlianTify</a>
+    <div style="font-size:11px;color:#94a3b8;text-align:center;margin-top:8px">💡 <b>Astuce iPhone 13 :</b> Ouvre <b>IlianTify</b> dans Safari → appuie sur <b>Partager</b> (⬆️) → <b>Sur l'écran d'accueil</b> pour avoir ta propre app musicale à côté de ton serveur !</div>
+</div>
+
+<!-- Barre Synchronisation Compte / Playlist Deezer -->
+<div class="deezer-bar" style="margin-top:12px">
+    <span style="font-size:12px;font-weight:700;color:#c084fc" id="dz_acct_status">💜 Compte Deezer :</span>
+    <input type="text" id="sp_sync_url" placeholder="Lien de ton compte Deezer (https://www.deezer.com/fr/profile/...) ou playlist" style="flex:1;min-width:200px;margin:0;padding:10px 12px;font-size:16px" onkeydown="if(event.key==='Enter') syncDeezerNow(this)">
+    <button type="button" class="btn-purp" style="width:auto;padding:10px 14px;margin:0;font-size:12px" onclick="syncDeezerNow(this)">🔄 Synchroniser</button>
+</div>
+
+<!-- Tiroir Propositions & Playlists Deezer -->
+<div id="deezer_drawer" style="display:none;margin-bottom:12px;background:#090d16;border:1px solid #334155;border-radius:12px;padding:10px">
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+        <button type="button" class="filter-btn active" id="dztab_recs" onclick="switchDeezerTab('recs')">✨ Sons Proposés</button>
+        <button type="button" class="filter-btn" id="dztab_pls" onclick="switchDeezerTab('pls')">💜 Mes Playlists (<span id="sp_pl_cnt">0</span>)</button>
+        <button type="button" class="filter-btn" id="dztab_albs" onclick="switchDeezerTab('albs')">💿 Albums Recommandés</button>
+    </div>
+    <div id="dzview_recs" class="music-grid" style="max-height:240px"></div>
+    <div id="dzview_pls" style="display:none;max-height:300px;overflow-y:auto"></div>
+    <div id="dzview_albs" class="music-grid" style="display:none;max-height:240px"></div>
+</div>
+
+<!-- BARRE DE RECHERCHE MUSIQUE 100% LARGEUR SUR LIGNE DÉDIÉE + BOUTON ❌ 1-TAP -->
+<div class="mobile-search-wrap">
+    <input type="text" id="m_query" placeholder="Rechercher un son, un album ou un artiste à télécharger (ex: Ino Casablanca, Damso...)" onkeydown="if(event.key==='Enter') previewMusic(LAST_MUSIC_MODE)">
+    <button type="button" class="input-clear-btn" onclick="clearMusicSearchInput()" title="Effacer la recherche">❌</button>
+</div>
+
+<!-- Grille principale des 3 boutons (🎵 Titre, 💿 Album, 🔥 Top Artiste) -->
+<div class="grid3">
+    <button type="button" class="btn-spot" onclick="previewMusic('track')">🎵 Titre</button>
+    <button type="button" class="btn-purp" onclick="previewMusic('album')">💿 Album</button>
+    <button type="button" class="btn-green" onclick="previewMusic('artist')">🔥 Top Artiste</button>
+</div>
+<!-- Grille complémentaire YouTube Music / Tout YouTube -->
+<div class="grid2">
+    <button type="button" class="btn-yt" onclick="previewMusic('ytmusic')">🔴 Chansons YT Music</button>
+    <button type="button" class="btn-ytall" onclick="previewMusic('youtube_all')">▶️ Tout YouTube (Exclus / Lives)</button>
+</div>
+
+<div id="preview_bar_mini" style="display:none;margin-top:8px;background:#121212;border:1px solid #1db954;border-radius:10px;padding:8px 12px;align-items:center;justify-content:space-between;gap:8px">
+    <span id="preview_bar_txt" style="font-size:12px;color:#86efac;font-weight:700">▶ Aperçu 30s en cours...</span>
+    <button type="button" class="btn-red" style="width:auto;padding:4px 10px;margin:0;font-size:11px" onclick="stopMiniPreview()">⏹ Stop</button>
+</div>
+<audio id="preview_audio" preload="none"></audio>
+
+<div id="music_results" class="music-grid"></div>
+</div>
+
+<!-- MÉDIAS SUR LE PC (RANGÉS PAR SÉRIES / DOSSIERS PLIABLES) -->
+<div class="card" id="sec_files">
+<h2>
+<span>🗂️ Bibliothèque & Suppression par Dossier</span>
+<span style="display:flex;align-items:center;gap:6px">
+    <button onclick="loadFiles()" style="width:auto;padding:5px 12px;margin:0;font-size:11px">🔄 Actualiser</button>
+    <span class="xp-win-btns"><span class="xp-ctl">_</span><span class="xp-ctl">□</span><span class="xp-ctl close">✕</span></span>
+</span>
+</h2>
+<div class="sub">Clique sur une série, un animé ou un dossier pour dérouler ses épisodes, ou supprime toute une série d'un coup après l'avoir vue :</div>
+<div class="filter-bar" style="margin-bottom:8px">
+<button type="button" id="fcat_all" class="filter-btn active" onclick="setFilesFilter('all')">📂 Tout</button>
+<button type="button" id="fcat_animes" class="filter-btn" onclick="setFilesFilter('animes')">🎌 Animés</button>
+<button type="button" id="fcat_series" class="filter-btn" onclick="setFilesFilter('series')">📺 Séries</button>
+<button type="button" id="fcat_films" class="filter-btn" onclick="setFilesFilter('films')">🍿 Films</button>
+<button type="button" id="fcat_musique" class="filter-btn" onclick="setFilesFilter('musique')">🎵 Musique</button>
+</div>
+<div id="files_list">Chargement...</div>
+</div>
+
+<!-- STUDIO MAC & CONTRÔLE À DISTANCE (TERMINAL + IDE WEB + SAUVEGARDES + ADGUARD TUTO) -->
+<div class="card" id="sec_studio">
+<h2>
+    <span>💻 Studio Mac, AdGuard & Contrôle à Distance (Wi-Fi & 4G/5G)</span>
+    <span class="xp-win-btns"><span class="xp-ctl">_</span><span class="xp-ctl">□</span><span class="xp-ctl close">✕</span></span>
+</h2>
+<div class="studio-tabs">
+<button type="button" id="stab_term" class="studio-tab active" onclick="switchStudioTab('term')">🖥️ Terminal PowerShell</button>
+<button type="button" id="stab_ide" class="studio-tab" onclick="switchStudioTab('ide')">📝 Éditeur de Code (Mac IDE)</button>
+<button type="button" id="stab_bk" class="studio-tab" onclick="switchStudioTab('bk')">🛡️ Sauvegardes & ZIP</button>
+<button type="button" id="stab_ag" class="studio-tab" onclick="switchStudioTab('ag')">🚫 AdGuard & Tuto Anti-Pub</button>
+<button type="button" id="stab_mac" class="studio-tab" onclick="switchStudioTab('mac')">🍎 Connexion Mac / SSH</button>
+</div>
+
+<!-- ONGLET 1 : TERMINAL POWERSHELL -->
+<div id="spanel_term">
+<div class="term-quick-bar">
+<button type="button" class="term-quick-btn" onclick="quickTermPorts()">🔍 État des Services (Ports)</button>
+<button type="button" class="term-quick-btn" onclick="quickTermLinks()">🌐 Voir IPs & Liens 4G</button>
+<button type="button" class="term-quick-btn" onclick="restartServices()">🔄 Relancer Serveur</button>
+<button type="button" class="term-quick-btn" onclick="clearTerminal()">🧹 Clear Console</button>
+</div>
+<div class="win-term" onclick="document.getElementById('term_input').focus()">
+<div class="win-term-header">
+<div class="win-term-tab"><span>⚡</span> <span>Windows PowerShell — Administrateur</span></div>
+<div class="win-term-dots">
+<span class="win-term-dot" style="background:#eab308"></span>
+<span class="win-term-dot" style="background:#22c55e"></span>
+<span class="win-term-dot" style="background:#ef4444"></span>
+</div>
+</div>
+<div class="win-term-body" id="term_body">Windows PowerShell
+Copyright (C) Microsoft Corporation. Tous droits réservés.
+Console interactive connectée au serveur Dell Latitude (C:\Serveur).
+</div>
+<div class="win-term-input-row">
+<span class="win-term-prompt" id="term_prompt">PS C:\Serveur&gt;</span>
+<input type="text" id="term_input" class="win-term-input" placeholder="Tapez une commande PowerShell (cd, dir, git, pip install...)" autocomplete="off" spellcheck="false" onkeydown="handleTermKey(event)">
+</div>
+</div>
+</div>
+
+<!-- ONGLET 2 : ÉDITEUR DE CODE EN DIRECT (POUR MODIFIER DEPUIS LE MAC) -->
+<div id="spanel_ide" style="display:none">
+<div class="sub">Modifie le code du serveur directement depuis ton Mac (une sauvegarde automatique est créée avant chaque enregistrement + vérification anti-erreur Python) :</div>
+<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+<select id="ide_file_sel" onchange="loadCodeFile()" style="margin:0;flex:1">
+<option value="index.html">🌐 index.html (Interface Portail Web)</option>
+<option value="music_app.html">🎧 music_app.html (Application Autonome IlianTify)</option>
+<option value="hub.py">🐍 hub.py (Serveur Python & API)</option>
+<option value="sources_config.json">🛠️ sources_config.json (Domaines Stream Healer)</option>
+<option value="TUTO_VPN_TAILSCALE.md">🛡️ TUTO_VPN_TAILSCALE.md (Guide VPN Tailscale)</option>
+<option value="watchdog.ps1">🛡️ watchdog.ps1 (Maintien en vie & Tunnels)</option>
+<option value="start_all.ps1">🚀 start_all.ps1 (Script de Démarrage)</option>
+<option value="navidrome\navidrome.toml">🎵 navidrome\navidrome.toml (Config Navidrome)</option>
+</select>
+<button type="button" class="btn-sec" onclick="loadCodeFile()" style="width:auto;padding:10px 14px;margin:0">🔄 Recharger</button>
+</div>
+<textarea id="code_editor" spellcheck="false" placeholder="Chargement du fichier..."></textarea>
+<div id="ide_status" style="font-size:12px;color:#86efac;margin:4px 0"></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button type="button" class="btn-green" onclick="saveCodeFile()" style="flex:2">💾 Enregistrer & Appliquer (Avec Auto-Backup)</button>
+<button type="button" class="btn-purp" onclick="restartServices()" style="flex:1">🔄 Redémarrer Services</button>
+</div>
+</div>
+
+<!-- ONGLET 3 : SAUVEGARDES & RESTAURATION -->
+<div id="spanel_bk" style="display:none">
+<div class="sub">Crée un point de sauvegarde avant de faire un test, télécharge tout le code en ZIP sur ton Mac, ou restaure une version stable en 1 clic :</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+<input type="text" id="bk_label" placeholder="Nom de la sauvegarde (ex: avant_modif_mac)" style="flex:2;margin:0">
+<button type="button" class="btn-green" onclick="createBackupNow()" style="flex:1;margin:0">➕ Créer Sauvegarde</button>
+<a href="/api/backups_download_zip" target="_blank" style="flex:1;background:#7c3aed;color:#fff;padding:10px;border-radius:10px;text-align:center;text-decoration:none;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center">📦 Télécharger ZIP sur mon Mac</a>
+</div>
+<div id="backups_list_box">Chargement des sauvegardes...</div>
+</div>
+
+<!-- ONGLET 4 : ADGUARD HOME & TUTORIEL MULTI-APPAREILS -->
+<div id="spanel_ag" style="display:none">
+<div class="status-box" style="line-height:1.6">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+        <b style="color:#38bdf8;font-size:14px">🛡️ AdGuard Home — Bloqueur de Pubs Maison (DNS : <code>192.168.1.33</code>)</b>
+        <a href="/go/adguard" target="_blank" style="background:#059669;color:#fff;padding:6px 12px;border-radius:8px;text-decoration:none;font-weight:700;font-size:12px">⚡ Ouvrir AdGuard (Auto-Login)</a>
+    </div>
+    <div><b>1️⃣ Toute la maison d'un coup (Box Internet) :</b> Ouvre <code>http://192.168.1.1</code> (ou <code>http://mafreebox.freebox.fr</code>) → Réseau / DHCP / DNS → mets l'IP locale du serveur en DNS Primaire.</div>
+    <div style="margin-top:6px"><b>2️⃣ iPhone / iPad :</b> Réglages → Wi-Fi → <b>ⓘ</b> à côté de ton Wi-Fi → Configurer le DNS → <b>Manuel</b> → mets l'IP du serveur → Enregistrer.</div>
+    <div style="margin-top:6px"><b>3️⃣ Mac :</b> Réglages Système → Wi-Fi → Détails... → onglet <b>DNS</b> → clique sur <b>+</b> et ajoute l'IP du serveur.</div>
+</div>
+</div>
+
+<!-- ONGLET 5 : AIDE CONNEXION MAC (SSH / VS CODE / CURSOR) -->
+<div id="spanel_mac" style="display:none">
+<div class="status-box" style="line-height:1.6">
+<b style="color:#38bdf8;font-size:14px">🍎 Comment contrôler et coder sur le serveur depuis ton Mac :</b>
+<div style="margin-top:8px">
+<b>1️⃣ Depuis n'importe où (4G / Café / Train / Fac / Maison) via le navigateur du Mac :</b><br>
+• Ouvre le lien 4G/5G Cloudflare ou ton IP fixe <b>Tailscale</b> affiché tout en haut de cette page.<br>
+• Utilise l'onglet <b>📝 Éditeur de Code (Mac IDE)</b> ci-dessus pour modifier <code>index.html</code>, <code>music_app.html</code> ou <code>hub.py</code>, et l'onglet <b>🖥️ Terminal PowerShell</b> pour installer des paquets (<code>pip install ...</code>) ou gérer Windows.
+</div>
+<div style="margin-top:10px">
+<b>2️⃣ Depuis le Terminal de ton Mac ou VS Code / Cursor (extension Remote-SSH) :</b><br>
+• Commande Terminal Mac : <code id="mac_ssh_cmd" style="color:#86efac;background:#1e293b;padding:3px 7px;border-radius:5px">ssh ilian@192.168.1.33</code> (ou port de secours : <code>ssh -p 8022 ilian@192.168.1.33</code>)<br>
+• Dans <b>VS Code / Cursor sur Mac</b> : installe l'extension <i>Remote - SSH</i>, connecte-toi à <code>ilian@192.168.1.33</code> et ouvre directement le dossier <code>C:\Serveur</code> !
+</div>
+</div>
+</div>
+</div>
+
+<!-- BARRE DES TÂCHES WINDOWS XP LUNA (AFFICHÉE EN MODE JOUR WINDOWS XP) -->
+<div class="xp-taskbar">
+    <button type="button" class="xp-start-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <span style="font-style:normal;font-size:16px">🪟</span> <span>démarrer</span>
+    </button>
+    <div class="xp-task-items">
+        <a class="xp-task-pill" href="/iliantify">🎧 IlianTify</a>
+        <a class="xp-task-pill" onclick="document.getElementById('sec_catalog').scrollIntoView({behavior:'smooth'})">🎬 Catalogue</a>
+        <a class="xp-task-pill" onclick="document.getElementById('sec_music').scrollIntoView({behavior:'smooth'})">🎵 Musique</a>
+        <a class="xp-task-pill" onclick="document.getElementById('sec_files').scrollIntoView({behavior:'smooth'})">🗂️ Fichiers</a>
+        <a class="xp-task-pill" onclick="document.getElementById('sec_studio').scrollIntoView({behavior:'smooth'})">💻 Studio Mac</a>
+    </div>
+    <div class="xp-systray">
+        <span>🛡️</span>
+        <span>🔊</span>
+        <span id="xp_clock">12:00</span>
+    </div>
+</div>
+
+<script>
+let CURRENT_FILTER = "trending";
+let CATALOG_ITEMS = [];
+let CATALOG_EXPANDED = false;
+let IS_SEARCH_MODE = false;
+let LAST_MUSIC_MODE = "track";
+let ALL_FILE_GROUPS = [];
+let CURRENT_FILES_FILTER = "all";
+let OPEN_ACCORDIONS = {};
+let TERM_HISTORY = [];
+let TERM_HIST_IDX = -1;
+
+/* ==================== MISSION 2 : SYSTÈME DE THÈME STRICT (UNIQUEMENT NUIT & WINDOWS XP ORIGINAL) ==================== */
+const THEMES = ["dark", "xp"];
+
+function applyTheme(t) {
+    // Migration auto si l'utilisateur avait "light" enregistré auparavant
+    if (t === "light" || !THEMES.includes(t)) {
+        t = (t === "light") ? "xp" : "dark";
+    }
+    document.body.classList.remove("theme-xp");
+    if (t === "xp") {
+        document.body.classList.add("theme-xp");
+    }
+    localStorage.setItem("serveur_ilian_theme", t);
+    const btn = document.getElementById("theme_toggle_btn");
+    if (btn) {
+        btn.innerHTML = (t === "xp") ? "🪟 Mode XP (Jour)" : "🌙 Mode Nuit";
+    }
+}
+
+function cycleTheme() {
+    const cur = localStorage.getItem("serveur_ilian_theme") || "dark";
+    const next = (cur === "dark") ? "xp" : "dark";
+    applyTheme(next);
+}
+
+applyTheme(localStorage.getItem("serveur_ilian_theme") || "dark");
+
+function updateXpClock() {
+    const el = document.getElementById("xp_clock");
+    if (el) {
+        const d = new Date();
+        el.textContent = String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+    }
+}
+setInterval(updateXpClock, 15000);
+updateXpClock();
+
+/* ==================== MISSION 1 : BOUTONS CLEAR (❌) RAPIDES POUR IPHONE ==================== */
+function clearMusicSearchInput() {
+    const inp = document.getElementById("m_query");
+    if (inp) {
+        inp.value = "";
+        inp.focus();
+    }
+    document.getElementById("music_results").innerHTML = "";
+}
+
+function clearMediaSearchInput() {
+    const inp = document.getElementById("ms_query");
+    if (inp) {
+        inp.value = "";
+        inp.focus();
+    }
+    if (IS_SEARCH_MODE) {
+        loadMediaCatalog(CURRENT_FILTER);
+    }
+}
+
+/* ==================== FEEDBACK BOUTON VALIDÉ SANS REMONTER EN HAUT DE LA PAGE ==================== */
+function markBtnValidated(btnEl) {
+    if (!btnEl) return;
+    if (!btnEl.dataset.origHtml) {
+        btnEl.dataset.origHtml = btnEl.innerHTML;
+        btnEl.dataset.origBg = btnEl.style.background || "";
+    }
+    btnEl.innerHTML = "✅";
+    btnEl.style.background = "#16a34a";
+    btnEl.style.color = "#ffffff";
+    setTimeout(() => {
+        if (btnEl && btnEl.dataset.origHtml) {
+            btnEl.innerHTML = "✅ " + btnEl.dataset.origHtml.replace(/^✅\s*/, "");
+        }
+    }, 1200);
+}
+
+function escJs(s) {
+    return String(s || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, "&quot;");
+}
+
+function openService(port, tunnelUrl, subPath) {
+    const path = subPath || "/";
+    if (window.location.hostname.includes("trycloudflare.com") && tunnelUrl && tunnelUrl.startsWith("http")) {
+        window.open(tunnelUrl.replace(/\/$/, "") + path, "_blank");
+    } else {
+        window.open("http://" + window.location.hostname + ":" + port + path, "_blank");
+    }
+}
+
+function copyLogs() {
+    const el = document.getElementById("raw_logs");
+    el.select();
+    document.execCommand("copy");
+    alert("Logs copiés !");
+}
+async function clearLogs() { await fetch("/api/clear_logs", {method:"POST"}); updateStatus(); }
+async function stopDownload() { await fetch("/api/stop", {method:"POST"}); updateStatus(); }
+
+/* ==================== CATALOGUE UNIVERSEL COMPACT ==================== */
+function setActiveFilterBtn(flt) {
+    CURRENT_FILTER = flt;
+    ["trending", "disney", "hbo", "animes", "movies", "series"].forEach(k => {
+        const el = document.getElementById("flt_" + k);
+        if (el) el.classList.toggle("active", k === flt);
+    });
+}
+
+function toggleCatalogExpanded() {
+    CATALOG_EXPANDED = !CATALOG_EXPANDED;
+    renderMediaItems(CATALOG_ITEMS);
+}
+
+async function loadMediaCatalog(flt) {
+    setActiveFilterBtn(flt);
+    IS_SEARCH_MODE = false;
+    CATALOG_EXPANDED = false;
+    document.getElementById("ms_query").value = "";
+    document.getElementById("media_action_panel").innerHTML = "";
+    const box = document.getElementById("media_results");
+    box.innerHTML = "<div class='sub'>⏳ Chargement du catalogue...</div>";
+    const r = await fetch(`/api/media_catalog?filter=${encodeURIComponent(flt)}`);
+    CATALOG_ITEMS = await r.json();
+    renderMediaItems(CATALOG_ITEMS);
+}
+
+async function searchMediaCatalog() {
+    const q = document.getElementById("ms_query").value.trim();
+    if (!q) return loadMediaCatalog(CURRENT_FILTER);
+    IS_SEARCH_MODE = true;
+    CATALOG_EXPANDED = true;
+    document.getElementById("media_action_panel").innerHTML = "";
+    const box = document.getElementById("media_results");
+    box.innerHTML = "<div class='sub'>⏳ Recherche dans Films, Séries & Animés...</div>";
+    const r = await fetch(`/api/media_catalog?filter=all&q=${encodeURIComponent(q)}`);
+    CATALOG_ITEMS = await r.json();
+    renderMediaItems(CATALOG_ITEMS);
+}
+
+function renderMediaItems(items) {
+    const box = document.getElementById("media_results");
+    const toggleBtn = document.getElementById("toggle_cat_view_btn");
+    if (!items || !items.length) {
+        box.innerHTML = "<div class='sub' style='color:#fca5a5'>Aucun résultat trouvé.</div>";
+        if (toggleBtn) toggleBtn.style.display = "none";
+        return;
+    }
+    if (toggleBtn) {
+        toggleBtn.style.display = "inline-block";
+        toggleBtn.innerText = CATALOG_EXPANDED ? "🔼 Vue compacte" : `👁️ Tout voir (${items.length})`;
+    }
+
+    if (!CATALOG_EXPANDED && !IS_SEARCH_MODE) {
+        box.innerHTML = `<div class="poster-strip">` + items.map(it => {
+            const bClass = it.badge.includes("Disney") ? "badge-disney" : (it.badge.includes("HBO") ? "badge-hbo" : (it.media_type === "anime" ? "badge-anime" : (it.media_type === "movie" ? "badge-film" : "")));
+            return `
+            <div class="poster-card" onclick="openMediaPanel('${escJs(it.id)}', '${escJs(it.media_type)}', '${escJs(it.title)}', '${escJs(it.year)}', '${escJs(it.imdb_id)}', '${escJs(it.url || '')}', '${escJs(it.synopsis || '')}')">
+                <img src="${it.image || ''}" alt="" onerror="this.style.background='#334155'">
+                <div class="poster-card-body">
+                    <div class="poster-card-title" title="${escJs(it.title)}">${it.title}</div>
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+                        <span class="badge ${bClass}">${it.badge}</span>
+                        <span style="font-size:10px;color:#94a3b8">${it.year}</span>
+                    </div>
+                </div>
+            </div>`;
+        }).join("") + `</div>`;
+        return;
+    }
+
+    box.innerHTML = `<div class="poster-grid-expanded">` + items.map(it => {
+        const bClass = it.badge.includes("Disney") ? "badge-disney" : (it.badge.includes("HBO") ? "badge-hbo" : (it.media_type === "anime" ? "badge-anime" : (it.media_type === "movie" ? "badge-film" : "")));
+        const btnLabel = it.media_type === "movie" ? "🍿 Film" : (it.media_type === "anime" ? "🎌 Saisons" : "📺 Saisons");
+        return `
+        <div class="res-item">
+            <img src="${it.image || ''}" alt="" onerror="this.style.background='#334155'">
+            <div class="res-info">
+                <b title="${escJs(it.title)}">${it.title} <span style="color:#94a3b8;font-weight:400">(${it.year})</span></b>
+                <span class="badge ${bClass}">${it.badge}</span>
+                <div class="synopsis">${it.synopsis || ''}</div>
+            </div>
+            <button class="${it.media_type === 'movie' ? 'btn-green' : ''}" style="width:auto;padding:8px 10px;margin:0;flex-shrink:0;font-size:11px"
+                onclick="openMediaPanel('${escJs(it.id)}', '${escJs(it.media_type)}', '${escJs(it.title)}', '${escJs(it.year)}', '${escJs(it.imdb_id)}', '${escJs(it.url || '')}', '${escJs(it.synopsis || '')}')">
+                ${btnLabel}
+            </button>
+        </div>`;
+    }).join("") + `</div>`;
+}
+
+/* ==================== MISSION 2 : SÉLECTEUR DE LANGUE COMPACT [ 🇫🇷 VF ] [ 🇯🇵 VOSTFR ] [ 🇬🇧 VO ] ==================== */
+let SELECTED_MEDIA_LANG = "vf";
+let CURRENT_PANEL_CTX = null;
+let CURRENT_ANIME_SEASONS = [];
+
+function buildLangPillBarHtml() {
+    return `
+    <div class="lang-pill-bar">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="font-size:11.5px;color:#94a3b8;font-weight:700">🌐 Langue :</span>
+            <div class="lang-pill-group">
+                <button type="button" class="lang-pill ${SELECTED_MEDIA_LANG === 'vf' ? 'active' : ''}" id="lpill_vf" onclick="selectMediaLang('vf')">🇫🇷 VF</button>
+                <button type="button" class="lang-pill ${SELECTED_MEDIA_LANG === 'vostfr' ? 'active' : ''}" id="lpill_vostfr" onclick="selectMediaLang('vostfr')">🇯🇵 VOSTFR</button>
+                <button type="button" class="lang-pill ${SELECTED_MEDIA_LANG === 'vo' ? 'active' : ''}" id="lpill_vo" onclick="selectMediaLang('vo')">🇬🇧 VO</button>
+            </div>
+        </div>
+        <span id="lang_fallback_badge" class="lang-fallback-badge" style="display:none"></span>
+    </div>`;
+}
+
+function selectMediaLang(lang) {
+    SELECTED_MEDIA_LANG = lang;
+    ["vf", "vostfr", "vo"].forEach(k => {
+        const el = document.getElementById("lpill_" + k);
+        if (el) el.classList.toggle("active", k === lang);
+    });
+    if (!CURRENT_PANEL_CTX) return;
+    if (CURRENT_PANEL_CTX.mediaType === "anime") {
+        renderAnimeSeasonsByLang();
+    } else if (CURRENT_PANEL_CTX.mediaType === "movie") {
+        const btn = document.getElementById("movie_dl_btn_main");
+        if (btn) {
+            btn.innerHTML = `📥 Télécharger le Film en ${lang.toUpperCase()} (Jellyfin)`;
+        }
+        const fb = document.getElementById("lang_fallback_badge");
+        if (fb) {
+            fb.style.display = "inline-block";
+            fb.textContent = `Priorité ${lang.toUpperCase()} (bascule auto si indisponible)`;
+        }
+    } else if (CURRENT_PANEL_CTX.mediaType === "series") {
+        renderSeriesSeasonEps(CURRENT_PANEL_CTX.title, CURRENT_PANEL_CTX.year, CURRENT_PANEL_CTX.imdbId);
+    }
+}
+
+function renderAnimeSeasonsByLang() {
+    const listBox = document.getElementById("anime_seasons_list_box");
+    const fbBadge = document.getElementById("lang_fallback_badge");
+    const epSub = document.getElementById("anime_ep_subpanel");
+    if (epSub) epSub.innerHTML = "";
+    if (!listBox) return;
+
+    if (!CURRENT_ANIME_SEASONS || !CURRENT_ANIME_SEASONS.length) {
+        listBox.innerHTML = `<div class="sub" style="margin-top:6px;color:#fca5a5">Aucune saison détectée.</div>`;
+        if (fbBadge) fbBadge.style.display = "none";
+        return;
+    }
+
+    let matching = CURRENT_ANIME_SEASONS.filter(s => (s.lang || "").toLowerCase() === SELECTED_MEDIA_LANG);
+    let effectiveLang = SELECTED_MEDIA_LANG;
+
+    if (!matching.length) {
+        // Bascule automatique intelligente vers VOSTFR (ou VF) sans planter
+        const fallbackOrder = SELECTED_MEDIA_LANG === "vo" ? ["vostfr", "vf"] : ["vostfr", "vf", "vo"];
+        for (const cand of fallbackOrder) {
+            const found = CURRENT_ANIME_SEASONS.filter(s => (s.lang || "").toLowerCase() === cand);
+            if (found.length) {
+                matching = found;
+                effectiveLang = cand;
+                break;
+            }
+        }
+        if (!matching.length) {
+            matching = CURRENT_ANIME_SEASONS;
+            effectiveLang = (matching[0].lang || "vostfr").toLowerCase();
+        }
+        if (fbBadge) {
+            fbBadge.style.display = "inline-block";
+            fbBadge.textContent = `⚠️ Indisponible en ${SELECTED_MEDIA_LANG.toUpperCase()} — bascule auto ${effectiveLang.toUpperCase()}`;
+        }
+    } else {
+        if (fbBadge) {
+            fbBadge.style.display = "none";
+            fbBadge.textContent = "";
+        }
+    }
+
+    const title = CURRENT_PANEL_CTX ? CURRENT_PANEL_CTX.title : "Anime";
+    listBox.innerHTML = matching.map(s => `
+        <div class="season-btn">
+            <div><b>${s.name}</b> <span class="badge badge-anime">${s.lang.toUpperCase()}</span></div>
+            <button style="width:auto;padding:6px 12px;margin:0;font-size:12px" onclick="openAnimeSeasonEpisodes('${escJs(title)}', '${escJs(s.name)} (${s.lang.toUpperCase()})', '${escJs(s.js_url)}')">🎞️ Épisodes</button>
+        </div>`).join("");
+}
+
+async function openMediaPanel(id, mediaType, title, year, imdbId, animeUrl, synopsis) {
+    const panel = document.getElementById("media_action_panel");
+    CURRENT_PANEL_CTX = {id, mediaType, title, year, imdbId, animeUrl, synopsis};
+
+    if (mediaType === "anime") {
+        const targetUrl = animeUrl || id.replace(/^anime:/, "");
+        panel.innerHTML = "<div class='season-box'>⏳ Analyse des saisons VF / VOSTFR / VO sur Anime-Sama...</div>";
+        const r = await fetch("/api/anime_seasons?url=" + encodeURIComponent(targetUrl));
+        const data = await r.json();
+        CURRENT_ANIME_SEASONS = data.seasons || [];
+        panel.innerHTML = `<div class="season-box" style="border-color:#f472b6">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <b style="color:#f472b6;font-size:14px">🎌 ${title}</b>
+                <button type="button" class="btn-sec" style="width:auto;padding:4px 9px;margin:0;font-size:11px" onclick="document.getElementById('media_action_panel').innerHTML=''">✖️ Fermer</button>
+            </div>
+            ${buildLangPillBarHtml()}
+            <div id="anime_seasons_list_box"></div>
+            <div id="anime_ep_subpanel"></div>
+        </div>`;
+        renderAnimeSeasonsByLang();
+        return;
+    }
+
+    if (mediaType === "movie") {
+        panel.innerHTML = `
+        <div class="season-box" style="border-color:#10b981">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+                <b style="color:#10b981;font-size:14px">🍿 ${title} (${year})</b>
+                <button type="button" class="btn-sec" style="width:auto;padding:4px 9px;margin:0;font-size:11px" onclick="document.getElementById('media_action_panel').innerHTML=''">✖️ Fermer</button>
+            </div>
+            <div class="sub" style="margin-top:5px">${synopsis || ''}</div>
+            ${buildLangPillBarHtml()}
+            <input type="text" id="custom_media_url" placeholder="Optionnel : Lien direct hébergeur (uqload, vidmoly, voe, doodstream, m3u8, mp4)...">
+            <button id="movie_dl_btn_main" class="btn-green" onclick="triggerMediaDownload('movie', '${escJs(title)}', '${escJs(year)}', 1, 1, 1, '${escJs(imdbId)}', this)">📥 Télécharger le Film en ${SELECTED_MEDIA_LANG.toUpperCase()} (Jellyfin)</button>
+        </div>`;
+    } else {
+        panel.innerHTML = "<div class='season-box'>⏳ Chargement des saisons et épisodes...</div>";
+        const r = await fetch(`/api/series_episodes?id=${encodeURIComponent(id)}&title=${encodeURIComponent(title)}`);
+        const data = await r.json();
+        window.CURRENT_SERIES_SEASONS = data.seasons || [];
+        let sOpts = window.CURRENT_SERIES_SEASONS.map(s => `<option value="${s.season}">Season ${String(s.season).padStart(2,'0')} (${s.count} ép.)</option>`).join("");
+        panel.innerHTML = `
+        <div class="season-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+                <b style="color:#38bdf8;font-size:14px">📺 ${title} (${year})</b>
+                <button type="button" class="btn-sec" style="width:auto;padding:4px 9px;margin:0;font-size:11px" onclick="document.getElementById('media_action_panel').innerHTML=''">✖️ Fermer</button>
+            </div>
+            <div class="sub" style="margin-top:4px">${synopsis || ''}</div>
+            ${buildLangPillBarHtml()}
+            <select id="series_season_sel" onchange="renderSeriesSeasonEps('${escJs(title)}', '${escJs(year)}', '${escJs(imdbId)}')" style="margin-top:4px">${sOpts}</select>
+            <input type="text" id="custom_media_url" placeholder="Optionnel : Lien direct hébergeur (uqload, vidmoly, voe, doodstream, vidoza, lulustream, m3u8)...">
+            <div id="series_eps_box"></div>
+        </div>`;
+        renderSeriesSeasonEps(title, year, imdbId);
+    }
+}
+
+async function openAnimeSeasonEpisodes(animeTitle, seasonLabel, jsUrl) {
+    const epPanel = document.getElementById("anime_ep_subpanel");
+    epPanel.innerHTML = "<div class='sub' style='margin-top:8px'>⏳ Lecture des épisodes...</div>";
+    const r = await fetch("/api/season_info?js_url=" + encodeURIComponent(jsUrl));
+    const data = await r.json();
+    if (!data.count) {
+        epPanel.innerHTML = `<div class='sub' style='color:#fca5a5;margin-top:8px'>Aucun épisode trouvé.</div>`;
+        return;
+    }
+    let btns = "";
+    for (let i = 1; i <= data.count; i++) {
+        btns += `<button class="btn-green" style="padding:7px 4px;margin:0;font-size:11px" onclick="startEpDl('${escJs(animeTitle)}', '${escJs(seasonLabel)}', '${escJs(jsUrl)}', ${i}, ${i}, this)">📥 Ép ${i}</button>`;
+    }
+    epPanel.innerHTML = `<div style="margin-top:10px;padding-top:8px;border-top:1px solid #334155">
+        <b style="color:#10b981;font-size:13px">🎬 ${animeTitle} - ${seasonLabel} (${data.count} ép.)</b>
+        <div class="ep-grid">${btns}</div>
+        <div style="display:flex;gap:6px;align-items:center;margin-top:8px">
+            <span style="font-size:12px">De</span>
+            <input type="number" id="ep_start" value="1" min="1" max="${data.count}" style="width:60px;padding:7px;margin:0">
+            <span style="font-size:12px">à</span>
+            <input type="number" id="ep_end" value="${data.count}" min="1" max="${data.count}" style="width:60px;padding:7px;margin:0">
+            <button onclick="startRangeDl('${escJs(animeTitle)}', '${escJs(seasonLabel)}', '${escJs(jsUrl)}', this)" style="margin:0;padding:8px">📥 Tout télécharger</button>
+        </div></div>`;
+}
+
+function renderSeriesSeasonEps(title, year, imdbId) {
+    const selEl = document.getElementById("series_season_sel");
+    if (!selEl) return;
+    const sNum = parseInt(selEl.value || "1", 10);
+    const sObj = (window.CURRENT_SERIES_SEASONS || []).find(x => x.season === sNum) || {season: sNum, count: 10};
+    const count = sObj.count || 10;
+    const langTag = SELECTED_MEDIA_LANG.toUpperCase();
+    let btns = "";
+    for (let i = 1; i <= count; i++) {
+        const epTag = `S${String(sNum).padStart(2,'0')}E${String(i).padStart(2,'0')}`;
+        btns += `<button class="btn-green" style="padding:7px 4px;margin:0;font-size:11px" onclick="triggerMediaDownload('series', '${escJs(title)}', '${escJs(year)}', ${sNum}, ${i}, ${i}, '${escJs(imdbId)}', this)">📥 ${epTag} (${langTag})</button>`;
+    }
+    document.getElementById("series_eps_box").innerHTML = `
+        <div class="ep-grid">${btns}</div>
+        <div style="display:flex;gap:6px;align-items:center;margin-top:8px">
+            <span style="font-size:12px">Ép.</span>
+            <input type="number" id="ser_ep_start" value="1" min="1" max="${count}" style="width:60px;padding:7px;margin:0">
+            <span style="font-size:12px">à</span>
+            <input type="number" id="ser_ep_end" value="${count}" min="1" max="${count}" style="width:60px;padding:7px;margin:0">
+            <button onclick="triggerMediaRangeDownload('${escJs(title)}', '${escJs(year)}', ${sNum}, '${escJs(imdbId)}', this)" style="margin:0;padding:8px">📥 Télécharger en ${langTag}</button>
+        </div>`;
+}
+
+async function triggerMediaDownload(mediaType, title, year, season, startEp, endEp, imdbId, btnEl) {
+    markBtnValidated(btnEl);
+    const customUrlEl = document.getElementById("custom_media_url");
+    const customUrl = customUrlEl ? customUrlEl.value.trim() : "";
+    const fd = new FormData();
+    fd.append("media_type", mediaType);
+    fd.append("title", title);
+    fd.append("year", year);
+    fd.append("season", season);
+    fd.append("start_ep", startEp);
+    fd.append("end_ep", endEp);
+    fd.append("imdb_id", imdbId || "");
+    fd.append("custom_url", customUrl);
+    fd.append("lang", SELECTED_MEDIA_LANG || "vf");
+    await fetch("/api/download_media", {method: "POST", body: fd});
+    updateStatus();
+}
+
+function triggerMediaRangeDownload(title, year, season, imdbId, btnEl) {
+    const s = document.getElementById("ser_ep_start").value || 1;
+    const e = document.getElementById("ser_ep_end").value || 1;
+    triggerMediaDownload("series", title, year, season, s, e, imdbId, btnEl);
+}
+
+async function startEpDl(title, season, jsUrl, startEp, endEp, btnEl) {
+    markBtnValidated(btnEl);
+    const fd = new FormData();
+    fd.append("title", title);
+    fd.append("season", season);
+    fd.append("js_url", jsUrl);
+    fd.append("start_ep", startEp);
+    fd.append("end_ep", endEp);
+    await fetch("/api/download_season", {method:"POST", body:fd});
+    updateStatus();
+}
+
+function startRangeDl(title, season, jsUrl, btnEl) {
+    startEpDl(title, season, jsUrl, document.getElementById("ep_start").value || 1, document.getElementById("ep_end").value || 12, btnEl);
+}
+
+/* ==================== MISSION 3 : STREAM HEALER (AUTO-RÉPARATEUR DE SITES STREAMING) ==================== */
+function renderStreamHealerBar(sh) {
+    if (!sh) return;
+    const txtEl = document.getElementById("healer_txt");
+    const pillsEl = document.getElementById("healer_domains_pills");
+    if (txtEl) {
+        txtEl.textContent = `Sources Streaming : ${sh.last_status || 'Opérationnelles'} (Auto-Heal actif)`;
+    }
+    if (pillsEl && sh.sources) {
+        pillsEl.innerHTML = Object.keys(sh.sources).map(k => {
+            const s = sh.sources[k];
+            const host = (s.active_domain || "").replace(/^https?:\/\//, "");
+            const stClass = s.status === "healed" ? "healed" : "ok";
+            const msTxt = s.latency_ms ? ` (${s.latency_ms}ms)` : "";
+            return `<span class="healer-pill ${stClass}" title="${escJs(s.label || k)}">✔ ${host}${msTxt}</span>`;
+        }).join("");
+    }
+}
+
+async function runStreamHealerNow(btnEl) {
+    if (btnEl) {
+        btnEl.disabled = true;
+        btnEl.textContent = "⏳ Vérification & réparation en cours...";
+    }
+    try {
+        const r = await fetch("/api/stream_healer_run", {method: "POST"});
+        const d = await r.json();
+        renderStreamHealerBar(d);
+        if (btnEl) {
+            btnEl.textContent = "✅ Sites vérifiés & à jour !";
+            setTimeout(() => {
+                btnEl.disabled = false;
+                btnEl.textContent = "🛠️ Vérifier & Réparer les sites de streaming";
+            }, 2500);
+        }
+    } catch (e) {
+        if (btnEl) {
+            btnEl.disabled = false;
+            btnEl.textContent = "🛠️ Vérifier & Réparer les sites de streaming";
+        }
+    }
+}
+
+/* ==================== MISSION 4 : VPN PRIVÉ FIXE (TAILSCALE) ==================== */
+function toggleTailscaleCard(forceOpen = null) {
+    const card = document.getElementById("sec_tailscale");
+    if (!card) return;
+    const open = forceOpen !== null ? forceOpen : (card.style.display === "none");
+    card.style.display = open ? "block" : "none";
+    if (open) {
+        card.scrollIntoView({behavior: "smooth", block: "nearest"});
+    }
+}
+
+function renderTailscaleStatus(ts) {
+    if (!ts) return;
+    const badge = document.getElementById("ts_mini_badge");
+    const stTitle = document.getElementById("ts_state_title");
+    const stSub = document.getElementById("ts_state_sub");
+    const btn = document.getElementById("ts_connect_btn");
+    const tutoLinks = document.getElementById("ts_links_tuto");
+
+    if (ts.connected && ts.ip) {
+        if (badge) {
+            badge.style.color = "#86efac";
+            badge.textContent = `🟢 Actif : ${ts.ip}`;
+        }
+        if (stTitle) {
+            stTitle.style.color = "#86efac";
+            stTitle.innerHTML = `🟢 VPN Privé Tailscale Connecté — IP Fixe à Vie : <code>${ts.ip}</code>`;
+        }
+        if (stSub) {
+            stSub.innerHTML = `Portail : <a href="http://${ts.ip}:5000" style="color:#38bdf8">http://${ts.ip}:5000</a> • IlianTify : <a href="http://${ts.ip}:5000/iliantify" style="color:#1db954">http://${ts.ip}:5000/iliantify</a>`;
+        }
+        if (btn) {
+            btn.textContent = "✅ Dell Connecté";
+            btn.style.background = "#059669";
+        }
+        if (tutoLinks) {
+            tutoLinks.innerHTML = `
+                • Portail : <a href="http://${ts.ip}:5000" style="color:#86efac;font-weight:700">http://${ts.ip}:5000</a><br>
+                • IlianTify : <a href="http://${ts.ip}:5000/iliantify" style="color:#86efac;font-weight:700">http://${ts.ip}:5000/iliantify</a><br>
+                • Jellyfin : <a href="http://${ts.ip}:8096" style="color:#86efac;font-weight:700">http://${ts.ip}:8096</a>`;
+        }
+    } else if (ts.auth_url) {
+        if (badge) {
+            badge.style.color = "#fde68a";
+            badge.textContent = "🔑 Prêt à valider (1-Clic)";
+        }
+        if (stTitle) {
+            stTitle.style.color = "#fde68a";
+            stTitle.textContent = "🔑 Tailscale est installé ! Clique sur le bouton à droite pour lier ton compte :";
+        }
+        if (stSub) {
+            stSub.innerHTML = `<a href="${ts.auth_url}" target="_blank" style="color:#38bdf8;font-weight:700">👉 Ouvrir la page d'activation Tailscale (${ts.auth_url.slice(0, 42)}...)</a>`;
+        }
+        if (btn) {
+            btn.textContent = "🔑 Valider mon compte Tailscale";
+            btn.onclick = () => window.open(ts.auth_url, "_blank");
+        }
+    } else {
+        if (badge) {
+            badge.style.color = "#38bdf8";
+            badge.textContent = "🔒 Configurer mon IP Fixe";
+        }
+        if (stTitle) {
+            stTitle.style.color = "#38bdf8";
+            stTitle.textContent = "🛡️ Service Tailscale installé sur le Dell (En attente d'association 1-Clic)";
+        }
+    }
+}
+
+async function connectTailscaleNow(btnEl) {
+    if (btnEl) {
+        btnEl.disabled = true;
+        btnEl.textContent = "⏳ Génération du lien Tailscale...";
+    }
+    try {
+        const r = await fetch("/api/tailscale_connect", {method: "POST"});
+        const d = await r.json();
+        renderTailscaleStatus(d);
+        if (d.auth_url) {
+            window.open(d.auth_url, "_blank");
+        }
+    } catch (e) {}
+    if (btnEl) {
+        btnEl.disabled = false;
+    }
+}
+
+/* ==================== MUSIQUE : DEEZER SYNC, RECHERCHE & APERÇU RAPIDE ==================== */
+function toggleDeezerDrawer(forceOpen = null) {
+    const dr = document.getElementById("deezer_drawer");
+    const isNowOpen = forceOpen !== null ? forceOpen : (dr.style.display === "none");
+    dr.style.display = isNowOpen ? "block" : "none";
+}
+
+function switchDeezerTab(tab) {
+    ["recs", "pls", "albs"].forEach(k => {
+        document.getElementById("dzview_" + k).style.display = (k === tab) ? (k === "pls" ? "block" : "grid") : "none";
+        document.getElementById("dztab_" + k).classList.toggle("active", k === tab);
+    });
+}
+
+function renderMusicCardHtml(item, isServerStream = false) {
+    const img = item.image || item.cover_url || "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120";
+    const playUrl = isServerStream ? item.stream_url : (item.preview || "");
+    const subTxt = item.subtitle || (item.artist ? `${item.artist}${item.album ? ' • ' + item.album : ''}` : "");
+    return `
+    <div class="spot-card">
+        <img src="${img}" alt="" onerror="this.style.background='#282828'">
+        <div class="spot-info">
+            <b title="${escJs(item.title)}">${item.title}</b>
+            <span title="${escJs(subTxt)}">${subTxt}</span>
+        </div>
+        <div class="spot-actions">
+            <button type="button" class="spot-btn-play" title="Écouter un extrait 30s" onclick="playMusicPreview('${escJs(item.title)}', '${escJs(item.artist || '')}', '${escJs(img)}', '${escJs(playUrl)}', ${isServerStream})">▶</button>
+            ${!isServerStream ? `<button type="button" class="spot-btn-dl" onclick="downloadMusicItem('${item.type || 'track'}', '${escJs(item.id)}', '${escJs(item.title)}', '${escJs(item.artist || '')}', '${escJs(img)}', this)">📥</button>` : ``}
+        </div>
+    </div>`;
+}
+
+async function loadDeezerHome(force = false) {
+    try {
+        const r = await fetch("/api/deezer_home" + (force ? "?refresh=1" : ""));
+        const d = await r.json();
+        if (d.account_name && d.account_name !== "Non connecté") {
+            document.getElementById("dz_acct_status").textContent = "💜 " + d.account_name;
+        }
+        if (d.account_url) {
+            document.getElementById("sp_sync_url").value = d.account_url;
+        }
+        document.getElementById("dzview_recs").innerHTML = (d.recommendations || []).map(it => renderMusicCardHtml(it, false)).join("");
+        document.getElementById("dzview_albs").innerHTML = (d.top_albums || []).map(it => renderMusicCardHtml(it, false)).join("");
+
+        const pls = d.playlists || [];
+        document.getElementById("sp_pl_cnt").textContent = pls.length;
+        document.getElementById("dzview_pls").innerHTML = pls.length
+            ? pls.map(p => `
+                <div style="background:#121212;border:1px solid #7c3aed;border-radius:10px;padding:10px;margin-bottom:8px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px">
+                        <b>💜 ${p.name} (${p.tracks_count || (p.tracks||[]).length} titres)</b>
+                        <button type="button" class="btn-purp" style="width:auto;padding:5px 10px;margin:0;font-size:11px" onclick="downloadSpotifyPlaylist('${escJs(p.id)}', '${escJs(p.name)}', this)">📥 Tout télécharger</button>
+                    </div>
+                    <div class="music-grid" style="max-height:200px">
+                        ${(p.tracks || []).slice(0, 30).map(tr => renderMusicCardHtml(tr, false)).join("")}
+                    </div>
+                </div>`).join("")
+            : "<div class='sub'>Colle le lien de ton profil ou d'une playlist Deezer ci-dessus et clique sur Synchroniser.</div>";
+    } catch (e) {}
+}
+
+async function syncDeezerNow(btnEl) {
+    const u = document.getElementById("sp_sync_url").value.trim();
+    if (!u) return alert("Colle le lien de ton compte Deezer (ex: https://www.deezer.com/fr/profile/...) ou d'une playlist Deezer !");
+    markBtnValidated(btnEl);
+    const fd = new FormData();
+    fd.append("url", u);
+    const r = await fetch("/api/deezer_sync", {method: "POST", body: fd});
+    const d = await r.json();
+    if (d.ok) {
+        await loadDeezerHome(true);
+        toggleDeezerDrawer(true);
+        switchDeezerTab("pls");
+    } else {
+        alert(d.error || "Impossible de synchroniser ce lien Deezer.");
+    }
+}
+
+async function downloadSpotifyPlaylist(pid, name, btnEl) {
+    markBtnValidated(btnEl);
+    const fd = new FormData();
+    fd.append("id", pid);
+    await fetch("/api/spotify_download_playlist", {method: "POST", body: fd});
+    updateStatus();
+}
+
+async function previewMusic(type) {
+    LAST_MUSIC_MODE = type;
+    const q = document.getElementById("m_query").value.trim();
+    const box = document.getElementById("music_results");
+    if (!q) {
+        document.getElementById("m_query").focus();
+        return;
+    }
+    box.innerHTML = "<div class='sub'>⏳ Recherche musicale en cours...</div>";
+    const r = await fetch(`/api/music_preview?q=${encodeURIComponent(q)}&type=${type}`);
+    const data = await r.json();
+    if (!data.length) {
+        box.innerHTML = "<div class='sub' style='color:#fca5a5'>Aucun résultat trouvé.</div>";
+        return;
+    }
+    box.innerHTML = data.map(item => renderMusicCardHtml(item, false)).join("");
+}
+
+async function downloadMusicItem(type, id, title, artist, image, btnEl) {
+    markBtnValidated(btnEl);
+    const fd = new FormData();
+    fd.append("type", type);
+    fd.append("id", id);
+    fd.append("title", title);
+    fd.append("artist", artist || "");
+    fd.append("image", image || "");
+    await fetch("/api/music_download", {method:"POST", body:fd});
+    updateStatus();
+    setTimeout(() => { loadFiles(); }, 8000);
+}
+
+async function playMusicPreview(title, artist, image, directPreviewUrl, isFullStream = false) {
+    let url = directPreviewUrl;
+    if (!url && !isFullStream) {
+        const q = (artist && !title.toLowerCase().includes(artist.toLowerCase())) ? `${artist} ${title}` : title;
+        const r = await fetch(`/api/music_find_preview?q=${encodeURIComponent(q)}`);
+        const d = await r.json();
+        url = d.preview || "";
+    }
+    if (!url) {
+        alert("Aucun extrait 30s disponible pour ce titre (clique sur 📥 pour le télécharger dans IlianTify).");
+        return;
+    }
+    const audio = document.getElementById("preview_audio");
+    const bar = document.getElementById("preview_bar_mini");
+    const txt = document.getElementById("preview_bar_txt");
+    if (audio) {
+        audio.src = url;
+        audio.play().catch(() => {});
+        if (bar) bar.style.display = "flex";
+        if (txt) txt.textContent = `▶ Extrait 30s : ${artist ? artist + ' - ' : ''}${title}`;
+        audio.onended = () => { if (bar) bar.style.display = "none"; };
+    }
+}
+
+function stopMiniPreview() {
+    const audio = document.getElementById("preview_audio");
+    const bar = document.getElementById("preview_bar_mini");
+    if (audio) {
+        audio.pause();
+        audio.src = "";
+    }
+    if (bar) bar.style.display = "none";
+}
+
+/* ==================== MÉDIAS SUR LE PC (ACCORDÉONS RANGÉS PAR DOSSIER) ==================== */
+function setFilesFilter(cat) {
+    CURRENT_FILES_FILTER = cat;
+    ["all", "animes", "series", "films", "musique"].forEach(k => {
+        const el = document.getElementById("fcat_" + k);
+        if (el) el.classList.toggle("active", k === cat);
+    });
+    renderFileGroups();
+}
+
+function toggleFolderAcc(folderPath) {
+    OPEN_ACCORDIONS[folderPath] = !OPEN_ACCORDIONS[folderPath];
+    renderFileGroups();
+}
+
+async function loadFiles() {
+    const r = await fetch("/api/files");
+    const data = await r.json();
+    ALL_FILE_GROUPS = data.groups || [];
+    renderFileGroups();
+}
+
+function renderFileGroups() {
+    const box = document.getElementById("files_list");
+    const filtered = ALL_FILE_GROUPS.filter(g => CURRENT_FILES_FILTER === "all" || g.category === CURRENT_FILES_FILTER);
+    if (!filtered.length) {
+        box.innerHTML = "<div class='sub'>Aucun média dans cette catégorie.</div>";
+        return;
+    }
+    box.innerHTML = filtered.map(g => {
+        const isOpen = !!OPEN_ACCORDIONS[g.folder_path];
+        const filesHtml = g.files.map(f => `
+            <div class="ep-row">
+                <div style="flex:1;padding-right:8px;min-width:0">
+                    <b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${f.name}</b>
+                    <span style="font-size:11px;color:#64748b">${f.subfolder ? f.subfolder + ' • ' : ''}${f.size_mb} Mo</span>
+                </div>
+                <div style="display:flex;gap:5px;flex-shrink:0">
+                    <a href="/stream?path=${encodeURIComponent(f.path)}" target="_blank" style="background:#059669;color:#fff;padding:6px 9px;border-radius:7px;text-decoration:none;font-weight:700;font-size:11px">▶️ Voir</a>
+                    <button class="btn-red" style="width:auto;padding:6px 9px;margin:0;font-size:11px" onclick="deleteFile('${escJs(f.path)}', false)">🗑️</button>
+                </div>
+            </div>`).join("");
+
+        return `
+        <div class="folder-acc ${isOpen ? 'open' : ''}">
+            <div class="folder-acc-head" onclick="toggleFolderAcc('${escJs(g.folder_path)}')">
+                <div style="flex:1;min-width:0">
+                    <b style="font-size:13px">${isOpen ? '📂' : '📁'} ${g.title}</b>
+                    <span style="font-size:11px;color:#38bdf8;margin-left:6px">${g.category_label} • ${g.count} fichier(s) • ${g.total_mb} Mo</span>
+                </div>
+                <div style="display:flex;gap:6px;align-items:center" onclick="event.stopPropagation()">
+                    <button type="button" class="btn-red" style="width:auto;padding:5px 9px;margin:0;font-size:11px" onclick="deleteFile('${escJs(g.folder_path)}', true)">🗑️ Tout supprimer</button>
+                </div>
+            </div>
+            <div class="folder-acc-body">${filesHtml}</div>
+        </div>`;
+    }).join("");
+}
+
+async function deleteFile(path, isFolder) {
+    const msg = isFolder ? "Supprimer ce dossier complet et tous ses épisodes ?" : "Supprimer ce fichier ?";
+    if (!confirm(msg)) return;
+    const fd = new FormData();
+    fd.append("path", path);
+    await fetch("/api/delete_file", {method:"POST", body:fd});
+    loadFiles();
+    updateStatus();
+}
+
+/* ==================== STUDIO MAC (TERMINAL + IDE + SAUVEGARDES + ADGUARD) ==================== */
+function switchStudioTab(tab) {
+    ["term", "ide", "bk", "ag", "mac"].forEach(t => {
+        const btn = document.getElementById("stab_" + t);
+        const pan = document.getElementById("spanel_" + t);
+        if (btn) btn.classList.toggle("active", t === tab);
+        if (pan) pan.style.display = (t === tab) ? "block" : "none";
+    });
+    if (tab === "ide" && !document.getElementById("code_editor").value) {
+        loadCodeFile();
+    } else if (tab === "bk") {
+        loadBackupsList();
+    }
+}
+
+async function loadCodeFile() {
+    const f = document.getElementById("ide_file_sel").value;
+    const st = document.getElementById("ide_status");
+    st.textContent = "⏳ Chargement de " + f + "...";
+    const r = await fetch(`/api/code_read?file=${encodeURIComponent(f)}`);
+    const d = await r.json();
+    if (d.ok) {
+        document.getElementById("code_editor").value = d.content;
+        st.textContent = `✅ Fichier chargé : C:\\Serveur\\${d.file}`;
+    } else {
+        st.textContent = "❌ " + (d.error || "Erreur");
+    }
+}
+
+async function saveCodeFile() {
+    const f = document.getElementById("ide_file_sel").value;
+    const content = document.getElementById("code_editor").value;
+    const st = document.getElementById("ide_status");
+    st.textContent = "⏳ Vérification et sauvegarde en cours...";
+    const fd = new FormData();
+    fd.append("file", f);
+    fd.append("content", content);
+    const r = await fetch("/api/code_save", {method: "POST", body: fd});
+    const d = await r.json();
+    if (d.ok) {
+        st.style.color = "#86efac";
+        st.textContent = `✅ Enregistré avec succès ! Sauvegarde auto créée : ${d.snapshot}`;
+        if (f === "index.html") {
+            if (confirm("index.html a été mis à jour ! Recharger la page maintenant pour voir les changements ?")) {
+                window.location.reload();
+            }
+        }
+    } else {
+        st.style.color = "#fca5a5";
+        st.textContent = `❌ Refusé : ${d.error}`;
+    }
+}
+
+async function loadBackupsList() {
+    const box = document.getElementById("backups_list_box");
+    const r = await fetch("/api/backups_list");
+    const d = await r.json();
+    if (!d.backups || !d.backups.length) {
+        box.innerHTML = "<div class='sub'>Aucune sauvegarde.</div>";
+        return;
+    }
+    box.innerHTML = d.backups.map(b => `
+        <div class="ep-row">
+            <div><b>🛡️ ${b.name}</b><br><span style="font-size:11px;color:#38bdf8">${b.files_count} fichiers système • ${b.size_kb} Ko</span></div>
+            <button type="button" class="btn-purp" style="width:auto;padding:6px 12px;margin:0;font-size:11px" onclick="restoreBackup('${escJs(b.name)}')">⏪ Restaurer</button>
+        </div>`).join("");
+}
+
+async function createBackupNow() {
+    const lbl = document.getElementById("bk_label").value.trim() || "manuel";
+    const fd = new FormData();
+    fd.append("label", lbl);
+    await fetch("/api/backups_create", {method: "POST", body: fd});
+    document.getElementById("bk_label").value = "";
+    loadBackupsList();
+}
+
+async function restoreBackup(name) {
+    if (!confirm(`Restaurer la sauvegarde '${name}' ? (Une sauvegarde de l'état actuel sera créée automatiquement avant)`)) return;
+    const fd = new FormData();
+    fd.append("name", name);
+    const r = await fetch("/api/backups_restore", {method: "POST", body: fd});
+    const d = await r.json();
+    if (d.ok) {
+        alert("Restauration effectuée ! La page va se recharger.");
+        window.location.reload();
+    }
+}
+
+/* ==================== TERMINAL POWERSHELL ==================== */
+function appendTerminalEntry(promptStr, cmdStr, outStr) {
+    const body = document.getElementById("term_body");
+    const block = document.createElement("div");
+    block.style.marginTop = "6px";
+    const echoLine = document.createElement("div");
+    echoLine.innerHTML = `<span style="color:#22c55e;font-weight:700">${promptStr}</span> <span class="term-cmd-echo"></span>`;
+    echoLine.querySelector(".term-cmd-echo").textContent = cmdStr;
+    block.appendChild(echoLine);
+    if (outStr) {
+        const outDiv = document.createElement("div");
+        outDiv.className = "term-out-text";
+        outDiv.textContent = outStr;
+        block.appendChild(outDiv);
+    }
+    body.appendChild(block);
+    body.scrollTop = body.scrollHeight;
+}
+
+async function execTerminalCmd(cmdStr) {
+    const c = (cmdStr || "").trim();
+    if (!c) return;
+    if (c.toLowerCase() === "cls" || c.toLowerCase() === "clear") {
+        clearTerminal();
+        return;
+    }
+    TERM_HISTORY.push(c);
+    TERM_HIST_IDX = TERM_HISTORY.length;
+    const promptEl = document.getElementById("term_prompt");
+    const curPrompt = promptEl.textContent || "PS C:\\Serveur>";
+    const inp = document.getElementById("term_input");
+    inp.value = "";
+    inp.disabled = true;
+
+    try {
+        const fd = new FormData();
+        fd.append("cmd", c);
+        const r = await fetch("/api/cmd", {method: "POST", body: fd});
+        const d = await r.json();
+        appendTerminalEntry(curPrompt, c, d.output || "");
+        if (d.prompt) promptEl.textContent = d.prompt;
+    } catch (e) {
+        appendTerminalEntry(curPrompt, c, "Erreur de connexion : " + e);
+    } finally {
+        inp.disabled = false;
+        inp.focus();
+    }
+}
+
+function handleTermKey(e) {
+    const inp = document.getElementById("term_input");
+    if (e.key === "Enter") {
+        e.preventDefault();
+        execTerminalCmd(inp.value);
+    } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (TERM_HISTORY.length > 0 && TERM_HIST_IDX > 0) {
+            TERM_HIST_IDX--;
+            inp.value = TERM_HISTORY[TERM_HIST_IDX];
+        }
+    } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        if (TERM_HIST_IDX < TERM_HISTORY.length - 1) {
+            TERM_HIST_IDX++;
+            inp.value = TERM_HISTORY[TERM_HIST_IDX];
+        } else {
+            TERM_HIST_IDX = TERM_HISTORY.length;
+            inp.value = "";
+        }
+    }
+}
+
+function clearTerminal() {
+    document.getElementById("term_body").innerHTML = "Console nettoyée.";
+}
+
+function quickTermPorts() {
+    execTerminalCmd("netstat -ano | Select-String 'LISTENING' | Select-String ':(22|8022|5000|8096|4533|8080|8053)\\s' | Out-String");
+}
+
+function quickTermLinks() {
+    execTerminalCmd("Write-Output \"Hostname : $(hostname)\"; Get-ChildItem C:\\Serveur\\logs\\cf_*.log | ForEach-Object { $m = Select-String -Path $_.FullName -Pattern 'https://[a-zA-Z0-9-]+\\.trycloudflare\\.com' -AllMatches; if ($m) { Write-Output \"$($_.Name) -> $($m.Matches[-1].Value)\" } }");
+}
+
+async function restartServices() {
+    if (!confirm("Relancer les services du serveur (les liens 4G/5G seront conservés à l'identique) ?")) return;
+    appendTerminalEntry(document.getElementById("term_prompt").textContent, "start_all.ps1", "🔄 Relance des services en cours (lien 4G/5G conservé)...");
+    await fetch("/api/restart_all", {method:"POST"});
+    setTimeout(updateStatus, 8000);
+}
+
+/* ==================== STATUT GLOBAL ==================== */
+async function updateStatus() {
+    try {
+        const r = await fetch("/api/status");
+        const st = await r.json();
+        window.JF_URL = st.jf_url;
+        window.ND_URL = st.nd_url;
+        window.FB_URL = st.fb_url;
+        window.AG_PORT = st.ag_port;
+        document.getElementById("disk_txt").innerText = `Libre: ${st.disk_free} Go / ${st.disk_total} Go`;
+        document.getElementById("disk_bar").style.width = st.disk_pct + "%";
+        document.getElementById("disk_details").innerHTML =
+            `<span>🎵 Musique: ${st.music_mb} Mo</span>` +
+            `<span>🎬 Animés: ${st.anime_mb} Mo</span>` +
+            `<span>🍿 Films: ${st.films_mb || 0} Mo</span>` +
+            `<span>📺 Séries: ${st.series_mb || 0} Mo</span>`;
+        const mainIp = (st.ips || "192.168.1.33").split(",")[0].trim();
+        const tsInfo = st.tailscale || {};
+        const tsLine = (tsInfo.connected && tsInfo.ip)
+            ? `<div style="margin-top:4px">🛡️ <b>VPN Privé Fixe (Tailscale) :</b> <a href="http://${tsInfo.ip}:5000">http://${tsInfo.ip}:5000</a> • 🎧 <a href="http://${tsInfo.ip}:5000/iliantify">IlianTify VPN</a></div>`
+            : `<div style="margin-top:4px">🛡️ <b>VPN Privé Fixe (Tailscale) :</b> <a href="javascript:void(0)" onclick="toggleTailscaleCard(true)" style="color:#38bdf8">Activer mon IP fixe à vie (Tuto 3 étapes)</a></div>`;
+        document.getElementById("links_panel").innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+                <div>🌍 <b>Lien 4G/5G (Mac / iPhone) :</b> ${st.hub_url ? `<a href="${st.hub_url}" target="_blank">${st.hub_url}</a> • 🎧 <a href="${st.hub_url}/iliantify" target="_blank">IlianTify 4G</a>` : "⏳ Génération..."}</div>
+                <a href="/api/permanent_bookmark" style="background:#0284c7;color:#fff;padding:4px 9px;border-radius:7px;font-size:11px;text-decoration:none">📌 Favori 4G Fixe</a>
+            </div>
+            <div style="margin-top:4px">🏠 <b>Lien Fixe Maison (Wi-Fi / Ethernet) :</b> <a href="http://${mainIp}:5000">http://${mainIp}:5000</a> • 🎧 <a href="http://${mainIp}:5000/iliantify">http://${mainIp}:5000/iliantify</a></div>
+            ${tsLine}
+        `;
+        renderTailscaleStatus(st.tailscale);
+        renderStreamHealerBar(st.stream_healer);
+        const macSsh = document.getElementById("mac_ssh_cmd");
+        if (macSsh && mainIp) macSsh.textContent = `ssh ilian@${mainIp}`;
+        const qTxt = st.queue_count > 0 ? ` (+${st.queue_count} en file)` : "";
+        document.getElementById("dl_state").innerText = (st.active ? "En cours" : "Prêt") + qTxt;
+        document.getElementById("dl_title").innerText = st.title;
+        document.getElementById("dl_step").innerText = st.step;
+        document.getElementById("dl_bar").style.width = (st.percent || 0) + "%";
+        document.getElementById("dl_pct").innerText = (st.percent || 0) + "%";
+        document.getElementById("dl_speed").innerText = st.speed || "-";
+        if (st.cwd) {
+            document.getElementById("term_prompt").textContent = `PS ${st.cwd}>`;
+        }
+        const logEl = document.getElementById("raw_logs");
+        if (document.activeElement !== logEl) {
+            logEl.value = st.logs || "";
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+    } catch (e) {}
+}
+
+setInterval(updateStatus, 2500);
+setInterval(loadFiles, 10000);
+updateStatus();
+loadFiles();
+loadMediaCatalog("trending");
+loadDeezerHome();
+</script>
+</body>
+</html>

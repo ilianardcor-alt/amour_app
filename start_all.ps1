@@ -1,10 +1,11 @@
-﻿# C:\Serveur\start_all.ps1 - Démarrage / Redémarrage des services SANS couper les tunnels 4G/5G (URL fixe conservée)
+﻿# start_all.ps1 - Démarrage / Redémarrage des services SANS couper les tunnels 4G/5G (URL fixe conservée)
 param([switch]$ResetTunnels = $false)
 $ErrorActionPreference = "SilentlyContinue"
+$BaseDir = $PSScriptRoot
 
 if ($ResetTunnels) {
     Stop-Process -Name "filebrowser", "navidrome", "jellyfin", "cloudflared", "AdGuardHome" -Force -ErrorAction SilentlyContinue
-    Remove-Item "C:\Serveur\logs\cf_*.log" -Force -ErrorAction SilentlyContinue
+    Remove-Item "$BaseDir\logs\cf_*.log" -Force -ErrorAction SilentlyContinue
 } else {
     # On ne coupe PAS cloudflared pour que l'URL 4G/5G reste strictement identique !
     Stop-Process -Name "filebrowser", "navidrome", "jellyfin", "AdGuardHome" -Force -ErrorAction SilentlyContinue
@@ -15,13 +16,13 @@ Get-CimInstance Win32_Process -Filter "Name = 'python.exe'" -ErrorAction Silentl
 Start-Sleep -Seconds 2
 
 # Lance tous les services manquants de manière détachée via le Watchdog
-& "C:\Serveur\watchdog.ps1"
+& "$BaseDir\watchdog.ps1"
 
 Start-Sleep -Seconds 6
 
 # Auto-validation de l'assistant Jellyfin (mot de passe lu dans secrets.json)
 $jfPw = ""
-if (Test-Path "C:\Serveur\secrets.json") { $jfPw = (Get-Content "C:\Serveur\secrets.json" -Raw | ConvertFrom-Json).jellyfin_password }
+if (Test-Path "$BaseDir\secrets.json") { $jfPw = (Get-Content "$BaseDir\secrets.json" -Raw | ConvertFrom-Json).jellyfin_password }
 try {
     $pub = Invoke-RestMethod -Uri "http://127.0.0.1:8096/System/Info/Public" -Method Get -TimeoutSec 5
     if (-not $pub.StartupWizardCompleted) {

@@ -1,4 +1,4 @@
-import base64
+﻿import base64
 import codecs
 import collections
 import hashlib
@@ -16,7 +16,7 @@ from urllib.parse import quote, quote_plus, urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
-from flask import Flask, Response, jsonify, redirect, request, send_file, send_from_directory
+from flask import Flask, Response, jsonify, redirect, render_template, request, send_file, send_from_directory
 
 try:
     import cloudscraper
@@ -49,9 +49,10 @@ try:
 except Exception:
     YTM = None
 
-BASE_DIR = r"C:\Serveur"
+BASE_DIR = os.environ.get("SERVEUR_DIR", os.path.dirname(os.path.abspath(__file__)))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
-app = Flask(__name__, static_folder=STATIC_DIR, static_url_path="/static")
+TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
+app = Flask(__name__, static_folder=STATIC_DIR, static_url_path="/static", template_folder=TEMPLATES_DIR)
 
 BIN_DIR = os.path.join(BASE_DIR, "bin")
 BACKUP_DIR = os.path.join(BASE_DIR, "backups")
@@ -76,7 +77,7 @@ def _load_secrets():
     """Charge les secrets locaux (non versionnés) : secrets.json ou variables d'environnement."""
     data = {}
     try:
-        with open(os.path.join(BASE_DIR, "secrets.json"), encoding="utf-8") as _f:
+        with open(os.path.join(BASE_DIR, "secrets.json"), encoding="utf-8-sig") as _f:
             data = json.load(_f)
     except Exception:
         pass
@@ -141,12 +142,17 @@ def enqueue_download(label, func, *args, **kwargs):
     autant de films, épisodes ou musiques qu'on veut en même temps sans aucun bug."""
     global QUEUE_WORKER_RUNNING
     with QUEUE_LOCK:
+        STATUS["stop"] = False
         DOWNLOAD_QUEUE.append((label, func, args, kwargs))
         STATUS["queue_count"] = len(DOWNLOAD_QUEUE)
         q_len = len(DOWNLOAD_QUEUE)
         if not STATUS["active"] and q_len == 1:
+            STATUS["active"] = True
             STATUS["title"] = label
-            STATUS["step"] = "Démarrage..."
+            STATUS["step"] = "⏳ Démarrage du téléchargement..."
+            STATUS["percent"] = 0
+            STATUS["speed"] = "-"
+            STATUS["error"] = ""
         else:
             write_log(f"➕ Ajouté à la file d'attente ({q_len} en attente) : {label}")
 
@@ -237,7 +243,7 @@ def get_local_ips():
 def get_ag_port():
     return (
         8053
-        if os.path.exists(r"C:\Serveur\adguard\AdGuardHome\AdGuardHome.yaml")
+        if os.path.exists(os.path.join(BASE_DIR, "adguard", "AdGuardHome", "AdGuardHome.yaml"))
         else 3000
     )
 
@@ -1352,9 +1358,15 @@ def season_download_worker(title, season_name, js_url, start_ep, end_ep, target_
                     break
             if not ep_ok and not STATUS["stop"]:
                 write_log(f"❌ Tous les lecteurs ont échoué pour {clean_t} S{s_num:02d}E{ep_num:02d}")
-        refresh_jellyfin_library()
-        STATUS["step"] = "✅ Terminé ! Épisodes vérifiés et disponibles dans Jellyfin."
-        STATUS["percent"] = 100
+        if STATUS["stop"]:
+            STATUS["title"] = "Aucun téléchargement actif"
+            STATUS["step"] = "⏹️ Téléchargement arrêté par l'utilisateur."
+            STATUS["percent"] = 0
+            STATUS["speed"] = "-"
+        else:
+            refresh_jellyfin_library()
+            STATUS["step"] = "✅ Terminé ! Épisodes vérifiés et disponibles dans Jellyfin."
+            STATUS["percent"] = 100
     except Exception as e:
         STATUS["error"] = str(e)
         write_log(f"❌ Erreur téléchargement saison: {e}")
@@ -1789,8 +1801,14 @@ def media_download_worker(
                     success = True
                     write_log(f"✅ Film complet ({lang_tag}) vérifié et classé dans Jellyfin : {out_file}")
                     break
-            if not success and not STATUS["stop"]:
+            if STATUS["stop"]:
+                STATUS["title"] = "Aucun téléchargement actif"
+                STATUS["step"] = "⏹️ Téléchargement arrêté par l'utilisateur."
+                STATUS["percent"] = 0
+                STATUS["speed"] = "-"
+            elif not success:
                 STATUS["error"] = f"Aucune source complète {lang_tag} trouvée (bandes-annonces ignorées)."
+                STATUS["step"] = f"⚠️ Aucune source complète {lang_tag} trouvée."
                 write_log(f"⚠️ Aucune source complète validée pour {folder_label} ({lang_tag}).")
             else:
                 refresh_jellyfin_library()
@@ -1853,9 +1871,15 @@ def media_download_worker(
                     write_log(
                         f"⚠️ Aucun épisode complet ({lang_tag}) trouvé pour {clean_t} S{s_num:02d}E{ep_num:02d}."
                     )
-            refresh_jellyfin_library()
-            STATUS["step"] = f"✅ Terminé ! Épisodes ({lang_tag}) vérifiés dans Jellyfin."
-            STATUS["percent"] = 100
+            if STATUS["stop"]:
+                STATUS["title"] = "Aucun téléchargement actif"
+                STATUS["step"] = "⏹️ Téléchargement arrêté par l'utilisateur."
+                STATUS["percent"] = 0
+                STATUS["speed"] = "-"
+            else:
+                refresh_jellyfin_library()
+                STATUS["step"] = f"✅ Terminé ! Épisodes ({lang_tag}) vérifiés dans Jellyfin."
+                STATUS["percent"] = 100
     except Exception as e:
         STATUS["error"] = str(e)
         write_log(f"❌ Erreur téléchargement média: {e}")
@@ -2853,8 +2877,12 @@ def api_spotify_download_playlist():
 
 
 def music_download_worker(m_type, item_id, label, artist_hint="", image_hint=""):
+    global CURRENT_PROC
     STATUS["active"], STATUS["stop"], STATUS["error"] = True, False, ""
     STATUS["title"] = f"🎵 {label}"
+    STATUS["step"] = "⏳ Préparation du téléchargement musical..."
+    STATUS["percent"] = 5
+    STATUS["speed"] = "-"
     env = get_env()
     ytdlp_bin = os.path.join(BIN_DIR, "yt-dlp.exe")
     try:
@@ -3021,7 +3049,7 @@ def music_download_worker(m_type, item_id, label, artist_hint="", image_hint="")
                 target_arg = f"https://music.youtube.com/watch?v={item['vid_id']}"
             else:
                 target_arg = f"ytsearch1:{item['query']} Audio"
-            subprocess.run(
+            CURRENT_PROC = subprocess.Popen(
                 [
                     ytdlp_bin,
                     "-x",
@@ -3031,12 +3059,37 @@ def music_download_worker(m_type, item_id, label, artist_hint="", image_hint="")
                     "0",
                     "--no-playlist",
                     "--ignore-errors",
+                    "--newline",
                     "-o",
                     out_f[:-4] + ".%(ext)s",
                     target_arg,
                 ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                encoding="utf-8",
+                errors="ignore",
                 env=env,
             )
+            for line in CURRENT_PROC.stdout:
+                if STATUS["stop"]:
+                    try:
+                        CURRENT_PROC.kill()
+                    except Exception:
+                        pass
+                    break
+                line_s = line.strip()
+                if "[download]" in line_s and "%" in line_s:
+                    m_pct = re.search(r"(\d+(?:\.\d+)?)%", line_s)
+                    m_spd = re.search(r"at\s+([0-9.]+[a-zA-Z/]+)", line_s)
+                    if m_pct:
+                        track_pct = float(m_pct.group(1))
+                        STATUS["percent"] = round((((i - 1) + (track_pct / 100.0)) / total_t) * 100, 1)
+                    if m_spd:
+                        STATUS["speed"] = m_spd.group(1)
+            CURRENT_PROC.wait()
+            if STATUS["stop"]:
+                break
             if os.path.exists(out_f):
                 apply_id3_tags(
                     out_f,
@@ -3051,10 +3104,17 @@ def music_download_worker(m_type, item_id, label, artist_hint="", image_hint="")
                     f"🎵 Son ajouté : {os.path.basename(out_f)} -> Album='{item['album']}'"
                 )
 
-        rebuild_singles_playlist()
-        trigger_navidrome_scan()
-        STATUS["percent"] = 100
-        STATUS["step"] = "✅ Musique taguée en HD (1000x1000) et ajoutée dans Navidrome / Amperfy !"
+        if STATUS["stop"]:
+            STATUS["title"] = "Aucun téléchargement actif"
+            STATUS["step"] = "⏹️ Téléchargement arrêté par l'utilisateur."
+            STATUS["percent"] = 0
+            STATUS["speed"] = "-"
+        else:
+            rebuild_singles_playlist()
+            trigger_navidrome_scan()
+            STATUS["percent"] = 100
+            STATUS["speed"] = "-"
+            STATUS["step"] = f"✅ {label} téléchargé et ajouté à la bibliothèque musicale !"
     except Exception as e:
         STATUS["error"] = str(e)
         write_log(f"❌ Erreur téléchargement musique: {e}")
@@ -3731,12 +3791,15 @@ def api_music_favorites():
 
 @app.route("/")
 def index():
+    tpl_index = os.path.join(TEMPLATES_DIR, "index.html")
+    if os.path.exists(tpl_index):
+        return render_template("index.html")
     return open(HTML_FILE, encoding="utf-8", errors="ignore").read()
 
 
 @app.route("/api/status")
 def api_status():
-    total, used, free = shutil.disk_usage("C:\\")
+    total, used, free = shutil.disk_usage(BASE_DIR)
     logs = (
         "".join(
             open(LOG_FILE, encoding="utf-8", errors="ignore").readlines()[-50:]
@@ -3847,7 +3910,7 @@ def api_restart_all():
             "-ExecutionPolicy",
             "Bypass",
             "-File",
-            r"C:\Serveur\start_all.ps1",
+            os.path.join(BASE_DIR, "start_all.ps1"),
         ]
     )
     return jsonify({"ok": True})
@@ -3861,18 +3924,37 @@ def api_clear_logs():
 
 @app.route("/api/stop", methods=["POST"])
 def api_stop():
+    global CURRENT_PROC
     STATUS["stop"] = True
     with QUEUE_LOCK:
         DOWNLOAD_QUEUE.clear()
         STATUS["queue_count"] = 0
     if CURRENT_PROC:
         try:
+            subprocess.run(
+                ["taskkill", "/F", "/T", "/PID", str(CURRENT_PROC.pid)],
+                capture_output=True,
+                timeout=4,
+            )
+        except Exception:
+            pass
+        try:
             CURRENT_PROC.kill()
         except Exception:
             pass
+        CURRENT_PROC = None
+    try:
+        subprocess.run(["taskkill", "/F", "/IM", "yt-dlp.exe"], capture_output=True, timeout=3)
+    except Exception:
+        pass
     STATUS["active"] = False
-    STATUS["step"] = "⏹️ Téléchargement et file d'attente arrêtés."
-    return jsonify({"ok": True})
+    STATUS["title"] = "Aucun téléchargement actif"
+    STATUS["step"] = "⏹️ Téléchargement arrêté."
+    STATUS["percent"] = 0
+    STATUS["speed"] = "-"
+    STATUS["error"] = ""
+    write_log("⏹️ Téléchargement et file d'attente arrêtés par l'utilisateur.")
+    return jsonify({"ok": True, "status": STATUS})
 
 
 # --- STUDIO MAC & ÉDITEUR DE CODE À DISTANCE + SAUVEGARDES ---
