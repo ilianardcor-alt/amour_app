@@ -1,0 +1,116 @@
+/**
+ * DESIGN SYSTEM TOKENS — Échelle typographique (>=14px/16px), grille 8px & contrastes WCAG AA (>= 4.5:1)
+ */
+:root {
+  /* Surfaces (Mode Sombre par défaut) */
+  --bg-app: #0b1120;
+  --bg-surface: #111827;
+  --bg-elevated: #1e293b;
+  --bg-input: #090e1a;
+  --bg-overlay: rgba(11, 17, 32, 0.86);
+
+  /* Textes (Contrastes vérifiés WCAG AA >= 5.8:1 sur --bg-surface) */
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+
+  /* Bordures */
+  --border-subtle: #1e293b;
+  --border-default: #334155;
+  --border-strong: #475569;
+  --border-focus: #60a5fa;
+
+  /* Couleurs d'action et états sémantiques */
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-soft: rgba(37, 99, 235, 0.16);
+  --color-accent-text: #93c5fd;
+
+  --color-success: #10b981;
+  --color-success-bg: rgba(16, 185, 129, 0.16);
+  --color-success-text: #6ee7b7;
+
+  --color-warning: #f59e0b;
+  --color-warning-bg: rgba(245, 158, 11, 0.16);
+  --color-warning-text: #fcd34d;
+
+  --color-danger: #dc2626;
+  --color-danger-hover: #b91c1c;
+  --color-danger-bg: rgba(220, 38, 38, 0.16);
+  --color-danger-text: #fca5a5;
+
+  /* Grille d'espacement stricte sur base 8px */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 40px;
+
+  /* Rayons et ombres */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.28);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.38);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55);
+
+  /* Police unique et échelle de 4 tailles (base 16px, secondaire 14px minimum) */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "Fira Code", Consolas, monospace;
+
+  --text-xs: 0.875rem;   /* 14px — minimum strict pour textes secondaires et badges */
+  --text-sm: 0.875rem;   /* 14px — libellés secondaires */
+  --text-base: 1rem;     /* 16px — texte courant */
+  --text-lg: 1.25rem;    /* 20px — titres de section */
+  --text-xl: 1.5rem;     /* 24px — titre principal & indicateur stockage */
+
+  --target-min: 44px;
+  --transition-fast: 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Mode Clair (Contrastes WCAG AA >= 5.5:1) */
+html[data-theme="light"] {
+  --bg-app: #f1f5f9;
+  --bg-surface: #ffffff;
+  --bg-elevated: #f8fafc;
+  --bg-input: #ffffff;
+  --bg-overlay: rgba(15, 23, 42, 0.55);
+
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #475569;
+
+  --border-subtle: #e2e8f0;
+  --border-default: #cbd5e1;
+  --border-strong: #94a3b8;
+  --border-focus: #2563eb;
+
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-soft: rgba(37, 99, 235, 0.1);
+  --color-accent-text: #1d4ed8;
+
+  --color-success-bg: #d1fae5;
+  --color-success-text: #065f46;
+
+  --color-warning-bg: #fef3c7;
+  --color-warning-text: #92400e;
+
+  --color-danger-bg: #fee2e2;
+  --color-danger-text: #991b1b;
+
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+  --shadow-md: 0 6px 18px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 16px 36px rgba(15, 23, 42, 0.16);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
