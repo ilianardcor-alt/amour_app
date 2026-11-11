@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="IlianTify">
+<meta name="apple-mobile-web-app-title" content="HugoTify">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#09090b">
 <link rel="apple-touch-icon" href="/iliantify_icon.png">
 <link rel="icon" type="image/png" href="/iliantify_icon.png">
 <link rel="manifest" href="/manifest_iliantify.json">
-<title>IlianTify — Streaming Musical</title>
+<title>HugoTify — Streaming Musical</title>
 <style>
 :root{
     --bg:#09090b;
@@ -943,11 +943,11 @@ body{
 </head>
 <body>
 
-<!-- HEADER SUPÉRIEUR ILIANTIFY -->
+<!-- HEADER SUPÉRIEUR HUGOTIFY -->
 <header class="app-header">
     <div class="brand-row">
         <div class="brand-logo">🎧</div>
-        <span class="brand-title">IlianTify</span>
+        <span class="brand-title">HugoTify</span>
     </div>
     <div class="header-actions">
         <button type="button" class="hdr-pill" id="hdr_offline_btn" onclick="toggleManualOfflineMode()">✈️ Hors-Ligne</button>
@@ -972,7 +972,7 @@ body{
     <div class="dl-live-bar"><div class="dl-live-fill" id="offline_batch_fill"></div></div>
 </div>
 
-<!-- BANNIÈRE SUIVI DE TÉLÉCHARGEMENT EN DIRECT DANS ILIANTIFY -->
+<!-- BANNIÈRE SUIVI DE TÉLÉCHARGEMENT EN DIRECT DANS HUGOTIFY -->
 <div class="dl-live-banner" id="dl_banner">
     <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700">
         <span id="dl_banner_title">📥 Téléchargement en cours...</span>
@@ -1120,7 +1120,7 @@ body{
         <img src="/iliantify_icon.png" alt="" class="mp-cover" id="mp_cover" onclick="openFullPlayer()">
         <div class="mp-text" onclick="openFullPlayer()">
             <div class="mp-title" id="mp_title">Aucun titre</div>
-            <div class="mp-artist" id="mp_artist">IlianTify</div>
+            <div class="mp-artist" id="mp_artist">HugoTify</div>
         </div>
         <div class="mp-btns">
             <button type="button" class="mp-ctl" id="mp_like_btn" onclick="toggleCurrentTrackFavorite()">🤍</button>
@@ -1211,7 +1211,7 @@ let ACTIVE_ALBUM_IDX = -1;
 let ACTIVE_ARTIST_IDX = -1;
 
 /* ==================== ÉTAT HORS-LIGNE & BASE INDEXEDDB (MISSION 2, 3, 4) ==================== */
-const OFFLINE_DB_NAME = "IlianTifyOfflineDB";
+const OFFLINE_DB_NAME = "HugoTifyOfflineDB";
 const OFFLINE_STORE = "offline_tracks";
 let OFFLINE_DB = null;
 let OFFLINE_META = new Map(); // path -> {path, title, artist, album, duration, duration_str, track_num, size_mb, downloaded_at, coverDataUrl}
@@ -1275,7 +1275,7 @@ function updateOfflineModeUI() {
     }
 }
 
-/* ==================== MOTEUR INDEXEDDB (IlianTifyOfflineDB) ==================== */
+/* ==================== MOTEUR INDEXEDDB (HugoTifyOfflineDB) ==================== */
 function initOfflineDB() {
     return new Promise((resolve) => {
         if (!("indexedDB" in window)) {
@@ -2237,7 +2237,7 @@ async function startQueueAt(idx) {
     let coverUrl = getEffectiveCoverUrl(t);
     let playingFromIphone = false;
 
-    // MISSION 4.1 : Vérifie toujours d'abord IlianTifyOfflineDB (lecture locale 0 data, 0.01s)
+    // MISSION 4.1 : Vérifie toujours d'abord HugoTifyOfflineDB (lecture locale 0 data, 0.01s)
     if (t.path && OFFLINE_META.has(t.path)) {
         const rec = await getOfflineRecord(t.path);
         if (rec && rec.audioBlob) {
@@ -2260,8 +2260,8 @@ async function startQueueAt(idx) {
 
     document.getElementById("fp_cover").src = coverUrl;
     document.getElementById("fp_title").textContent = t.title || "Morceau";
-    document.getElementById("fp_artist").textContent = `${t.artist || "Artiste"} • ${t.album || "IlianTify"}`;
-    document.getElementById("fp_album_top").textContent = (t.album || "ILIANTIFY") + (playingFromIphone ? " • 📱 HORS-LIGNE" : "");
+    document.getElementById("fp_artist").textContent = `${t.artist || "Artiste"} • ${t.album || "HugoTify"}`;
+    document.getElementById("fp_album_top").textContent = (t.album || "HUGOTIFY") + (playingFromIphone ? " • 📱 HORS-LIGNE" : "");
 
     audioEl.src = playUrl;
     audioEl.play().catch(() => {});
@@ -2371,9 +2371,9 @@ function updateMediaSession(track, customCoverUrl = null) {
             ? rawCover
             : window.location.origin + (rawCover || "/iliantify_icon.png");
         navigator.mediaSession.metadata = new MediaMetadata({
-            title: track.title || "IlianTify",
+            title: track.title || "HugoTify",
             artist: track.artist || "Artiste",
-            album: track.album || "IlianTify",
+            album: track.album || "HugoTify",
             artwork: [
                 {src: absImg, sizes: "300x300", type: "image/jpeg"},
                 {src: absImg, sizes: "512x512", type: "image/jpeg"}
@@ -2502,7 +2502,7 @@ function renderOnlineItems(items) {
             </div>
             <div class="track-actions" onclick="event.stopPropagation()">
                 <button type="button" class="icon-btn" onclick="playOnlinePreview('${esc(it.title)}', '${esc(it.artist || '')}', '${esc(img)}', '${esc(it.preview || '')}')" title="Écouter un extrait">▶</button>
-                <button type="button" class="icon-btn dl-btn" onclick="downloadFromApp('${it.type || 'track'}', '${esc(it.id)}', '${esc(it.title)}', '${esc(it.artist || '')}', '${esc(img)}', this)" title="Télécharger dans IlianTify">📥</button>
+                <button type="button" class="icon-btn dl-btn" onclick="downloadFromApp('${it.type || 'track'}', '${esc(it.id)}', '${esc(it.title)}', '${esc(it.artist || '')}', '${esc(img)}', this)" title="Télécharger dans HugoTify">📥</button>
             </div>
         </div>`;
     }).join("");
@@ -2517,7 +2517,7 @@ async function playOnlinePreview(title, artist, image, directPreview) {
         url = d.preview || "";
     }
     if (!url) {
-        alert("Aucun extrait 30s disponible. Touche 📥 pour télécharger le titre complet dans IlianTify !");
+        alert("Aucun extrait 30s disponible. Touche 📥 pour télécharger le titre complet dans HugoTify !");
         return;
     }
     QUEUE = [{

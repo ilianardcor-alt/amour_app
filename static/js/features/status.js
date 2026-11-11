@@ -183,9 +183,9 @@ export async function updateStatus() {
     const macSsh = document.getElementById("mac_ssh_cmd");
     if (macSsh && mainIp) {
       if (macSsh.tagName === "INPUT") {
-        macSsh.value = `ssh ilian@${mainIp}`;
+        macSsh.value = `ssh hpigr@${mainIp}`;
       } else {
-        macSsh.textContent = `ssh ilian@${mainIp}`;
+        macSsh.textContent = `ssh hpigr@${mainIp}`;
       }
     }
 

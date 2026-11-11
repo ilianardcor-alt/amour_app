@@ -43,7 +43,7 @@ if ($sshd -and $sshd.Status -ne "Running") {
 }
 
 # Resolve binaries
-$pyExe = "C:\Users\ilian\AppData\Local\Programs\Python\Python311\python.exe"
+$pyExe = "(Get-Command python -ErrorAction SilentlyContinue).Source"
 if (-not (Test-Path $pyExe)) {
     $pyExe = Get-ChildItem -Path "C:\Users\*\AppData\Local\Programs\Python\Python*", "C:\Users\*\AppData\Local\Python\pythoncore*", "C:\Python*", "C:\Program Files\Python*" -Filter "python.exe" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
     if (-not $pyExe) { $pyExe = "python" }
@@ -137,7 +137,7 @@ if (Test-Path "$BaseDir\logs\cf_hub.log") {
             Set-Content -Path $lastPubFile -Value $currentHubUrl -Encoding UTF8
             try {
                 Invoke-RestMethod -Uri "https://ntfy.sh/$ntfyTopic" -Method Post -Body $currentHubUrl -Headers @{
-                    Title = "Portail 4G/5G Serveur Ilian"
+                    Title = "Portail 4G/5G Serveur Hugo"
                     Click = $currentHubUrl
                     Tags = "computer,link"
                 } -TimeoutSec 6 | Out-Null

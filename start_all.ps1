@@ -28,7 +28,7 @@ try {
     if (-not $pub.StartupWizardCompleted) {
         Invoke-RestMethod -Uri "http://127.0.0.1:8096/Startup/Configuration" -Method Post -ContentType "application/json" -Body '{"UICulture":"fr","MetadataCountryCode":"FR","PreferredMetadataLanguage":"fr"}' -TimeoutSec 5 | Out-Null
         Invoke-RestMethod -Uri "http://127.0.0.1:8096/Startup/User" -Method Get -TimeoutSec 5 | Out-Null
-        Invoke-RestMethod -Uri "http://127.0.0.1:8096/Startup/User" -Method Post -ContentType "application/json" -Body ('{"Name":"ilian","Password":"' + $jfPw + '"}') -TimeoutSec 5 | Out-Null
+        Invoke-RestMethod -Uri "http://127.0.0.1:8096/Startup/User" -Method Post -ContentType "application/json" -Body ('{"Name":"hugo","Password":"' + $jfPw + '"}') -TimeoutSec 5 | Out-Null
         Invoke-RestMethod -Uri "http://127.0.0.1:8096/Startup/Complete" -Method Post -TimeoutSec 5 | Out-Null
     }
 } catch {}

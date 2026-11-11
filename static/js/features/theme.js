@@ -10,7 +10,7 @@ export function applyTheme(themeName) {
   if (isLight) {
     document.body.classList.add("theme-light");
   }
-  localStorage.setItem("serveur_ilian_theme", normalized);
+  localStorage.setItem("serveur_hugo_theme", normalized);
 
   const btn = document.getElementById("theme_toggle_btn");
   if (btn) {
@@ -23,7 +23,7 @@ export function applyTheme(themeName) {
 }
 
 export function cycleTheme() {
-  const cur = localStorage.getItem("serveur_ilian_theme") || "dark";
+  const cur = localStorage.getItem("serveur_hugo_theme") || "dark";
   const next = cur === "dark" ? "light" : "dark";
   applyTheme(next);
 }

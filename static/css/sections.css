@@ -181,7 +181,7 @@ html[data-theme="light"] .sticky-topnav {
   line-height: 1.45;
 }
 
-/* Grille des applications externes (IlianTify, Jellyfin, Navidrome, FileBrowser...) */
+/* Grille des applications externes (HugoTify, Jellyfin, Navidrome, FileBrowser...) */
 .app-shortcuts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

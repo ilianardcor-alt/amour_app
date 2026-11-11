@@ -284,8 +284,8 @@ def create_snapshot(label="auto"):
 # ==============================================================================
 def get_jellyfin_headers(token=None):
     base_h = (
-        'MediaBrowser Client="ServeurHub", Device="DellLatitude", '
-        'DeviceId="dell-latitude-srv", Version="2.0.0"'
+        'MediaBrowser Client="ServeurHub", Device="PChugo", '
+        'DeviceId="pchugo-srv", Version="2.0.0"'
     )
     if token:
         base_h += f', Token="{token}"'
@@ -296,7 +296,7 @@ def get_jellyfin_token():
     base = "http://127.0.0.1:8096"
     r = requests.post(
         f"{base}/Users/AuthenticateByName",
-        json={"Username": "ilian", "Pw": JF_PASSWORD},
+        json={"Username": "hugo", "Pw": JF_PASSWORD},
         headers=get_jellyfin_headers(),
         timeout=5,
     )
@@ -322,7 +322,7 @@ def ensure_jellyfin_configured():
             requests.get(f"{base}/Startup/User", timeout=5)
             requests.post(
                 f"{base}/Startup/User",
-                json={"Name": "ilian", "Password": JF_PASSWORD},
+                json={"Name": "hugo", "Password": JF_PASSWORD},
                 timeout=5,
             )
             requests.post(f"{base}/Startup/Complete", timeout=5)
@@ -408,7 +408,7 @@ def get_adguard_session():
     try:
         s.post(
             f"http://127.0.0.1:{get_ag_port()}/control/login",
-            json={"name": "ilian", "password": JF_PASSWORD},
+            json={"name": "hugo", "password": JF_PASSWORD},
             timeout=3,
         )
     except Exception:
@@ -482,7 +482,7 @@ def go_adguard():
     try:
         r = requests.post(
             f"http://127.0.0.1:{port}/control/login",
-            json={"name": "ilian", "password": JF_PASSWORD},
+            json={"name": "hugo", "password": JF_PASSWORD},
             timeout=3,
         )
         agh_cookie = r.cookies.get("agh_session")
@@ -511,7 +511,7 @@ def api_permanent_bookmark():
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Portail Serveur Ilian (Lien Fixe Permanent)</title>
+<title>Portail Serveur Hugo (Lien Fixe Permanent)</title>
 <style>
 body{{background:#090d16;color:#f8fafc;font-family:-apple-system,Segoe UI,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;text-align:center;padding:20px}}
 .box{{background:#1e293b;border:1px solid #38bdf8;border-radius:16px;padding:24px;max-width:420px;width:100%}}
@@ -520,7 +520,7 @@ a{{display:block;background:#0284c7;color:#fff;padding:12px;border-radius:10px;t
 </head>
 <body>
 <div class="box">
-<h2 style="color:#38bdf8;margin-top:0">🚀 Connexion au Serveur d'Ilian...</h2>
+<h2 style="color:#38bdf8;margin-top:0">🚀 Connexion au Serveur de Hugo...</h2>
 <p id="st" style="color:#94a3b8;font-size:13px">Recherche automatique du lien 4G/5G ou Wi-Fi actif...</p>
 <div id="links"></div>
 </div>
@@ -2035,7 +2035,7 @@ def trigger_navidrome_scan():
     """Déclenche un scan rapide de Navidrome pour rafraîchir Amperfy immédiatement."""
     try:
         requests.get(
-            "http://127.0.0.1:4533/rest/startScan.view?u=ilian&v=1.16.1&c=hub&f=json",
+            "http://127.0.0.1:4533/rest/startScan.view?u=hugo&v=1.16.1&c=hub&f=json",
             headers={"X-ND-Client-Unique-Id": "hub"},
             timeout=3,
         )
@@ -3584,6 +3584,7 @@ def api_stream_healer_run():
     return jsonify({"ok": True, **cfg})
 
 
+@app.route("/hugotify")
 @app.route("/iliantify")
 def iliantify_app():
     """Sert la WebApp musicale autonome IlianTify (Clone Spotify/Deezer iOS)."""
@@ -3605,9 +3606,9 @@ def iliantify_icon():
 def manifest_iliantify():
     return jsonify(
         {
-            "name": "IlianTify Music",
-            "short_name": "IlianTify",
-            "description": "Application de streaming et téléchargement musical personnel d'Ilian (Mode Hors-Ligne inclus)",
+            "name": "HugoTify Music",
+            "short_name": "HugoTify",
+            "description": "Application de streaming et téléchargement musical personnel de Hugo (Mode Hors-Ligne inclus)",
             "start_url": "/iliantify",
             "scope": "/",
             "display": "standalone",
@@ -4053,7 +4054,7 @@ def api_backups_download_zip():
         mem,
         mimetype="application/zip",
         as_attachment=True,
-        download_name=f"Serveur_Ilian_Backup_{ts}.zip",
+        download_name=f"Serveur_Hugo_Backup_{ts}.zip",
     )
 
 
@@ -4583,7 +4584,7 @@ def publish_tunnel_url():
             requests.post(
                 f"https://ntfy.sh/{NTFY_TOPIC}",
                 data=u.encode("utf-8"),
-                headers={"Title": "Portail 4G/5G Serveur Ilian", "Click": u},
+                headers={"Title": "Portail 4G/5G Serveur Hugo", "Click": u},
                 timeout=6,
             )
     except Exception:

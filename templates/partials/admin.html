@@ -56,7 +56,7 @@
         <select id="ide_file_sel" aria-label="Fichier à modifier" onchange="loadCodeFile()" style="flex:1">
           <option value="templates\index.html">🌐 templates\index.html (Template Principal Jinja2)</option>
           <option value="static\css\style.css">🎨 static\css\style.css (Feuille de style principale)</option>
-          <option value="music_app.html">🎧 music_app.html (Application IlianTify)</option>
+          <option value="music_app.html">🎧 music_app.html (Application HugoTify)</option>
           <option value="hub.py">🐍 hub.py (Serveur Python & API)</option>
           <option value="sources_config.json">🛠️ sources_config.json (Sources Streaming)</option>
           <option value="watchdog.ps1">🛡️ watchdog.ps1 (Maintien en vie & Tunnels)</option>
@@ -97,7 +97,7 @@
         <b style="display:block;margin-bottom:8px">🍎 Connexion SSH depuis le Terminal Mac ou VS Code :</b>
         <div class="copy-input-group">
           <label for="mac_ssh_cmd" class="sr-only">Commande SSH</label>
-          <input id="mac_ssh_cmd" type="text" readonly value="ssh ilian@192.168.1.22" onclick="this.select()">
+          <input id="mac_ssh_cmd" type="text" readonly value="ssh hpigr@192.168.1.22" onclick="this.select()">
           <button type="button" class="btn-secondary btn-sm" onclick="copyLinkWithFeedback(document.getElementById('mac_ssh_cmd').value, 'Commande SSH')">📋 Copier</button>
         </div>
       </div>

@@ -50,7 +50,7 @@ export function renderRemoteLinksPanel(st) {
             <button type="button" class="btn-secondary btn-sm" onclick="copyLinkWithFeedback('${escJs(localUrl)}', 'À la maison')" aria-label="Copier le lien à la maison" title="Copier le lien">📋 Copier</button>
           </div>
         </div>
-        <a href="${escHtml(localUrl)}/iliantify" class="btn btn-secondary btn-sm btn-block" style="text-decoration:none">🎧 Ouvrir IlianTify sur le réseau local</a>
+        <a href="${escHtml(localUrl)}/hugotify" class="btn btn-secondary btn-sm btn-block" style="text-decoration:none">🎧 Ouvrir HugoTify sur le réseau local</a>
       </div>
 
       <!-- OPTION 2 : HORS DE CHEZ VOUS -->
@@ -112,13 +112,13 @@ export function renderTailscaleStatus(ts) {
     if (badge) badge.textContent = `🟢 Actif : ${ts.ip}`;
     if (stTitle) stTitle.innerHTML = `🟢 Accès permanent actif — Adresse fixe : <code>${ts.ip}</code>`;
     if (stSub) {
-      stSub.innerHTML = `Portail : <a href="http://${ts.ip}:5000">http://${ts.ip}:5000</a> • IlianTify : <a href="http://${ts.ip}:5000/iliantify">http://${ts.ip}:5000/iliantify</a>`;
+      stSub.innerHTML = `Portail : <a href="http://${ts.ip}:5000">http://${ts.ip}:5000</a> • HugoTify : <a href="http://${ts.ip}:5000/hugotify">http://${ts.ip}:5000/hugotify</a>`;
     }
     if (btn) btn.textContent = "✅ Serveur connecté";
     if (tutoLinks) {
       tutoLinks.innerHTML =
         `• Portail : <a href="http://${ts.ip}:5000">http://${ts.ip}:5000</a><br>` +
-        `• IlianTify : <a href="http://${ts.ip}:5000/iliantify">http://${ts.ip}:5000/iliantify</a><br>` +
+        `• HugoTify : <a href="http://${ts.ip}:5000/hugotify">http://${ts.ip}:5000/hugotify</a><br>` +
         `• Jellyfin : <a href="http://${ts.ip}:8096">http://${ts.ip}:8096</a>`;
     }
   } else if (ts.auth_url) {

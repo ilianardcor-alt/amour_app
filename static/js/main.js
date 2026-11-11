@@ -187,7 +187,7 @@ function initNavigationObserver() {
 
 // Initialisation au chargement du DOM
 document.addEventListener("DOMContentLoaded", () => {
-  applyTheme(localStorage.getItem("serveur_ilian_theme") || "dark");
+  applyTheme(localStorage.getItem("serveur_hugo_theme") || "dark");
   updateXpClock();
   setInterval(updateXpClock, 15000);
   initNavigationObserver();
