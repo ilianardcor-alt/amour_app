@@ -95,8 +95,13 @@ def _load_secrets():
 
 
 _SECRETS = _load_secrets()
+_WIN_USER = (os.environ.get("USERNAME") or "hpigr").strip()
+_DEFAULT_ADMIN = "ilian" if (_WIN_USER.lower() == "ilian" or "dell" in socket.gethostname().lower()) else "hugo"
+ADMIN_USER = (_SECRETS.get("admin_user") or _DEFAULT_ADMIN).strip().lower()
+OWNER_NAME = "Ilian" if ADMIN_USER == "ilian" else "Hugo"
+APP_MUSIC_NAME = "IlianTify" if ADMIN_USER == "ilian" else "HugoTify"
 JF_PASSWORD = os.environ.get("JF_PASSWORD") or _SECRETS.get("jellyfin_password", "")
-NTFY_TOPIC = os.environ.get("NTFY_TOPIC") or _SECRETS.get("ntfy_topic", "")
+NTFY_TOPIC = os.environ.get("NTFY_TOPIC") or _SECRETS.get("ntfy_topic", f"serveur_{ADMIN_USER}_ntfy")
 
 for _d in [
     STATIC_DIR,
@@ -3616,9 +3621,12 @@ def api_stream_healer_run():
 @app.route("/hugotify")
 @app.route("/iliantify")
 def iliantify_app():
-    """Sert la WebApp musicale autonome IlianTify (Clone Spotify/Deezer iOS)."""
+    """Sert la WebApp musicale autonome (HugoTify sur le PC de Hugo, IlianTify sur le PC d'Ilian)."""
     if os.path.exists(ILIANTIFY_HTML_FILE):
-        return open(ILIANTIFY_HTML_FILE, encoding="utf-8", errors="ignore").read()
+        html = open(ILIANTIFY_HTML_FILE, encoding="utf-8", errors="ignore").read()
+        if ADMIN_USER == "ilian":
+            html = html.replace("HugoTify", "IlianTify").replace("Serveur Hugo", "Serveur Ilian").replace("de Hugo", "d'Ilian")
+        return html
     return redirect("/")
 
 
@@ -3823,7 +3831,14 @@ def api_music_favorites():
 def index():
     tpl_index = os.path.join(TEMPLATES_DIR, "index.html")
     if os.path.exists(tpl_index):
-        return render_template("index.html")
+        html = render_template("index.html")
+        if ADMIN_USER == "ilian":
+            html = (
+                html.replace("HugoTify", "IlianTify")
+                .replace("/hugotify", "/iliantify")
+                .replace("ssh hpigr@192.168.1.22", f"ssh {_WIN_USER}@{get_local_ips().split(',')[0].strip()}")
+            )
+        return html
     return open(HTML_FILE, encoding="utf-8", errors="ignore").read()
 
 
@@ -4621,6 +4636,15 @@ def publish_tunnel_url():
 
 
 def startup_maintenance():
+    try:
+        nd_toml = os.path.join(BASE_DIR, "navidrome", "navidrome.toml")
+        if os.path.exists(nd_toml):
+            txt = open(nd_toml, encoding="utf-8").read()
+            new_txt = re.sub(r"DevAutoLoginUsername\s*=\s*['\"][^'\"]+['\"]", f"DevAutoLoginUsername = '{ADMIN_USER}'", txt)
+            if new_txt != txt:
+                open(nd_toml, "w", encoding="utf-8").write(new_txt)
+    except Exception:
+        pass
     cleanup_existing_music()
     ensure_jellyfin_configured()
     publish_tunnel_url()
