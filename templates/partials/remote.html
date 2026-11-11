@@ -1,0 +1,48 @@
+<!-- SECTION ACCÈS À DISTANCE : 3 OPTIONS INDÉPENDANTES (« À LA MAISON », « HORS DE CHEZ VOUS », « ACCÈS PERMANENT ») -->
+<section class="card" id="sec_remote" aria-labelledby="title_remote">
+  <h2>
+    <span id="title_remote">🌐 Accès à distance au serveur</span>
+    <button type="button" class="btn-secondary btn-sm" onclick="toggleTailscaleCard()">🛡️ Configurer l'accès permanent</button>
+  </h2>
+  <p class="sub">Choisissez l'option qui correspond à votre situation actuelle et copiez le lien en un clic :</p>
+
+  <div id="links_panel">
+    <div class="remote-steps-grid">
+      <div class="remote-card skeleton" style="height:180px"></div>
+      <div class="remote-card skeleton" style="height:180px"></div>
+      <div class="remote-card skeleton" style="height:180px"></div>
+    </div>
+  </div>
+
+  <!-- TIROIR DE CONFIGURATION TAILSCALE (ACCÈS PERMANENT) -->
+  <div id="sec_tailscale" class="status-box" style="display:none;margin-top:var(--space-2)">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:var(--space-2)">
+      <div>
+        <b id="ts_state_title" style="font-size:var(--text-base)">🛡️ Accès permanent (VPN privé Tailscale)</b>
+        <div id="ts_state_sub" style="font-size:var(--text-sm);color:var(--text-secondary)">Une adresse privée qui reste identique même après redémarrage du serveur.</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button type="button" id="ts_connect_btn" class="btn-primary btn-sm" onclick="connectTailscaleNow(this)">🔗 Connecter le serveur</button>
+        <button type="button" class="btn-ghost btn-sm" onclick="toggleTailscaleCard(false)">✖️ Fermer</button>
+      </div>
+    </div>
+    <div class="remote-steps-grid">
+      <div class="remote-card">
+        <b>1. Sur ce serveur</b>
+        <p class="sub" style="margin:0">Cliquez sur « Connecter le serveur » et identifiez-vous avec votre compte Google, Apple ou GitHub.</p>
+      </div>
+      <div class="remote-card">
+        <b>2. Sur votre téléphone ou ordinateur</b>
+        <p class="sub" style="margin:0">Installez l'application gratuite Tailscale et connectez-vous avec le même compte.</p>
+      </div>
+      <div class="remote-card">
+        <b>3. Vos adresses permanentes</b>
+        <div id="ts_links_tuto" style="font-size:var(--text-sm);color:var(--text-secondary)">
+          Portail : <code>http://100.x.y.z:5000</code><br>
+          IlianTify : <code>http://100.x.y.z:5000/iliantify</code><br>
+          Jellyfin : <code>http://100.x.y.z:8096</code>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

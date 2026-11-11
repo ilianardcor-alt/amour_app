@@ -1,0 +1,21 @@
+<!-- SECTION BIBLIOTHÈQUE : FILTRE SEGMENTÉ & ÉTAT VIDE ILLUSTRÉ AVEC ACTION (Point 10) -->
+<section class="card" id="sec_library" aria-labelledby="title_library">
+  <div id="sec_files" class="sr-only" aria-hidden="true"></div>
+  <h2>
+    <span id="title_library">🗂️ Ma bibliothèque sur le serveur</span>
+    <button type="button" class="btn-secondary btn-sm" onclick="loadFiles()">🔄 Actualiser</button>
+  </h2>
+  <p class="sub">Consultez les fichiers présents sur le disque, lancez la lecture directe ou supprimez un dossier après l'avoir regardé.</p>
+
+  <div class="segmented-control" role="tablist" aria-label="Filtrer par catégorie de média">
+    <button type="button" id="fcat_all" class="seg-btn active" role="tab" aria-selected="true" onclick="setFilesFilter('all')">📂 Tout</button>
+    <button type="button" id="fcat_animes" class="seg-btn" role="tab" aria-selected="false" onclick="setFilesFilter('animes')">🎌 Animés</button>
+    <button type="button" id="fcat_series" class="seg-btn" role="tab" aria-selected="false" onclick="setFilesFilter('series')">📺 Séries</button>
+    <button type="button" id="fcat_films" class="seg-btn" role="tab" aria-selected="false" onclick="setFilesFilter('films')">🍿 Films</button>
+    <button type="button" id="fcat_musique" class="seg-btn" role="tab" aria-selected="false" onclick="setFilesFilter('musique')">🎵 Musique</button>
+  </div>
+
+  <div id="files_list" aria-live="polite">
+    <div class="skeleton" style="height:120px"></div>
+  </div>
+</section>
