@@ -1,8 +1,7 @@
 /**
- * STYLE.CSS — Feuille de style principale du serveur multimédia
- * Regroupe le Design System (tokens), la base typographique (>=16px/14px, AA), les composants et les sections.
+ * STYLE.CSS — Point d'entrée unique de la feuille de style du tableau de bord
  */
-@import url("./tokens.css");
-@import url("./base.css");
-@import url("./components.css");
-@import url("./sections.css");
+@import url("./tokens.css?v=6");
+@import url("./base.css?v=6");
+@import url("./components.css?v=6");
+@import url("./sections.css?v=6");

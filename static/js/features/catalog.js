@@ -1,11 +1,11 @@
 /**
  * FEATURE / CATALOG — Catalogue Films, Séries & Animés, choix de langue et sources
  */
-import { api } from "../core/api.js";
-import { store } from "../core/state.js";
-import { escJs, escHtml } from "../core/utils.js";
-import { markBtnValidated, showToast } from "../ui/feedback.js";
-import { updateStatus, notifyDownloadStarted } from "./status.js";
+import { api } from "../core/api.js?v=6";
+import { store } from "../core/state.js?v=6";
+import { escJs, escHtml } from "../core/utils.js?v=6";
+import { markBtnValidated, showToast } from "../ui/feedback.js?v=6";
+import { updateStatus, notifyDownloadStarted } from "./status.js?v=6";
 
 export function clearMediaSearchInput() {
   const inp = document.getElementById("ms_query");

@@ -1,11 +1,11 @@
 /**
  * FEATURE / SOCIAL — Téléchargement direct par lien (YouTube, TikTok, X / Twitter, Instagram)
  */
-import { api } from "../core/api.js";
-import { escJs, escHtml } from "../core/utils.js";
-import { markBtnValidated, showToast, askConfirm } from "../ui/feedback.js";
-import { updateStatus, notifyDownloadStarted } from "./status.js";
-import { loadFiles } from "./library.js";
+import { api } from "../core/api.js?v=6";
+import { escJs, escHtml } from "../core/utils.js?v=6";
+import { markBtnValidated, showToast, confirmAction } from "../ui/feedback.js?v=6";
+import { updateStatus, notifyDownloadStarted } from "./status.js?v=6";
+import { loadFiles } from "./library.js?v=6";
 
 let currentSocialFormat = "mp4";
 
@@ -107,10 +107,13 @@ export async function loadSocialDownloads() {
 }
 
 export async function deleteSocialFile(path, name) {
-  const confirmed = await askConfirm(
-    "Supprimer ce fichier ?",
-    `Voulez-vous supprimer « ${name} » du serveur ?`
-  );
+  const confirmed = await confirmAction({
+    title: "Supprimer ce fichier ?",
+    message: `Voulez-vous supprimer « ${name} » du serveur ?`,
+    confirmLabel: "Supprimer",
+    cancelLabel: "Annuler",
+    danger: true,
+  });
   if (!confirmed) return;
   await api.deleteFile(path);
   showToast(`🗑️ « ${name} » supprimé.`, "info");
