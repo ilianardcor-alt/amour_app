@@ -5,6 +5,8 @@
 export function escJs(str) {
   return String(str || "")
     .replace(/\\/g, "\\\\")
+    .replace(/\r/g, " ")
+    .replace(/\n/g, " ")
     .replace(/'/g, "\\'")
     .replace(/"/g, "&quot;");
 }

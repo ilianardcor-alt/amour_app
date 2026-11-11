@@ -124,7 +124,7 @@ export function renderMediaItems(items) {
     box.innerHTML =
       `<div class="poster-strip">` +
       items
-        .map((it) => {
+        .map((it, idx) => {
           const typeLabel =
             it.media_type === "anime"
               ? "🎌 Animé"
@@ -135,7 +135,7 @@ export function renderMediaItems(items) {
           const platformLabel = it.badge
             ? `${it.badge}${it.year && it.year !== "VF/VOSTFR" ? " • " + it.year : ""}`
             : it.year || "Catalogue HD";
-          const clickCall = `openMediaPanel('${escJs(it.id)}', '${escJs(it.media_type)}', '${escJs(it.title)}', '${escJs(it.year)}', '${escJs(it.imdb_id)}', '${escJs(it.url || "")}', '${escJs(it.synopsis || "")}')`;
+          const clickCall = `openMediaPanelByIndex(${idx})`;
           return `
           <div class="poster-card" role="button" tabindex="0" onclick="${clickCall}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();${clickCall}}">
             <div class="poster-img-wrap">
@@ -162,7 +162,7 @@ export function renderMediaItems(items) {
   box.innerHTML =
     `<div class="poster-grid-expanded">` +
     items
-      .map((it) => {
+      .map((it, idx) => {
         const typeLabel =
           it.media_type === "anime"
             ? "🎌 Animé"
@@ -180,13 +180,28 @@ export function renderMediaItems(items) {
             </div>
             <div class="synopsis">${escHtml(it.synopsis || "")}</div>
           </div>
-          <button type="button" class="btn-secondary btn-sm" onclick="openMediaPanel('${escJs(it.id)}', '${escJs(it.media_type)}', '${escJs(it.title)}', '${escJs(it.year)}', '${escJs(it.imdb_id)}', '${escJs(it.url || "")}', '${escJs(it.synopsis || "")}')">
+          <button type="button" class="btn-primary btn-sm" onclick="openMediaPanelByIndex(${idx})">
             + Ajouter
           </button>
         </div>`;
       })
       .join("") +
     `</div>`;
+}
+
+export function openMediaPanelByIndex(idx) {
+  const it = (store.catalogItems || [])[idx];
+  if (!it) return;
+  openMediaPanel(
+    it.id || "",
+    it.media_type || "movie",
+    it.title || "Média",
+    it.year || "",
+    it.imdb_id || "",
+    it.url || "",
+    it.synopsis || "",
+    true
+  );
 }
 
 function buildLangPillBarHtml() {
@@ -262,13 +277,21 @@ export function renderAnimeSeasonsByLang() {
       (s) => `
       <div class="season-btn">
         <div><b>${escHtml(s.name)}</b> <span class="badge badge-anime">${escHtml(s.lang.toUpperCase())}</span></div>
-        <button type="button" class="btn-primary btn-sm" onclick="openAnimeSeasonEpisodes('${escJs(title)}', '${escJs(s.name)} (${s.lang.toUpperCase()})', '${escJs(s.js_url)}')">🎞️ Épisodes</button>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button type="button" class="btn-green btn-sm" onclick="startEpDl('${escJs(title)}', '${escJs(s.name)} (${s.lang.toUpperCase()})', '${escJs(s.js_url)}', 1, 1, this)">📥 Lancer Ép. 1</button>
+          <button type="button" class="btn-primary btn-sm" onclick="openAnimeSeasonEpisodes('${escJs(title)}', '${escJs(s.name)} (${s.lang.toUpperCase()})', '${escJs(s.js_url)}')">🎞️ Choisir épisodes</button>
+        </div>
       </div>`
     )
     .join("");
+
+  if (matching.length > 0) {
+    const first = matching[0];
+    openAnimeSeasonEpisodes(title, `${first.name} (${first.lang.toUpperCase()})`, first.js_url);
+  }
 }
 
-export async function openMediaPanel(id, mediaType, title, year, imdbId, animeUrl, synopsis) {
+export async function openMediaPanel(id, mediaType, title, year, imdbId, animeUrl, synopsis, autoStartMovie = false) {
   const panel = document.getElementById("media_action_panel");
   if (!panel) return;
   store.currentPanelCtx = { id, mediaType, title, year, imdbId, animeUrl, synopsis };
@@ -276,6 +299,7 @@ export async function openMediaPanel(id, mediaType, title, year, imdbId, animeUr
   if (mediaType === "anime") {
     const targetUrl = animeUrl || id.replace(/^anime:/, "");
     panel.innerHTML = "<div class='season-box'>⏳ Analyse des saisons VF / VOSTFR / VO...</div>";
+    panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
     const data = await api.getAnimeSeasons(targetUrl);
     store.currentAnimeSeasons = data.seasons || [];
     panel.innerHTML = `
@@ -304,10 +328,15 @@ export async function openMediaPanel(id, mediaType, title, year, imdbId, animeUr
         <input type="text" id="custom_media_url" placeholder="Optionnel : Lien direct hébergeur (uqload, vidmoly, voe, mp4, m3u8)..." style="margin-bottom:8px">
         <button type="button" id="movie_dl_btn_main" class="btn-green btn-block" onclick="triggerMediaDownload('movie', '${escJs(title)}', '${escJs(year)}', 1, 1, 1, '${escJs(imdbId)}', this)">📥 Télécharger le Film en ${store.selectedMediaLang.toUpperCase()} (Jellyfin)</button>
       </div>`;
+    panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    if (autoStartMovie) {
+      triggerMediaDownload("movie", title, year, 1, 1, 1, imdbId, document.getElementById("movie_dl_btn_main"));
+    }
     return;
   }
 
   panel.innerHTML = "<div class='season-box'>⏳ Chargement des saisons et épisodes...</div>";
+  panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
   const data = await api.getSeriesEpisodes(id, title);
   store.currentSeriesSeasons = data.seasons || [];
   const sOpts = store.currentSeriesSeasons

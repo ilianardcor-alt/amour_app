@@ -53,6 +53,16 @@ BASE_DIR = os.environ.get("SERVEUR_DIR", os.path.dirname(os.path.abspath(__file_
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 app = Flask(__name__, static_folder=STATIC_DIR, static_url_path="/static", template_folder=TEMPLATES_DIR)
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
+app.config["TEMPLATES_AUTO_RELOAD"] = True
+
+
+@app.after_request
+def _add_no_cache_headers(response):
+    if request.path == "/" or request.path.startswith("/static/"):
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+    return response
 
 BIN_DIR = os.path.join(BASE_DIR, "bin")
 BACKUP_DIR = os.path.join(BASE_DIR, "backups")
@@ -947,7 +957,9 @@ def resolve_direct_stream(embed_url):
         # 2. VidMoly & Ansembed (lecteur principal Anime-Sama 1080p)
         if any(h in u_low for h in ["vidmoly.", "ansembed."]):
             u_target = u.replace("vidmoly.to", "vidmoly.net")
-            r = scraper.get(u_target, headers={"Referer": "https://anime-sama.to/"}, timeout=12)
+            r = scraper.get(u_target, headers={"Referer": "https://anime-sama.to/"}, timeout=6)
+            if r.status_code >= 400:
+                return "", ""
             combined = r.text + "\n" + unpack_p_a_c_k_e_d(r.text)
             m = re.search(
                 r'(https?://[^"\'\s<>]+\.(?:m3u8|mp4)[^"\'\s<>]*)', combined
@@ -955,10 +967,13 @@ def resolve_direct_stream(embed_url):
             if m:
                 ref_host = re.match(r"(https?://[^/]+/)", u_target).group(1)
                 return m.group(1), ref_host
+            return "", ""
 
         # 3. Uqload (.vc, .to, .io, .net, .co) avec décompresseur JS p,a,c,k,e,d
         if "uqload." in u_low:
-            r = scraper.get(u, headers={"Referer": "https://anime-sama.to/"}, timeout=12)
+            r = scraper.get(u, headers={"Referer": "https://anime-sama.to/"}, timeout=6)
+            if r.status_code >= 400:
+                return "", ""
             combined = r.text + "\n" + unpack_p_a_c_k_e_d(r.text)
             m = re.search(
                 r'(https?://[^"\'\s<>]+\.(?:m3u8|mp4)[^"\'\s<>]*)', combined
@@ -983,7 +998,9 @@ def resolve_direct_stream(embed_url):
                 "lulu.st",
             ]
         ):
-            r = scraper.get(u, headers={"Referer": "https://anime-sama.to/"}, timeout=12)
+            r = scraper.get(u, headers={"Referer": "https://anime-sama.to/"}, timeout=6)
+            if r.status_code >= 400:
+                return "", ""
             combined = r.text + "\n" + unpack_p_a_c_k_e_d(r.text)
             m = re.search(
                 r'(https?://[^"\'\s<>]+\.(?:m3u8|mp4)[^"\'\s<>]*)', combined
@@ -1192,7 +1209,7 @@ def download_with_progress(embed_url, out_path, media_type="episode", min_durati
     ]
     # Filtre anti-bande-annonce directement dans yt-dlp si c'est une recherche !
     if direct_url.startswith("ytsearch"):
-        cmd.extend(["--match-filter", f"duration >= {min_duration_sec} & !is_live"])
+        cmd.extend(["--match-filter", f"duration >= {min_duration_sec} & !is_live", "--max-downloads", "1"])
     elif referer:
         cmd.extend(["--referer", referer])
     cmd.append(direct_url)
@@ -1224,7 +1241,7 @@ def download_with_progress(embed_url, out_path, media_type="episode", min_durati
             write_log(f"[YT-DLP] {line_s}")
     CURRENT_PROC.wait()
 
-    if not os.path.exists(out_path) or last_err:
+    if not os.path.exists(out_path) or os.path.getsize(out_path) < 1048576:
         if os.path.exists(out_path):
             try:
                 os.remove(out_path)
@@ -1314,6 +1331,9 @@ def season_download_worker(title, season_name, js_url, start_ep, end_ep, target_
     safe_dir = os.path.join(base_folder, clean_t, f"Season {s_num:02d}")
     os.makedirs(safe_dir, exist_ok=True)
     STATUS["title"] = f"{clean_t} - Saison {s_num:02d}"
+    STATUS["step"] = f"🔍 Récupération des lecteurs HD pour {clean_t}..."
+    STATUS["percent"] = 0
+    STATUS["speed"] = "-"
     try:
         episodes = parse_episodes_js(js_url)
         # Récupère aussi l'autre langue (VOSTFR <-> VF) en secours si un lecteur est mort
@@ -1343,6 +1363,8 @@ def season_download_worker(title, season_name, js_url, start_ep, end_ep, target_
                 for alt_u in alt_episodes[idx]:
                     if alt_u not in candidate_embeds:
                         candidate_embeds.append(alt_u)
+            candidate_embeds.append(f"ytsearch3:{clean_t} Saison {s_num} Episode {ep_num} VF complet")
+            candidate_embeds.append(f"ytsearch3:{clean_t} Saison {s_num} Episode {ep_num} VOSTFR complet")
 
             ep_ok = False
             for p_i, embed in enumerate(candidate_embeds, 1):
@@ -1671,8 +1693,10 @@ def discover_embed_candidates(
                 ]
 
         for ep_u in embed_pages:
+            if "multiembed" in ep_u:
+                continue
             try:
-                resp = scraper.get(ep_u, timeout=7)
+                resp = scraper.get(ep_u, timeout=2.5)
                 combined_txt = resp.text + "\n" + unpack_p_a_c_k_e_d(resp.text)
                 found_hosts = re.findall(
                     r'(https?://(?:uqload|vidmoly|ansembed|smoothpre|movearnpre|oneupload|voe|vidoza|videzz|lulustream|luluvdo|dood|ds2play|sendvid|video\.sibnet)[^"\'\s<>]+)',
@@ -1778,7 +1802,9 @@ def media_download_worker(
             os.makedirs(target_dir, exist_ok=True)
             out_file = os.path.join(target_dir, f"{clean_t} [{lang_tag}].mp4")
             STATUS["title"] = f"🍿 Film ({lang_tag}) : {folder_label}"
+            STATUS["step"] = f"🔍 Recherche des sources vidéo ({lang_tag}) pour {clean_t}..."
             STATUS["percent"] = 0
+            STATUS["speed"] = "-"
 
             sources = (
                 [custom_url.strip()]
@@ -1821,6 +1847,9 @@ def media_download_worker(
             target_dir = os.path.join(SERIES_DIR, clean_t, f"Season {s_num:02d}")
             os.makedirs(target_dir, exist_ok=True)
             STATUS["title"] = f"📺 {clean_t} - Saison {s_num:02d} ({lang_tag})"
+            STATUS["step"] = f"🔍 Recherche des sources vidéo ({lang_tag}) pour {clean_t}..."
+            STATUS["percent"] = 0
+            STATUS["speed"] = "-"
 
             for ep_num in range(ep_s, ep_e + 1):
                 if STATUS["stop"]:

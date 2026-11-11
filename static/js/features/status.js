@@ -9,6 +9,7 @@ import { renderStreamHealerBar } from "./catalog.js";
 
 let dockDismissedForTitle = null;
 let dockAutoHideTimer = null;
+let optimisticStartUntil = 0;
 
 function formatDiskCapacity(gb) {
   const num = Number(gb) || 0;
@@ -31,6 +32,7 @@ export function dismissFloatingDock() {
 
 export function notifyDownloadStarted(label = "Téléchargement en cours...") {
   dockDismissedForTitle = null;
+  optimisticStartUntil = Date.now() + 6000;
   if (dockAutoHideTimer) {
     clearTimeout(dockAutoHideTimer);
     dockAutoHideTimer = null;
@@ -50,9 +52,9 @@ export function notifyDownloadStarted(label = "Téléchargement en cours...") {
   const dlTitle = document.getElementById("dl_title");
   if (dlTitle) dlTitle.textContent = label;
   const dlStep = document.getElementById("dl_step");
-  if (dlStep) dlStep.textContent = "⏳ Démarrage du téléchargement...";
+  if (dlStep) dlStep.textContent = "⏳ Démarrage et recherche de la meilleure source...";
   const dlBar = document.getElementById("dl_bar");
-  if (dlBar) dlBar.style.width = "4%";
+  if (dlBar) dlBar.style.width = "6%";
   const dlPct = document.getElementById("dl_pct");
   if (dlPct) dlPct.textContent = "0%";
   const dlSpeed = document.getElementById("dl_speed");
@@ -64,14 +66,14 @@ export function notifyDownloadStarted(label = "Téléchargement en cours...") {
   const dockTitle = document.getElementById("dock_dl_title");
   if (dockTitle) dockTitle.textContent = label;
   const dockStep = document.getElementById("dock_dl_step");
-  if (dockStep) dockStep.textContent = "⏳ Démarrage du téléchargement...";
+  if (dockStep) dockStep.textContent = "⏳ Démarrage et recherche de la meilleure source...";
   const dockBadge = document.getElementById("dock_dl_badge");
   if (dockBadge) {
     dockBadge.textContent = "⏳ En cours";
     dockBadge.className = "badge badge-warning";
   }
   const dockBar = document.getElementById("dock_dl_bar");
-  if (dockBar) dockBar.style.width = "4%";
+  if (dockBar) dockBar.style.width = "6%";
   const dockPct = document.getElementById("dock_dl_pct");
   if (dockPct) dockPct.textContent = "0%";
   const dockSpeed = document.getElementById("dock_dl_speed");
@@ -79,7 +81,7 @@ export function notifyDownloadStarted(label = "Téléchargement en cours...") {
   const spinner = document.getElementById("dock_spinner");
   if (spinner) spinner.style.display = "inline-block";
 
-  showToast(`📥 Ajouté aux téléchargements : ${label}`, "success");
+  showToast(`📥 Téléchargement lancé : ${label}`, "success");
 }
 
 export async function copyLogs() {
@@ -110,6 +112,8 @@ export async function stopDownload() {
     danger: true,
   });
   if (!ok) return;
+
+  optimisticStartUntil = 0;
 
   // Remise à zéro immédiate de l'interface vers l'état vide cohérent
   const emptyBox = document.getElementById("dl_empty_state");
@@ -179,7 +183,7 @@ export async function updateStatus() {
     renderTailscaleStatus(st.tailscale);
     renderStreamHealerBar(st.stream_healer);
 
-    const mainIp = (st.ips || "192.168.1.33").split(",")[0].trim();
+    const mainIp = (st.ips || "192.168.1.22").split(",")[0].trim();
     const macSsh = document.getElementById("mac_ssh_cmd");
     if (macSsh && mainIp) {
       if (macSsh.tagName === "INPUT") {
@@ -189,29 +193,36 @@ export async function updateStatus() {
       }
     }
 
+    // Si on vient tout juste de lancer un téléchargement (< 6s), on garde l'affichage optimiste actif
+    const isOptimisticActive = !st.active && Date.now() < optimisticStartUntil;
+    const effectiveActive = st.active || isOptimisticActive;
+
     // 2. Zone Téléchargements cohérente (Point 5 : État vide OU Carte de progression)
     const qTxt = st.queue_count > 0 ? ` (+${st.queue_count} en attente)` : "";
     const emptyBox = document.getElementById("dl_empty_state");
     const activeCard = document.getElementById("dl_active_card");
     const dlState = document.getElementById("dl_state");
 
-    if (st.active) {
+    if (effectiveActive) {
+      if (st.active) optimisticStartUntil = 0;
       if (emptyBox) emptyBox.style.display = "none";
       if (activeCard) activeCard.style.display = "block";
       if (dlState) {
         dlState.textContent = `⏳ En cours${qTxt}`;
         dlState.className = "badge badge-warning";
       }
-      const dlTitle = document.getElementById("dl_title");
-      if (dlTitle) dlTitle.textContent = st.title || "Téléchargement en cours";
-      const dlStep = document.getElementById("dl_step");
-      if (dlStep) dlStep.textContent = st.step || "Téléchargement...";
-      const dlBar = document.getElementById("dl_bar");
-      if (dlBar) dlBar.style.width = `${st.percent || 0}%`;
-      const dlPct = document.getElementById("dl_pct");
-      if (dlPct) dlPct.textContent = `${st.percent || 0}%`;
-      const dlSpeed = document.getElementById("dl_speed");
-      if (dlSpeed) dlSpeed.textContent = st.speed || "-";
+      if (st.active) {
+        const dlTitle = document.getElementById("dl_title");
+        if (dlTitle) dlTitle.textContent = st.title || "Téléchargement en cours";
+        const dlStep = document.getElementById("dl_step");
+        if (dlStep) dlStep.textContent = st.step || "Téléchargement...";
+        const dlBar = document.getElementById("dl_bar");
+        if (dlBar) dlBar.style.width = `${Math.max(4, st.percent || 0)}%`;
+        const dlPct = document.getElementById("dl_pct");
+        if (dlPct) dlPct.textContent = `${st.percent || 0}%`;
+        const dlSpeed = document.getElementById("dl_speed");
+        if (dlSpeed) dlSpeed.textContent = st.speed || "-";
+      }
     } else {
       if (activeCard) activeCard.style.display = "none";
       if (emptyBox) emptyBox.style.display = "flex";
@@ -219,12 +230,16 @@ export async function updateStatus() {
         dlState.textContent = "Aucun téléchargement";
         dlState.className = "badge badge-neutral";
       }
+      const idleNote = document.getElementById("dl_idle_note");
+      if (idleNote && st.step && st.step !== "Prêt.") {
+        idleNote.textContent = st.step;
+      }
     }
 
     // 3. Synchronisation du Dock Flottant
     const dock = document.getElementById("floating_dl_dock");
     if (dock) {
-      if (st.active) {
+      if (effectiveActive) {
         if (dockAutoHideTimer) {
           clearTimeout(dockAutoHideTimer);
           dockAutoHideTimer = null;
@@ -232,23 +247,25 @@ export async function updateStatus() {
         if (dockDismissedForTitle !== st.title) {
           dock.style.display = "block";
         }
-        const dockTitle = document.getElementById("dock_dl_title");
-        if (dockTitle) dockTitle.textContent = (st.title || "Téléchargement") + qTxt;
-        const dockStep = document.getElementById("dock_dl_step");
-        if (dockStep) dockStep.textContent = st.step || "Téléchargement en cours...";
-        const dockBadge = document.getElementById("dock_dl_badge");
-        if (dockBadge) {
-          dockBadge.textContent = "⏳ En cours" + qTxt;
-          dockBadge.className = "badge badge-warning";
+        if (st.active) {
+          const dockTitle = document.getElementById("dock_dl_title");
+          if (dockTitle) dockTitle.textContent = (st.title || "Téléchargement") + qTxt;
+          const dockStep = document.getElementById("dock_dl_step");
+          if (dockStep) dockStep.textContent = st.step || "Téléchargement en cours...";
+          const dockBadge = document.getElementById("dock_dl_badge");
+          if (dockBadge) {
+            dockBadge.textContent = "⏳ En cours" + qTxt;
+            dockBadge.className = "badge badge-warning";
+          }
+          const dockPct = document.getElementById("dock_dl_pct");
+          if (dockPct) dockPct.textContent = `${st.percent || 0}%`;
+          const dockSpeed = document.getElementById("dock_dl_speed");
+          if (dockSpeed) dockSpeed.textContent = st.speed || "-";
+          const dockBar = document.getElementById("dock_dl_bar");
+          if (dockBar) dockBar.style.width = `${Math.max(4, st.percent || 0)}%`;
+          const spinner = document.getElementById("dock_spinner");
+          if (spinner) spinner.style.display = "inline-block";
         }
-        const dockPct = document.getElementById("dock_dl_pct");
-        if (dockPct) dockPct.textContent = `${st.percent || 0}%`;
-        const dockSpeed = document.getElementById("dock_dl_speed");
-        if (dockSpeed) dockSpeed.textContent = st.speed || "-";
-        const dockBar = document.getElementById("dock_dl_bar");
-        if (dockBar) dockBar.style.width = `${Math.max(4, st.percent || 0)}%`;
-        const spinner = document.getElementById("dock_spinner");
-        if (spinner) spinner.style.display = "inline-block";
       } else if (dock.style.display !== "none") {
         if ((st.step || "").includes("arrêté")) {
           dock.style.display = "none";
@@ -270,7 +287,7 @@ export async function updateStatus() {
             dockAutoHideTimer = setTimeout(() => {
               dock.style.display = "none";
               dockAutoHideTimer = null;
-            }, 3500);
+            }, 4000);
           }
         }
       }
