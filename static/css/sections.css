@@ -749,3 +749,244 @@ details.sources-details > summary::-webkit-details-marker {
 @keyframes dlSpin {
   to { transform: rotate(360deg); }
 }
+
+/* ==========================================================================
+   TÉLÉCHARGEUR PAR LIEN (YOUTUBE / TIKTOK / X) & APERÇU DES QUALITÉS
+   ========================================================================== */
+.social-url-bar input {
+  padding-right: 345px;
+}
+.social-probe-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+.social-probe-thumb {
+  width: 128px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  flex-shrink: 0;
+  background: var(--bg-input);
+}
+.social-probe-meta {
+  flex: 1;
+  min-width: 0;
+}
+.social-probe-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: var(--space-1);
+  border-top: 1px solid var(--border-subtle);
+}
+.social-file-item {
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+}
+.social-file-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   VERSION TÉLÉPHONE MOBILE (iOS / Android <= 768px & <= 580px)
+   ========================================================================== */
+@media (hover: none), (max-width: 768px) {
+  /* Sur écran tactile (sans souris), affiche un bandeau "+ Ajouter" discret en bas de chaque affiche */
+  .poster-hover-cta {
+    opacity: 1;
+    inset: auto 0 0 0;
+    height: auto;
+    padding: 6px;
+    background: linear-gradient(to top, rgba(11, 17, 32, 0.94) 65%, transparent);
+  }
+  .poster-hover-cta .btn {
+    min-height: 34px;
+    padding: 4px 10px;
+    font-size: var(--text-xs);
+    width: 100%;
+  }
+  .carousel-nav-btn {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-bottom: calc(82px + env(safe-area-inset-bottom, 0px));
+  }
+  .sticky-topnav {
+    padding: max(8px, env(safe-area-inset-top, 8px)) 12px 8px 12px;
+  }
+  .topnav-online-badge {
+    display: none;
+  }
+  .mobile-bottom-nav {
+    padding: 4px 4px calc(6px + env(safe-area-inset-bottom, 0px)) 4px;
+    background: rgba(17, 24, 39, 0.96);
+    backdrop-filter: blur(14px);
+  }
+  html[data-theme="light"] .mobile-bottom-nav {
+    background: rgba(255, 255, 255, 0.96);
+  }
+  .mobile-bottom-nav a {
+    min-width: 48px;
+    padding: 4px 4px;
+    font-size: 0.78rem;
+  }
+
+  /* Sélecteurs segmentés : glissement horizontal fluide au doigt sur téléphone */
+  .segmented-control {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .segmented-control::-webkit-scrollbar {
+    display: none;
+  }
+  .seg-btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 8px 12px;
+  }
+
+  /* Champ de recherche et barre de lien adaptés à l'écran téléphone */
+  .search-integrated-wrap {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .search-integrated-wrap input,
+  .social-url-bar input {
+    padding-right: 14px;
+    width: 100%;
+  }
+  .search-integrated-actions {
+    position: static;
+    transform: none;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .search-integrated-actions .btn-primary {
+    flex: 1 1 auto;
+  }
+  .search-clear-btn {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-default);
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .floating-dl-dock {
+    bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+    width: calc(100vw - 16px);
+    padding: 12px;
+  }
+}
+
+@media (max-width: 580px) {
+  .wrap {
+    padding: 12px 10px;
+    gap: 14px;
+  }
+  h1 {
+    font-size: 1.25rem;
+  }
+  h2 {
+    font-size: 1.1rem;
+  }
+
+  /* Grille 2x2 compacte sur téléphone pour les 4 cartes d'accueil et les raccourcis d'apps */
+  .home-actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .home-action-card {
+    padding: 12px;
+    min-height: 96px;
+    gap: 8px;
+  }
+  .home-action-title-group {
+    font-size: 0.92rem;
+    gap: 8px;
+  }
+  .home-action-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
+  }
+  .home-action-desc {
+    font-size: 0.8rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .app-shortcuts-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .app-shortcut-btn {
+    padding: 10px 12px;
+    min-height: 56px;
+  }
+
+  /* Affiches de films/séries optimisées pour le swipe mobile */
+  .poster-card {
+    width: 144px;
+  }
+  .poster-img-wrap,
+  .poster-img-wrap img {
+    width: 144px;
+    height: 210px;
+  }
+
+  /* Cartes de résultats (Musique, Vidéos, Téléchargements par lien) empilées proprement */
+  .spot-card {
+    flex-wrap: wrap;
+  }
+  .spot-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+  .spot-actions button {
+    flex: 1;
+  }
+
+  .res-item,
+  .social-file-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .social-file-actions {
+    width: 100%;
+  }
+  .social-file-actions .btn-primary {
+    flex: 1;
+  }
+
+  .social-probe-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .social-probe-thumb {
+    width: 100%;
+    height: 150px;
+  }
+  .social-probe-actions button {
+    flex: 1 1 calc(50% - 6px);
+  }
+}

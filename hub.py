@@ -4618,10 +4618,147 @@ SOCIAL_DL_DIR = os.path.join(FILMS_DIR, "Videos_Web")
 os.makedirs(SOCIAL_DL_DIR, exist_ok=True)
 
 
-def social_download_worker(url, fmt="mp4"):
+@app.route("/manifest.json")
+def manifest_main_pwa():
+    return jsonify(
+        {
+            "name": f"Serveur Multimédia {OWNER_NAME}",
+            "short_name": f"Serveur {OWNER_NAME}",
+            "description": "Tableau de bord mobile et téléchargeur multimédia personnel",
+            "start_url": "/",
+            "scope": "/",
+            "display": "standalone",
+            "background_color": "#0b1120",
+            "theme_color": "#0b1120",
+            "orientation": "portrait-primary",
+            "icons": [
+                {
+                    "src": "/iliantify_icon.png",
+                    "sizes": "512x512",
+                    "type": "image/png",
+                    "purpose": "any maskable",
+                }
+            ],
+        }
+    )
+
+
+@app.route("/api/social_formats")
+def api_social_formats():
+    url = (request.args.get("url") or "").strip()
+    if not url or not url.lower().startswith(("http://", "https://")):
+        return jsonify({"ok": False, "error": "Lien invalide."})
+
+    ytdlp_bin = os.path.join(BIN_DIR, "yt-dlp.exe")
+    try:
+        r = subprocess.run(
+            [
+                ytdlp_bin,
+                "--no-playlist",
+                "--no-warnings",
+                "--no-check-certificate",
+                "--geo-bypass",
+                "--dump-single-json",
+                url,
+            ],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="ignore",
+            timeout=14,
+            env=get_env(),
+        )
+        if r.returncode != 0 or not (r.stdout or "").strip():
+            return jsonify({"ok": False, "error": "Impossible d'analyser les qualités de ce lien."})
+
+        info = json.loads(r.stdout.strip().splitlines()[-1])
+        title = info.get("title") or "Vidéo"
+        uploader = info.get("uploader") or info.get("channel") or info.get("extractor_key") or ""
+        dur_s = int(info.get("duration") or 0)
+        dur_str = f"{dur_s // 60}:{dur_s % 60:02d}" if dur_s else ""
+        thumb = info.get("thumbnail") or ""
+
+        heights = {}
+        for f in info.get("formats") or []:
+            vcodec = f.get("vcodec") or "none"
+            h = f.get("height")
+            if vcodec != "none" and isinstance(h, int) and h >= 144:
+                fps = int(f.get("fps") or 0)
+                sz = f.get("filesize") or f.get("filesize_approx") or 0
+                prev = heights.get(h, {"fps": 0, "size": 0})
+                heights[h] = {
+                    "fps": max(prev["fps"], fps),
+                    "size": max(prev["size"], int(sz or 0)),
+                }
+
+        sorted_h = sorted(heights.keys(), reverse=True)
+        max_h = sorted_h[0] if sorted_h else 1080
+        if max_h >= 2160:
+            max_tag = "4K UHD (2160p)"
+        elif max_h >= 1440:
+            max_tag = "2K QHD (1440p)"
+        elif max_h >= 1080:
+            max_tag = "Full HD (1080p)"
+        elif max_h >= 720:
+            max_tag = "HD (720p)"
+        else:
+            max_tag = f"{max_h}p"
+
+        qualities = [
+            {
+                "id": "best",
+                "label": f"🏆 Qualité Max ({max_tag})",
+                "badge": "Recommandé",
+            }
+        ]
+        standard_tiers = [
+            (2160, "2160p", "💎 4K (2160p)"),
+            (1440, "1440p", "✨ 2K (1440p)"),
+            (1080, "1080p", "🎬 1080p Full HD"),
+            (720, "720p", "📺 720p HD"),
+            (480, "480p", "📱 480p (Léger)"),
+            (360, "360p", "⚡ 360p (Rapide)"),
+        ]
+        for h_val, q_id, q_lbl in standard_tiers:
+            if any(ah >= h_val - 40 and ah <= h_val + 60 for ah in sorted_h):
+                meta = heights.get(h_val) or {}
+                fps_txt = " 60fps" if meta.get("fps", 0) >= 50 else ""
+                qualities.append({"id": q_id, "label": f"{q_lbl}{fps_txt}"})
+
+        if len(qualities) == 1:
+            qualities.extend(
+                [
+                    {"id": "1080p", "label": "🎬 1080p Full HD"},
+                    {"id": "720p", "label": "📺 720p HD"},
+                    {"id": "480p", "label": "📱 480p (Léger)"},
+                ]
+            )
+
+        qualities.append({"id": "mp3", "label": "🎵 Audio MP3 (320 kbps)"})
+
+        return jsonify(
+            {
+                "ok": True,
+                "title": title,
+                "uploader": uploader,
+                "duration": dur_str,
+                "thumbnail": thumb,
+                "max_height": max_h,
+                "max_label": max_tag,
+                "qualities": qualities,
+            }
+        )
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)})
+
+
+def social_download_worker(url, fmt="best"):
     global CURRENT_PROC
     STATUS["active"], STATUS["stop"], STATUS["error"] = True, False, ""
-    fmt = "mp3" if (fmt or "").lower() == "mp3" else "mp4"
+    q_choice = (fmt or "best").lower().strip()
+    if q_choice == "mp4":
+        q_choice = "best"
+
     u_low = (url or "").lower()
     if "tiktok.com" in u_low:
         plat = "TikTok"
@@ -4634,15 +4771,16 @@ def social_download_worker(url, fmt="mp4"):
     else:
         plat = "Lien Web"
 
-    STATUS["title"] = f"🔗 {plat} ({fmt.upper()})"
-    STATUS["step"] = f"🔍 Extraction du lien {plat}..."
+    q_display = "Qualité Max" if q_choice == "best" else q_choice.upper()
+    STATUS["title"] = f"🔗 {plat} ({q_display})"
+    STATUS["step"] = f"🔍 Extraction du lien {plat} en {q_display}..."
     STATUS["percent"] = 5
     STATUS["speed"] = "-"
     os.makedirs(SOCIAL_DL_DIR, exist_ok=True)
     ytdlp_bin = os.path.join(BIN_DIR, "yt-dlp.exe")
-    out_tmpl = os.path.join(SOCIAL_DL_DIR, "%(title).75B [%(extractor)s].%(ext)s")
 
-    if fmt == "mp3":
+    if q_choice == "mp3":
+        out_tmpl = os.path.join(SOCIAL_DL_DIR, "%(title).75B [Audio MP3].%(ext)s")
         cmd = [
             ytdlp_bin,
             "--no-playlist",
@@ -4659,6 +4797,26 @@ def social_download_worker(url, fmt="mp4"):
             url,
         ]
     else:
+        out_tmpl = os.path.join(SOCIAL_DL_DIR, "%(title).70B [%(height)sp].%(ext)s")
+        height_map = {
+            "2160p": 2160,
+            "4k": 2160,
+            "1440p": 1440,
+            "2k": 1440,
+            "1080p": 1080,
+            "720p": 720,
+            "480p": 480,
+            "360p": 360,
+        }
+        max_h = height_map.get(q_choice)
+        if max_h:
+            fmt_expr = f"bestvideo[height<={max_h}]+bestaudio/best[height<={max_h}]/best"
+            sort_expr = f"res:{max_h},fps,codec:h264:m4a"
+        else:
+            # Qualité Max sans plafond (4K / 2K / 1080p60)
+            fmt_expr = "bestvideo+bestaudio/best"
+            sort_expr = "res,fps,codec:h264:m4a"
+
         cmd = [
             ytdlp_bin,
             "--no-playlist",
@@ -4666,8 +4824,10 @@ def social_download_worker(url, fmt="mp4"):
             "--geo-bypass",
             "--concurrent-fragments",
             "4",
+            "-f",
+            fmt_expr,
             "-S",
-            "res:1080,codec:h264:m4a",
+            sort_expr,
             "--merge-output-format",
             "mp4",
             "--newline",
@@ -4702,7 +4862,7 @@ def social_download_worker(url, fmt="mp4"):
                     STATUS["percent"] = float(m_pct.group(1))
                 if m_spd:
                     STATUS["speed"] = m_spd.group(1)
-                STATUS["step"] = f"📥 Téléchargement {plat} ({fmt.upper()}) en cours..."
+                STATUS["step"] = f"📥 Téléchargement {plat} ({q_display}) en cours..."
             elif "Destination:" in ls:
                 fname = os.path.basename(ls.split("Destination:", 1)[1].strip())
                 STATUS["step"] = f"📥 {fname[:60]}"
@@ -4719,8 +4879,8 @@ def social_download_worker(url, fmt="mp4"):
             refresh_jellyfin_library()
             STATUS["percent"] = 100
             STATUS["speed"] = "-"
-            STATUS["step"] = f"✅ Vidéo {plat} ({fmt.upper()}) téléchargée !"
-            write_log(f"✅ Téléchargement par lien ({plat} / {fmt.upper()}) terminé.")
+            STATUS["step"] = f"✅ Vidéo {plat} ({q_display}) téléchargée !"
+            write_log(f"✅ Téléchargement par lien ({plat} / {q_display}) terminé.")
         else:
             STATUS["error"] = last_err[:120]
             STATUS["step"] = f"⚠️ Échec du lien {plat}."
@@ -4735,10 +4895,11 @@ def social_download_worker(url, fmt="mp4"):
 @app.route("/api/social_download", methods=["POST"])
 def api_social_download():
     url = (request.form.get("url") or "").strip()
-    fmt = (request.form.get("format") or "mp4").strip().lower()
+    fmt = (request.form.get("format") or "best").strip().lower()
     if not url or not url.lower().startswith(("http://", "https://")):
         return jsonify({"ok": False, "error": "Lien invalide."})
-    enqueue_download(f"🔗 Lien ({fmt.upper()})", social_download_worker, url, fmt)
+    q_lbl = "Qualité Max" if fmt in ("best", "mp4") else fmt.upper()
+    enqueue_download(f"🔗 Lien ({q_lbl})", social_download_worker, url, fmt)
     return jsonify({"ok": True, "queued": STATUS["queue_count"]})
 
 

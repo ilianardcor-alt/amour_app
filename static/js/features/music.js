@@ -1,12 +1,12 @@
 /**
  * FEATURE / MUSIC — Recherche musicale, aperçu audio 30s et synchronisation Deezer
  */
-import { api } from "../core/api.js?v=6";
-import { store } from "../core/state.js?v=6";
-import { escJs, escHtml } from "../core/utils.js?v=6";
-import { markBtnValidated, showToast } from "../ui/feedback.js?v=6";
-import { updateStatus, notifyDownloadStarted } from "./status.js?v=6";
-import { loadFiles } from "./library.js?v=6";
+import { api } from "../core/api.js?v=8";
+import { store } from "../core/state.js?v=8";
+import { escJs, escHtml } from "../core/utils.js?v=8";
+import { markBtnValidated, showToast } from "../ui/feedback.js?v=8";
+import { updateStatus, notifyDownloadStarted } from "./status.js?v=8";
+import { loadFiles } from "./library.js?v=8";
 
 export function clearMusicSearchInput() {
   const inp = document.getElementById("m_query");

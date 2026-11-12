@@ -1,43 +1,60 @@
-<!-- SECTION TÉLÉCHARGEMENT PAR LIEN (YOUTUBE, TIKTOK, X / TWITTER) -->
+<!-- SECTION TÉLÉCHARGEMENT PAR LIEN (YOUTUBE, TIKTOK, X / TWITTER) AVEC CHOIX DE QUALITÉ -->
 <section class="card" id="sec_social_dl">
-  <div class="card-title">
+  <div class="card-title" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
     <div>
       <h2>🔗 Télécharger via un lien (YouTube, TikTok, X / Twitter)</h2>
-      <p class="section-subtitle">Collez le lien d'une vidéo YouTube, TikTok, X (Twitter), Instagram ou Reddit pour la télécharger en MP4 HD ou en audio MP3</p>
+      <p class="sub" style="margin-bottom:4px">Collez un lien YouTube, TikTok, X (Twitter), Instagram ou Reddit, choisissez la qualité (jusqu'à 4K / Qualité Max) et téléchargez-le directement.</p>
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap">
-      <span class="badge badge-neutral">▶️ YouTube</span>
+      <span class="badge badge-neutral">▶️ YouTube 4K/HD</span>
       <span class="badge badge-neutral">🎵 TikTok</span>
       <span class="badge badge-neutral">🐦 X / Twitter</span>
     </div>
   </div>
 
-  <!-- Champ de lien avec bouton d'action intégré -->
-  <div class="search-integrated-wrap" style="margin-top:var(--space-2)">
+  <!-- Champ de lien avec boutons Coller, Analyser & Télécharger -->
+  <div class="search-integrated-wrap social-url-bar" style="margin-top:var(--space-2)">
     <label for="social_dl_url" class="sr-only">Lien de la vidéo YouTube, TikTok ou Twitter</label>
     <input
       id="social_dl_url"
       type="text"
-      placeholder="Collez votre lien ici (ex : https://www.youtube.com/watch?v=... ou https://www.tiktok.com/...)"
+      placeholder="Collez votre lien YouTube, TikTok ou X ici..."
+      onpaste="setTimeout(() => probeSocialLinkQualities(false), 120)"
       onkeydown="if(event.key==='Enter') startSocialLinkDownload(document.getElementById('social_dl_btn'))"
     >
     <div class="search-integrated-actions">
       <button type="button" class="search-clear-btn" onclick="clearSocialUrlInput()" aria-label="Effacer le lien" title="Effacer">✕</button>
+      <button type="button" class="btn-secondary btn-sm" onclick="pasteSocialUrlFromClipboard()" title="Coller depuis le presse-papiers">📋 Coller</button>
+      <button type="button" id="social_probe_btn" class="btn-secondary btn-sm" onclick="probeSocialLinkQualities(true)" title="Détecter toutes les résolutions disponibles sur ce lien">🔍 Qualités</button>
       <button type="button" id="social_dl_btn" class="btn-primary btn-sm" onclick="startSocialLinkDownload(this)">
         📥 Télécharger
       </button>
     </div>
   </div>
 
-  <!-- Sélecteur de format (Vidéo MP4 ou Audio MP3) -->
+  <!-- Sélecteur de qualité avant téléchargement (Qualité Max par défaut) -->
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:var(--space-2)">
-    <div class="segmented-control" role="tablist" aria-label="Format de téléchargement" style="margin-bottom:0">
-      <button type="button" id="sfmt_mp4" class="seg-btn active" role="tab" aria-selected="true" onclick="selectSocialFormat('mp4')">🎬 Vidéo MP4 (HD)</button>
-      <button type="button" id="sfmt_mp3" class="seg-btn" role="tab" aria-selected="false" onclick="selectSocialFormat('mp3')">🎵 Audio uniquement (MP3)</button>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;width:100%">
+      <span style="font-size:var(--text-xs);font-weight:700;color:var(--text-secondary)">🎚️ Qualité souhaitée :</span>
+      <div class="segmented-control" id="social_quality_bar" role="tablist" aria-label="Qualité de téléchargement" style="margin-bottom:0;flex:1">
+        <button type="button" id="sfmt_best" class="seg-btn active" role="tab" aria-selected="true" onclick="selectSocialFormat('best')">🏆 Qualité Max (4K / 1080p)</button>
+        <button type="button" id="sfmt_2160p" class="seg-btn" role="tab" aria-selected="false" onclick="selectSocialFormat('2160p')">💎 4K (2160p)</button>
+        <button type="button" id="sfmt_1440p" class="seg-btn" role="tab" aria-selected="false" onclick="selectSocialFormat('1440p')">✨ 2K (1440p)</button>
+        <button type="button" id="sfmt_1080p" class="seg-btn" role="tab" aria-selected="false" onclick="selectSocialFormat('1080p')">🎬 1080p Full HD</button>
+        <button type="button" id="sfmt_720p" class="seg-btn" role="tab" aria-selected="false" onclick="selectSocialFormat('720p')">📺 720p HD</button>
+        <button type="button" id="sfmt_480p" class="seg-btn" role="tab" aria-selected="false" onclick="selectSocialFormat('480p')">📱 480p (Léger)</button>
+        <button type="button" id="sfmt_mp3" class="seg-btn" role="tab" aria-selected="false" onclick="selectSocialFormat('mp3')">🎵 Audio MP3 (320k)</button>
+      </div>
     </div>
-    <button type="button" class="btn-ghost btn-sm" onclick="loadSocialDownloads()">🔄 Actualiser la liste</button>
   </div>
 
+  <!-- Aperçu dynamique de la vidéo et des qualités détectées sur le lien -->
+  <div id="social_probe_box" aria-live="polite"></div>
+
   <!-- Liste des vidéos téléchargées par lien (avec bouton Enregistrer sur mon appareil) -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:var(--space-1)">
+    <span style="font-size:var(--text-xs);color:var(--text-secondary)">Vos téléchargements rapides apparaissent ci-dessous :</span>
+    <button type="button" class="btn-ghost btn-sm" onclick="loadSocialDownloads()">🔄 Actualiser</button>
+  </div>
   <div id="social_dl_results"></div>
 </section>

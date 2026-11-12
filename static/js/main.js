@@ -1,9 +1,9 @@
 /**
  * MAIN.JS — Point d'entrée unique, initialisation et pont de non-régression window.*
  */
-import { escJs, openService } from "./core/utils.js?v=6";
-import { markBtnValidated } from "./ui/feedback.js?v=6";
-import { applyTheme, cycleTheme, updateXpClock } from "./features/theme.js?v=6";
+import { escJs, openService } from "./core/utils.js?v=8";
+import { markBtnValidated } from "./ui/feedback.js?v=8";
+import { applyTheme, cycleTheme, updateXpClock } from "./features/theme.js?v=8";
 import {
   copyLogs,
   clearLogs,
@@ -11,13 +11,13 @@ import {
   updateStatus,
   dismissFloatingDock,
   notifyDownloadStarted,
-} from "./features/status.js?v=6";
+} from "./features/status.js?v=8";
 import {
   copyLinkWithFeedback,
   toggleTailscaleCard,
   renderTailscaleStatus,
   connectTailscaleNow,
-} from "./features/remote.js?v=6";
+} from "./features/remote.js?v=8";
 import {
   clearMediaSearchInput,
   setActiveFilterBtn,
@@ -38,7 +38,7 @@ import {
   startRangeDl,
   renderStreamHealerBar,
   runStreamHealerNow,
-} from "./features/catalog.js?v=6";
+} from "./features/catalog.js?v=8";
 import {
   clearMusicSearchInput,
   toggleDeezerDrawer,
@@ -52,14 +52,14 @@ import {
   downloadMusicItem,
   playMusicPreview,
   stopMiniPreview,
-} from "./features/music.js?v=6";
+} from "./features/music.js?v=8";
 import {
   setFilesFilter,
   toggleFolderAcc,
   loadFiles,
   renderFileGroups,
   deleteFile,
-} from "./features/library.js?v=6";
+} from "./features/library.js?v=8";
 import {
   switchStudioTab,
   loadCodeFile,
@@ -74,14 +74,17 @@ import {
   quickTermPorts,
   quickTermLinks,
   restartServices,
-} from "./features/admin.js?v=6";
+} from "./features/admin.js?v=8";
 import {
   clearSocialUrlInput,
+  pasteSocialUrlFromClipboard,
   selectSocialFormat,
+  probeSocialLinkQualities,
   startSocialLinkDownload,
+  startSocialLinkDownloadWithQuality,
   loadSocialDownloads,
   deleteSocialFile,
-} from "./features/social.js?v=7";
+} from "./features/social.js?v=8";
 
 // Pont de rétrocompatibilité : expose toutes les fonctions attendues par le DOM
 Object.assign(window, {
@@ -151,8 +154,11 @@ Object.assign(window, {
   quickTermLinks,
   restartServices,
   clearSocialUrlInput,
+  pasteSocialUrlFromClipboard,
   selectSocialFormat,
+  probeSocialLinkQualities,
   startSocialLinkDownload,
+  startSocialLinkDownloadWithQuality,
   loadSocialDownloads,
   deleteSocialFile,
 });
@@ -180,7 +186,7 @@ function initNavigationObserver() {
     });
   });
 
-  const sections = ["sec_home", "sec_music", "sec_catalog", "sec_library", "sec_remote", "sec_admin"]
+  const sections = ["sec_home", "sec_music", "sec_catalog", "sec_library", "sec_remote", "sec_admin", "sec_social_dl"]
     .map((id) => document.getElementById(id))
     .filter(Boolean);
 

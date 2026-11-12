@@ -1,7 +1,7 @@
 /**
  * STYLE.CSS — Point d'entrée unique de la feuille de style du tableau de bord
  */
-@import url("./tokens.css?v=6");
-@import url("./base.css?v=6");
-@import url("./components.css?v=6");
-@import url("./sections.css?v=6");
+@import url("./tokens.css?v=8");
+@import url("./base.css?v=8");
+@import url("./components.css?v=8");
+@import url("./sections.css?v=8");

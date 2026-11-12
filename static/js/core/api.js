@@ -67,7 +67,9 @@ export const api = {
     fetch("/api/delete_file", { method: "POST", body: toFormData({ path }) }),
 
   // Téléchargement rapide par lien (YouTube, TikTok, X / Twitter)
-  downloadSocialLink: (url, format = "mp4") =>
+  probeSocialFormats: (url) =>
+    request(`/api/social_formats?url=${encodeURIComponent(url)}`),
+  downloadSocialLink: (url, format = "best") =>
     request("/api/social_download", {
       method: "POST",
       body: toFormData({ url, format }),

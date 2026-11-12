@@ -1,11 +1,11 @@
 /**
  * FEATURE / STATUS — Stockage intelligent (Go/To), Zone Téléchargements cohérente et Dock flottant
  */
-import { api } from "../core/api.js?v=6";
-import { copyTextToClipboard } from "../core/utils.js?v=6";
-import { confirmAction, showToast } from "../ui/feedback.js?v=6";
-import { renderTailscaleStatus, renderRemoteLinksPanel } from "./remote.js?v=6";
-import { renderStreamHealerBar } from "./catalog.js?v=6";
+import { api } from "../core/api.js?v=8";
+import { copyTextToClipboard } from "../core/utils.js?v=8";
+import { confirmAction, showToast } from "../ui/feedback.js?v=8";
+import { renderTailscaleStatus, renderRemoteLinksPanel } from "./remote.js?v=8";
+import { renderStreamHealerBar } from "./catalog.js?v=8";
 
 let dockDismissedForTitle = null;
 let dockAutoHideTimer = null;

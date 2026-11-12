@@ -1,9 +1,9 @@
 /**
  * FEATURE / REMOTE — 3 options d'accès à distance (« À la maison », « Hors de chez vous », « Accès permanent »)
  */
-import { api } from "../core/api.js?v=6";
-import { copyTextToClipboard, escJs, escHtml } from "../core/utils.js?v=6";
-import { showToast } from "../ui/feedback.js?v=6";
+import { api } from "../core/api.js?v=8";
+import { copyTextToClipboard, escJs, escHtml } from "../core/utils.js?v=8";
+import { showToast } from "../ui/feedback.js?v=8";
 
 export async function copyLinkWithFeedback(url, label = "Lien") {
   if (!url) {

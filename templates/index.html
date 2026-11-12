@@ -2,9 +2,16 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1120">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Mon Serveur">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/iliantify_icon.png">
   <title>Mon Serveur Multimédia — Tableau de bord</title>
-  <link rel="stylesheet" href="/static/css/style.css?v=6">
+  <link rel="stylesheet" href="/static/css/style.css?v=8">
 </head>
 <body>
   <a href="#main_content" class="sr-only">Aller au contenu principal</a>
@@ -21,11 +28,12 @@
         <a href="#sec_music" class="topnav-link" data-nav-sec="sec_music" role="menuitem">🎧 Musique</a>
         <a href="#sec_catalog" class="topnav-link" data-nav-sec="sec_catalog" role="menuitem">🍿 Vidéos</a>
         <a href="#sec_library" class="topnav-link" data-nav-sec="sec_library" role="menuitem">🗂️ Bibliothèque</a>
+        <a href="#sec_social_dl" class="topnav-link" data-nav-sec="sec_social_dl" role="menuitem">🔗 Liens YT/TikTok</a>
         <a href="#sec_remote" class="topnav-link" data-nav-sec="sec_remote" role="menuitem">🌐 Accès à distance</a>
         <a href="#sec_admin" class="topnav-link" data-nav-sec="sec_admin" role="menuitem">⚙️ Avancé</a>
       </div>
       <div style="display:flex;align-items:center;gap:8px">
-        <span class="badge badge-success" title="Serveur en ligne">🟢 En ligne</span>
+        <span class="badge badge-success topnav-online-badge" title="Serveur en ligne">🟢 En ligne</span>
         <button type="button" id="theme_toggle_btn" class="btn-secondary btn-sm" onclick="cycleTheme()" aria-label="Changer le thème clair ou sombre">☀️ Mode Clair</button>
       </div>
     </div>
@@ -59,6 +67,10 @@
       <span aria-hidden="true">🍿</span>
       <span>Vidéos</span>
     </a>
+    <a href="#sec_social_dl" data-nav-sec="sec_social_dl">
+      <span aria-hidden="true">🔗</span>
+      <span>Liens</span>
+    </a>
     <a href="#sec_library" data-nav-sec="sec_library">
       <span aria-hidden="true">🗂️</span>
       <span>Fichiers</span>
@@ -66,10 +78,6 @@
     <a href="#sec_remote" data-nav-sec="sec_remote">
       <span aria-hidden="true">🌐</span>
       <span>Distance</span>
-    </a>
-    <a href="#sec_admin" data-nav-sec="sec_admin">
-      <span aria-hidden="true">⚙️</span>
-      <span>Avancé</span>
     </a>
   </nav>
 
@@ -85,6 +93,6 @@
     </div>
   </div>
 
-  <script type="module" src="/static/js/main.js?v=7"></script>
+  <script type="module" src="/static/js/main.js?v=8"></script>
 </body>
 </html>

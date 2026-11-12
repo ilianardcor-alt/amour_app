@@ -1,11 +1,11 @@
 /**
  * FEATURE / ADMIN — Outils avancés (Console PowerShell, Éditeur de code, Sauvegardes)
  */
-import { api } from "../core/api.js?v=6";
-import { store } from "../core/state.js?v=6";
-import { escJs, escHtml } from "../core/utils.js?v=6";
-import { confirmAction, showToast } from "../ui/feedback.js?v=6";
-import { updateStatus } from "./status.js?v=6";
+import { api } from "../core/api.js?v=8";
+import { store } from "../core/state.js?v=8";
+import { escJs, escHtml } from "../core/utils.js?v=8";
+import { confirmAction, showToast } from "../ui/feedback.js?v=8";
+import { updateStatus } from "./status.js?v=8";
 
 export function switchStudioTab(tab) {
   ["term", "ide", "bk", "ag", "mac"].forEach((t) => {
